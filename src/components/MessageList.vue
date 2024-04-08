@@ -34,6 +34,7 @@ function RemoveChatMessage(id) {
 function RemoveAllChatMessages () {
   User.books = [];
 }
+
 function AddRandomChatMessage() {
   User.books.push(`Random message ${getRndInteger(1000, 9999)}`);
 }

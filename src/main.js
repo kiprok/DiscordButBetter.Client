@@ -8,8 +8,8 @@ import ChatView from "@/views/ChatView.vue";
 import FriendListView from "@/views/FriendListView.vue";
 
 const routes = [
-    {path: '/', component:ChatView},
-    {path: '/friends', component: FriendListView}
+    {path: '/', component: () => ChatView},
+    {path: '/friends', component: () => FriendListView}
 ];
 
 const router = createRouter({
