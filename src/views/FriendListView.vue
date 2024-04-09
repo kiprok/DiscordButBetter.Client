@@ -1,5 +1,9 @@
 <script setup>
 import ChatTopBar from "@/components/ChatTopBar.vue";
+import {useUserStore} from "@/stores/user.js";
+
+const userStore = useUserStore();
+
 
 </script>
 
@@ -11,7 +15,13 @@ import ChatTopBar from "@/components/ChatTopBar.vue";
       </h1>
     </ChatTopBar>
     <div>
-      content
+      <span v-if="userStore.conversations.length > 0">
+        {{userStore.conversations.length}} friends
+      </span>
+      <span v-else>
+        no friends
+      </span>
+
     </div>
   </div>
 </template>

@@ -1,8 +1,13 @@
 <script setup>
-function ToggleSideMenu(){
+import {useUserStore} from '@/stores/user.js';
+
+const userStore = useUserStore();
+
+function ToggleSideMenu() {
   let sideMenu = document.querySelector("#SideMenu")
   sideMenu.classList.toggle("hidden")
 }
+
 </script>
 
 <template>
@@ -14,15 +19,29 @@ function ToggleSideMenu(){
           Menu
         </h2>
       </div>
-      <div class="bg-purple-700 grow flex flex-col px-6">
-        <router-link @click="ToggleSideMenu" :to="{name: 'friendList'}">
+      <div class="bg-purple-700 grow flex flex-col px-2">
+        <router-link class="router-link"
+                     @click="ToggleSideMenu" :to="{name: 'friendList'}">
           Friends
         </router-link>
-        <router-link @click="ToggleSideMenu" :to="{name: 'chat'}">
-          chat
-        </router-link>
 
+        <router-link v-for="(conv,index) in userStore.conversations" :key="index"
+                     class="router-link" :to="{name: 'chat', params:{id: index}}"
+                     @click="ToggleSideMenu">
+          {{ conv.otherName }}
+        </router-link>
       </div>
     </div>
   </div>
 </template>
+
+
+<style scoped>
+.router-link {
+  @apply text-xl text-white hover:bg-gray-600/30 py-2 px-4 block transition-colors ease-in-out rounded-lg;
+}
+
+.router-link-exact-active {
+  @apply bg-gray-300/30;
+}
+</style>

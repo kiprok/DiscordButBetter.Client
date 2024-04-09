@@ -2,6 +2,10 @@
 
 import MessageList from "@/components/MessageList.vue";
 import ChatTopBar from "@/components/ChatTopBar.vue";
+import {useUserStore} from "@/stores/user.js";
+
+const userStore = useUserStore();
+
 </script>
 
 <template>
@@ -11,6 +15,6 @@ import ChatTopBar from "@/components/ChatTopBar.vue";
         Title
       </h1>
     </ChatTopBar>
-  <message-list />
+  <message-list :messages="userStore.conversations[$route.params.id].messages" />
   </div>
 </template>
