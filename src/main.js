@@ -4,12 +4,16 @@ import { createApp } from 'vue'
 import {createRouter,createWebHistory} from "vue-router";
 import App from './App.vue'
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
-import ChatView from "@/views/ChatView.vue";
-import FriendListView from "@/views/FriendListView.vue";
 
 const routes = [
-    {path: '/', component: () => ChatView},
-    {path: '/friends', component: () => FriendListView}
+    {
+        path: '/',
+        component: () => import('@/views/ChatView.vue'),
+        name: 'chat'},
+    {
+        path: '/friends',
+        component: () => import('@/views/FriendListView.vue'),
+        name: 'friendList'}
 ];
 
 const router = createRouter({

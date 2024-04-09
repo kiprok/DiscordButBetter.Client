@@ -1,11 +1,8 @@
 <script setup>
-import {library} from "@fortawesome/fontawesome-svg-core";
-import {faBars} from "@fortawesome/free-solid-svg-icons";
 import BookListItem from "@/components/MessageListItem.vue";
 import SimpleButton from "@/components/SimpleButton.vue";
 import {computed, reactive, ref} from "vue";
 import ChatTextBox from "@/components/ChatTextBox.vue";
-library.add(faBars)
 
 const User = reactive({
   name: "john smith",
