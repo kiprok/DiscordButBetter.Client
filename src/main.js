@@ -17,6 +17,7 @@ const router = createRouter({
     routes:routes
 });
 
+
 createApp(App)
     .component("font-awesome-icon", FontAwesomeIcon)
     .use(router)

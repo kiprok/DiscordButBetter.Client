@@ -1,8 +1,16 @@
 <script setup>
 
 import MessageList from "@/components/MessageList.vue";
+import ChatTopBar from "@/components/ChatTopBar.vue";
 </script>
 
 <template>
-  <message-list class="w-full h-full" />
+  <div class="w-full flex flex-col flex-nowrap">
+    <ChatTopBar>
+      <h1 class="text-white text-3xl font-bold">
+        Title
+      </h1>
+    </ChatTopBar>
+  <message-list />
+  </div>
 </template>
