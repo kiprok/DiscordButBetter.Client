@@ -1,8 +1,6 @@
 <script setup>
 import BookListItem from "@/components/MessageListItem.vue";
 import SimpleButton from "@/components/SimpleButton.vue";
-import {computed, reactive, ref} from "vue";
-import ChatTextBox from "@/components/ChatTextBox.vue";
 
 const props = defineProps(['messages']);
 
