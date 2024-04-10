@@ -43,8 +43,5 @@ function AddRandomChatMessage() {
                       @delete-book="RemoveChatMessage(index)"/>
       </ul>
     </div>
-    <div class="bg-gray-600 h-14 flex-none flex flex-row items-center px-6">
-      <ChatTextBox class="w-full" @send-chat-message="(message) => props.messages.push(message)"/>
-    </div>
   </div>
 </template>
