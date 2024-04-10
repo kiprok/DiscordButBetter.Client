@@ -4,20 +4,18 @@ import MessageList from "@/components/MessageList.vue";
 import ChatTopBar from "@/components/ChatTopBar.vue";
 import {useUserStore} from "@/stores/user.js";
 import ChatTextBox from "@/components/ChatTextBox.vue";
-import {reactive, watch} from "vue";
+import {ref, watch} from "vue";
 import {useRoute} from "vue-router";
 
-const route = useRoute()
+const route = useRoute();
 
 const userStore = useUserStore();
 
-const user = reactive({currentConversation: userStore.conversations[route.params.id]})
+const conversation = ref(userStore.conversations[route.params.id])
 
 watch(() => route.params.id, newId => {
-  user.currentConversation = userStore.conversations[newId]
+  conversation.value = userStore.conversations[newId];
 })
-
-
 
 </script>
 
@@ -25,12 +23,12 @@ watch(() => route.params.id, newId => {
   <div class="w-full flex flex-col flex-nowrap">
     <ChatTopBar>
       <h1 class="text-white text-3xl font-bold">
-        {{ user.currentConversation.otherName }}
+        {{ conversation.otherName }}
       </h1>
     </ChatTopBar>
-    <message-list :messages="user.currentConversation.messages"/>
+    <message-list :messages="conversation.messages"/>
     <div class="bg-gray-600 h-14 flex-none flex flex-row items-center px-6">
-      <ChatTextBox class="w-full" @send-chat-message="(message) => user.currentConversation.messages.push(message)"/>
+      <ChatTextBox class="w-full" @send-chat-message="(message) => conversation.messages.push(message)"/>
     </div>
   </div>
 </template>
