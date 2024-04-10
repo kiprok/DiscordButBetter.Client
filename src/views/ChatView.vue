@@ -11,10 +11,10 @@ const route = useRoute()
 
 const userStore = useUserStore();
 
-const convo = reactive({convo: userStore.conversations[route.params.id]})
+const user = reactive({currentConversation: userStore.conversations[route.params.id]})
 
 watch(() => route.params.id, newId => {
-  convo.convo = userStore.conversations[newId]
+  user.currentConversation = userStore.conversations[newId]
 })
 
 
@@ -25,12 +25,12 @@ watch(() => route.params.id, newId => {
   <div class="w-full flex flex-col flex-nowrap">
     <ChatTopBar>
       <h1 class="text-white text-3xl font-bold">
-        {{ convo.convo.otherName }}
+        {{ user.currentConversation.otherName }}
       </h1>
     </ChatTopBar>
-    <message-list :messages="convo.convo.messages"/>
+    <message-list :messages="user.currentConversation.messages"/>
     <div class="bg-gray-600 h-14 flex-none flex flex-row items-center px-6">
-      <ChatTextBox class="w-full" @send-chat-message="(message) => convo.convo.messages.push(message)"/>
+      <ChatTextBox class="w-full" @send-chat-message="(message) => user.currentConversation.messages.push(message)"/>
     </div>
   </div>
 </template>
