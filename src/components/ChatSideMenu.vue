@@ -19,7 +19,7 @@ function ToggleSideMenu() {
           Menu
         </h2>
       </div>
-      <div class="bg-purple-700 grow flex flex-col px-2">
+      <div class="bg-gray-500 grow flex flex-col px-2 overflow-auto">
         <router-link class="router-link"
                      @click="ToggleSideMenu" :to="{name: 'friendList'}">
           Friends
@@ -30,6 +30,11 @@ function ToggleSideMenu() {
                      @click="ToggleSideMenu">
           {{ conv.otherName }}
         </router-link>
+      </div>
+      <div class="w-full h-14 bg-gray-800 mt-auto flex-none">
+        <h2 class="text-white text-lg font-bold">
+          {{ userStore.userName }}
+        </h2>
       </div>
     </div>
   </div>

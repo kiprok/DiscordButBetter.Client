@@ -4,18 +4,16 @@ import MessageList from "@/components/MessageList.vue";
 import ChatTopBar from "@/components/ChatTopBar.vue";
 import {useUserStore} from "@/stores/user.js";
 import ChatTextBox from "@/components/ChatTextBox.vue";
-import {ref, watch} from "vue";
+import {computed} from "vue";
 import {useRoute} from "vue-router";
 
 const route = useRoute();
 
 const userStore = useUserStore();
+const conversation = computed(() => {
+  return userStore.conversations[route.params.id]
+});
 
-const conversation = ref(userStore.conversations[route.params.id])
-
-watch(() => route.params.id, newId => {
-  conversation.value = userStore.conversations[newId];
-})
 
 </script>
 
