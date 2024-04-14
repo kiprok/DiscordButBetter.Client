@@ -2,7 +2,6 @@
 import BookListItem from "@/components/MessageListItem.vue";
 import SimpleButton from "@/components/SimpleButton.vue";
 import {useUserStore} from "@/stores/user.js";
-import {reactive} from "vue";
 
 const props = defineProps(['convoId']);
 

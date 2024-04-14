@@ -3,7 +3,6 @@ import ChatTopBar from "@/components/ChatTopBar.vue";
 import {useUserStore} from "@/stores/user.js";
 import SimpleButton from "@/components/SimpleButton.vue";
 import {reactive, ref} from "vue";
-import {useRoute} from "vue-router";
 
 const userStore = useUserStore();
 

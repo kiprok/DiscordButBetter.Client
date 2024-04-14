@@ -1,6 +1,5 @@
 import {defineStore} from "pinia";
 import {reactive, ref} from "vue";
-import {createRouter as friends} from "vue-router";
 
 export const useUserStore = defineStore("user", () => {
 
