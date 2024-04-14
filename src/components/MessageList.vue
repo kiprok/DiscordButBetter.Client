@@ -1,24 +1,33 @@
 <script setup>
 import BookListItem from "@/components/MessageListItem.vue";
 import SimpleButton from "@/components/SimpleButton.vue";
+import {useUserStore} from "@/stores/user.js";
+import {reactive} from "vue";
 
-const props = defineProps(['messages']);
+const props = defineProps(['convoId']);
 
+const userStore = useUserStore();
 
 function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
 function RemoveChatMessage(id) {
-  props.messages.splice(id, 1);
+  userStore.DeleteMessage(id);
 }
 
 function RemoveAllChatMessages() {
-  props.messages.splice(0, props.messages.length);
+  userStore.DeleteAllMessages(props.convoId);
 }
 
 function AddRandomChatMessage() {
-  props.messages.push(`Random message ${getRndInteger(1000, 9999)}`);
+  userStore.SendMessage(props.convoId, {
+    senderId: userStore.myId,
+    convoId: props.convoId,
+    messageText: `person ${userStore.myUserName} says random message ${getRndInteger(1000, 9999)}`,
+    timeSend: Date.now(),
+    meta: {}
+  });
 }
 
 </script>
@@ -37,8 +46,8 @@ function AddRandomChatMessage() {
     </div>
     <div class="flex flex-col-reverse grow h-16 bg-gray-300 overflow-auto">
       <ul class="flex flex-col gap-2 p-4">
-        <BookListItem :key="index" v-for="(message, index) in props.messages" :title="message"
-                      @delete-book="RemoveChatMessage(index)"/>
+        <BookListItem :key="index" v-for="(message, index) in userStore.GetMessagesFromConversation(props.convoId)" :message="message"
+                      @delete-book="RemoveChatMessage(message.messageId)"/>
       </ul>
     </div>
   </div>

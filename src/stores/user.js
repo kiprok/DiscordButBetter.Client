@@ -30,7 +30,56 @@ export const useUserStore = defineStore("user", () => {
          */
     });
 
-    function AddUser(name, pfp){
+    const messages = reactive({
+        /*
+        "": {
+            messageId: "",
+            senderId: "",
+            convoId: "",
+            messageText: "",
+            timeSend: 0,
+            meta: {}
+        }
+         */
+    });
+
+    function SendMessage(convoId, message) {
+        let newId = crypto.randomUUID();
+        messages[newId] = {
+            messageId: newId,
+            senderId: message.senderId,
+            convoId: message.convoId,
+            messageText: message.messageText,
+            timeSend: message.timeSend,
+            meta: message.meta
+        };
+        conversations[message.convoId].messages.push(newId);
+        return newId;
+    }
+
+    function DeleteMessage(messageId) {
+        //this is insane
+        conversations[messages[messageId].convoId].messages.splice(conversations[messages[messageId].convoId].messages.indexOf(messageId), 1);
+
+        delete messages[messageId];
+    }
+
+    function DeleteAllMessages(convoId) {
+        for (let messageId in conversations[convoId].messages) {
+            delete messages[messageId];
+        }
+        conversations[convoId].messages.splice(0, conversations[convoId].messages.length);
+    }
+
+    function GetMessagesFromConversation(id) {
+        if(id in conversations) {
+            return conversations[id].messages.map(messageId => messages[messageId]);
+        }else{
+            return [];
+        }
+    }
+
+    function AddUser(name, pfp) {
         let id = crypto.randomUUID()
         users[id] = {
             userId: id,
@@ -41,14 +90,13 @@ export const useUserStore = defineStore("user", () => {
         return id;
     }
 
-    function AddFriend (userId){
+    function AddFriend(userId) {
         friends.push(userId);
     }
 
-    function GetFriends(){
+    function GetFriends() {
         return friends.map(friend => users[friend])
     }
-
 
 
     return {
@@ -58,8 +106,13 @@ export const useUserStore = defineStore("user", () => {
         users,
         friends,
         conversations,
+        messages,
         AddUser,
         AddFriend,
+        SendMessage,
+        DeleteMessage,
+        DeleteAllMessages,
+        GetMessagesFromConversation,
         GetFriends
     };
 })

@@ -3,6 +3,7 @@ import ChatTopBar from "@/components/ChatTopBar.vue";
 import {useUserStore} from "@/stores/user.js";
 import SimpleButton from "@/components/SimpleButton.vue";
 import {reactive, ref} from "vue";
+import {useRoute} from "vue-router";
 
 const userStore = useUserStore();
 
@@ -16,9 +17,8 @@ async function getFriends() {
   let newUser = await getUserResponse.json();
   let name = `${newUser.results[0].name.first} ${newUser.results[0].name.last}`;
   let picture = newUser.results[0].picture.thumbnail;
-  console.log(newUser.results[0]);
-
   let newUID = userStore.AddUser(name, picture);
+
   userStore.AddFriend(newUID);
 
   let newConvoId = crypto.randomUUID();
@@ -33,21 +33,17 @@ async function getFriends() {
   };
 
   for (let i = 0; i < 100; i++) {
-    userStore.conversations[newConvoId].messages.push(`person ${name} says random message ${i}`);
+    userStore.SendMessage(newConvoId, {
+      senderId: newUID,
+      convoId: newConvoId,
+      messageText: `person ${name} says random message ${i}`,
+      timeSend: Date.now(),
+      meta: {}
+    });
   }
 
-  console.log(userStore.users);
-
   //await new Promise((resolve) => setTimeout(resolve, 2000));
-
   _addingFriend.value = false;
-  // conversations.push({
-  //     otherName: `person ${i}`,
-  //     messages: []
-  // });
-  // for (let j = 0; j < 100; j++) {
-  //     conversations[i].messages.push(`person ${i} says random message ${j}`);
-  // }
 
 }
 
