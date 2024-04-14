@@ -7,7 +7,6 @@ function ToggleSideMenu() {
   let sideMenu = document.querySelector("#SideMenu")
   sideMenu.classList.toggle("hidden")
 }
-
 </script>
 
 <template>
@@ -24,17 +23,21 @@ function ToggleSideMenu() {
                      @click="ToggleSideMenu" :to="{name: 'friendList'}">
           Friends
         </router-link>
-
-        <router-link v-for="(conv,index) in userStore.conversations" :key="index"
-                     class="router-link" :to="{name: 'chat', params:{id: index}}"
+        <router-link v-for="(convo,index) in userStore.conversations" :key="index"
+                     class="router-link"
+                     :to="{name: 'chat', params:{id: convo.convoId}}"
                      @click="ToggleSideMenu">
-          {{ conv.otherName }}
+          <div class="flex flex-nowrap flex-row items-center gap-2">
+            <img :src="convo.convoPicture" alt="pfp" class="rounded-full size-10 flex-none">
+            <span>{{ convo.convoName }}</span>
+          </div>
         </router-link>
       </div>
       <div class="w-full h-14 bg-gray-800 mt-auto flex-none">
-        <h2 class="text-white text-lg font-bold">
-          {{ userStore.userName }}
-        </h2>
+        <div class="flex flex-nowrap flex-row items-center gap-2 h-full w-full">
+          <img :src="userStore.myProfilePicture" alt="pfp" class="rounded-full size-10 flex-none">
+          <span class="text-xl text-white">{{ userStore.myUserName }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -43,7 +46,7 @@ function ToggleSideMenu() {
 
 <style scoped>
 .router-link {
-  @apply text-xl text-white hover:bg-gray-600/30 py-2 px-4 block transition-colors ease-in-out rounded-lg;
+  @apply text-xl text-white hover:bg-gray-600/30 py-2 px-4 transition-colors ease-in-out rounded-lg;
 }
 
 .router-link-exact-active {

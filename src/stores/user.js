@@ -1,55 +1,65 @@
 import {defineStore} from "pinia";
 import {reactive, ref} from "vue";
-import {i} from "vite/dist/node/types.d-aGj9QkWt.js";
+import {createRouter as friends} from "vue-router";
 
 export const useUserStore = defineStore("user", () => {
 
-    const userName = ref('kiprok');
-    const userId = ref(0)
+    const myUserName = ref('kiprok');
+    const myId = crypto.randomUUID();
+    const myProfilePicture = ref("https://i.imgur.com/Y86bvSa.jpeg");
 
 
     const users = reactive({
         0: {
-            userId: userId,
-            userName: userName,
-            profilePicture: ""
+            userId: myId,
+            userName: myUserName,
+            profilePicture: myProfilePicture
         }
 
-    })
+    });
 
-    const conversations = reactive([])
+    const friends = reactive([]);
+    const conversations = reactive({
+        /*
+        convoId: "",
+        convoName: "",
+        convoType: 0, // 0 = private, 1 = group
+        convoPicture: "",
+        participants: [],
+        messages: []
+         */
+    });
 
-    for (let i = 1; i < 20; i++) {
+    function AddUser(name, pfp){
+        let id = crypto.randomUUID()
+        users[id] = {
+            userId: id,
+            userName: name,
+            profilePicture: pfp
+        };
 
-        // let getUser = fetch("https://randomuser.me/api/",
-        //     {
-        //         method: "GET",
-        //         headers: {
-        //             "Accept": "application/json"
-        //         }
-        //     })
-        //     .then(response => response.json())
-        //     .then(response => response);
-
-
-        users[i] = {
-            userId: i,
-            userName: `person ${i}`,
-            profilePicture: ""
-        }
-
-        conversations.push({
-            otherName: `person ${i}`,
-            messages: []
-        });
-        for (let j = 0; j < 100; j++) {
-            conversations[i].messages.push(`person ${i} says random message ${j}`);
-        }
+        return id;
     }
 
+    function AddFriend (userId){
+        friends.push(userId);
+    }
+
+    function GetFriends(){
+        return friends.map(friend => users[friend])
+    }
+
+
+
     return {
-        userName,
-        userId,
-        conversations
+        myUserName,
+        myId,
+        myProfilePicture,
+        users,
+        friends,
+        conversations,
+        AddUser,
+        AddFriend,
+        GetFriends
     };
 })
