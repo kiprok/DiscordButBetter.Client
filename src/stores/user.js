@@ -9,7 +9,7 @@ export const useUserStore = defineStore("user", () => {
 
 
     const users = reactive({
-        0: {
+        [myId]: {
             userId: myId,
             userName: myUserName,
             profilePicture: myProfilePicture
