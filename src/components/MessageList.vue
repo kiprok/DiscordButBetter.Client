@@ -13,6 +13,7 @@ function getRndInteger(min, max) {
 
 function RemoveChatMessage(id) {
   userStore.DeleteMessage(id);
+
 }
 
 function RemoveAllChatMessages() {

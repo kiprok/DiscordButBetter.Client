@@ -31,14 +31,17 @@ async function getFriends() {
     messages: []
   };
 
+  let lastMsgId = null;
+
   for (let i = 0; i < 100; i++) {
-    userStore.SendMessage(newConvoId, {
+    lastMsgId = userStore.SendMessage(newConvoId, {
       senderId: newUID,
       convoId: newConvoId,
       messageText: `person ${name} says random message ${i}`,
       timeSend: Date.now(),
-      meta: {}
+      meta: lastMsgId !== null ? {reply:{messageId: lastMsgId, userId: newUID}} : {}
     });
+
   }
 
   //await new Promise((resolve) => setTimeout(resolve, 2000));
