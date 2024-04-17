@@ -12,18 +12,22 @@ const timeSend = new Date(props.message.timeSend);
 
 const hasReply = props.message.meta.hasOwnProperty('reply');
 const repliedUserName = userStore.users[props.message.meta.reply?.userId]?.userName ?? "DELETED";
+const repliedMessage = userStore.messages[props.message.meta.reply?.messageId]?.messageText ?? "COULD NOT LOAD MESSAGE";
 
 library.add(faDeleteLeft)
 </script>
 
 <template>
   <li class="flex flex-col">
-    <div class="flex flex-row items-end" :class="{hidden: !hasReply}">
-      <div class="w-8 ml-6 h-3 border border-b-0 border-r-0 border-black rounded-tl"></div>
+    <div class="flex flex-row items-end text-nowrap truncate" :class="{hidden: !hasReply}">
+      <div class="w-8 ml-6 h-3 shrink-0 border border-b-0 border-r-0 border-black rounded-tl"></div>
       <div class="mb-0.5">
         <img :src="userStore.users[props.message.senderId].profilePicture" alt="profile picture"
              class="rounded-full size-4 inline mr-1">
-        <span class="text-xs">{{repliedUserName}}</span>
+        <span class=" ">
+          <span class="text-sm mr-0.5">{{ repliedUserName }}</span>
+          <span class="text-xs">{{ repliedMessage }}</span>
+        </span>
       </div>
     </div>
     <div class="flex flex-row justify-between border border-black">
