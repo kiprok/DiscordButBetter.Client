@@ -30,6 +30,14 @@ function AddRandomChatMessage() {
   });
 }
 
+function ScrollToMessage(messageId) {
+  let msgElement = document.querySelector(`#message-list [data-msg-id="${messageId}"]`);
+  msgElement.scrollIntoView({
+    block: 'center',
+    behavior: 'smooth'
+  });
+}
+
 </script>
 
 <template>
@@ -45,9 +53,12 @@ function AddRandomChatMessage() {
       </SimpleButton>
     </div>
     <div class="flex flex-col-reverse grow h-16 bg-gray-300 overflow-auto">
-      <ul class="flex flex-col gap-2 p-4">
-        <BookListItem :key="index" v-for="(message, index) in userStore.GetMessagesFromConversation(props.convoId)" :message="message"
-                      @delete-book="RemoveChatMessage(message.messageId)"/>
+      <ul class="flex flex-col gap-2 p-4" id="message-list">
+        <BookListItem :key="index" :data-msg-id="message.messageId"
+                      v-for="(message, index) in userStore.GetMessagesFromConversation(props.convoId)"
+                      :message="message"
+                      @delete-book="RemoveChatMessage(message.messageId)"
+                      @scroll-reply="ScrollToMessage"/>
       </ul>
     </div>
   </div>

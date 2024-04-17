@@ -39,9 +39,8 @@ async function getFriends() {
       convoId: newConvoId,
       messageText: `person ${name} says random message ${i}`,
       timeSend: Date.now(),
-      meta: lastMsgId !== null ? {reply:{messageId: lastMsgId, userId: newUID}} : {}
+      meta: lastMsgId !== null ? {reply: {messageId: lastMsgId, userId: newUID}} : {}
     });
-
   }
 
   //await new Promise((resolve) => setTimeout(resolve, 2000));
