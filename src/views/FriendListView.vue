@@ -2,11 +2,10 @@
 import ChatTopBar from "@/components/ChatTopBar.vue";
 import {useUserStore} from "@/stores/user.js";
 import SimpleButton from "@/components/SimpleButton.vue";
-import {reactive, ref} from "vue";
+import { ref} from "vue";
 
 const userStore = useUserStore();
 
-const friends = reactive(userStore.users);
 const _addingFriend = ref(false);
 
 async function getFriends() {

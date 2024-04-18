@@ -56,6 +56,27 @@ export const useUserStore = defineStore("user", () => {
             return newId;
         }
 
+        function GetUserById(id){
+            return users[id];
+        }
+
+        function GetMessageById(id) {
+            return messages[id];
+        }
+        function GetConversationById(id) {
+            return conversations[id];
+        }
+
+        function GetFriendList(){
+            console.log("Getting friends list");
+            return friends.map((friend) => users[friend]);
+        }
+
+        function GetALLConversations(){
+            console.log("Getting conversations");
+            return conversations;
+        }
+
         function DeleteMessage(messageId) {
             //this is insane
             conversations[messages[messageId].convoId].messages.splice(conversations[messages[messageId].convoId].messages.indexOf(messageId), 1);
@@ -112,6 +133,11 @@ export const useUserStore = defineStore("user", () => {
             DeleteMessage,
             DeleteAllMessages,
             GetMessagesFromConversation,
+            GetUserById,
+            GetConversationById,
+            GetMessageById,
+            GetALLConversations,
+            GetFriendList,
             GetFriends
         };
     }

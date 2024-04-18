@@ -1,7 +1,7 @@
 <script setup>
-import BookListItem from "@/components/MessageListItem.vue";
 import SimpleButton from "@/components/SimpleButton.vue";
 import {useUserStore} from "@/stores/user.js";
+import MessageListItem from "@/components/MessageListItem.vue";
 
 const props = defineProps(['convoId']);
 
@@ -32,6 +32,9 @@ function AddRandomChatMessage() {
 
 function ScrollToMessage(messageId) {
   let msgElement = document.querySelector(`#message-list [data-msg-id="${messageId}"]`);
+  if (!msgElement)
+    return;
+
   msgElement.scrollIntoView({
     block: 'center',
     behavior: 'smooth'
@@ -54,10 +57,10 @@ function ScrollToMessage(messageId) {
     </div>
     <div class="flex flex-col-reverse grow h-16 bg-gray-300 overflow-auto">
       <ul class="flex flex-col gap-2 p-4" id="message-list">
-        <BookListItem :key="index" :data-msg-id="message.messageId"
+        <message-list-item :key="index" :data-msg-id="message.messageId"
                       v-for="(message, index) in userStore.GetMessagesFromConversation(props.convoId)"
                       :message="message"
-                      @delete-book="RemoveChatMessage(message.messageId)"
+                      @delete-book="RemoveChatMessage"
                       @scroll-reply="ScrollToMessage"/>
       </ul>
     </div>

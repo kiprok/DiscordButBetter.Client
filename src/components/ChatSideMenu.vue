@@ -23,7 +23,7 @@ function ToggleSideMenu() {
                      @click="ToggleSideMenu" :to="{name: 'friendList'}">
           Friends
         </router-link>
-        <router-link v-for="(convo,index) in userStore.conversations" :key="index"
+        <router-link v-for="(convo,index) in userStore.GetALLConversations()" :key="index"
                      class="router-link"
                      :to="{name: 'chat', params:{id: convo.convoId}}"
                      @click="ToggleSideMenu">
