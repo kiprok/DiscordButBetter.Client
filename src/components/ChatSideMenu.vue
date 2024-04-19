@@ -10,7 +10,7 @@ function ToggleSideMenu() {
 </script>
 
 <template>
-  <div id="SideMenu" class="bg-green-600 row-span-3 absolute top-0 left-0 h-screen w-screen flex-none
+  <div id="SideMenu" class="z-10 bg-green-600 row-span-3 absolute top-0 left-0 h-screen w-screen flex-none
     hidden md:block md:w-72 md:h-full md:top-auto md:left-auto md:relative">
     <div class="w-full h-full flex flex-col">
       <div class="h-14 bg-gray-800 flex-none flex items-center p-4">

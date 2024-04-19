@@ -1,44 +1,46 @@
 <script setup>
 import SimpleButton from "@/components/SimpleButton.vue";
-import {library} from "@fortawesome/fontawesome-svg-core";
-import {faDeleteLeft} from "@fortawesome/free-solid-svg-icons";
 import {useUserStore} from "@/stores/user.js";
 import {computed} from "vue";
+import {useSendingMessageStore} from "@/stores/sendingMessage.js";
 
-const emits = defineEmits(['delete-book', 'scroll-reply'])
+const emits = defineEmits(['scroll-reply'])
 const props = defineProps(['message'])
 const userStore = useUserStore();
+const sendMessageStore = useSendingMessageStore();
 
 const timeSend = new Date(props.message.timeSend);
 
-const hasReply = computed(()=>{
-  return props.message.meta.hasOwnProperty('reply')
-});
-const replyId = computed(()=>{
-  return props.message.meta.reply?.messageId;
-});
-const replyUserId = computed(()=>{
-  return props.message.meta.reply?.userId;
-});
+const reply = computed(() => {
+  return userStore.GetMessageById(props.message.meta.reply?.messageId) ?? null;
+})
 
-library.add(faDeleteLeft);
+function RemoveChatMessage() {
+  userStore.DeleteMessage(props.message.messageId);
+  //sendMessageStore.replyTo = userStore.GetMessageById(props.message.messageId);
+}
+
+function ReplyToMessage() {
+  sendMessageStore.replyTo = userStore.GetMessageById(props.message.messageId);
+}
+
 </script>
 
 <template>
-  <li class="flex flex-col">
-    <div class="flex flex-row items-end" :class="{hidden: !hasReply}">
+  <li class="flex flex-col group relative">
+    <div class="flex flex-row items-end" v-if="reply">
       <div class="w-8 ml-6 h-3 shrink-0 border border-b-0 border-r-0 border-black rounded-tl"></div>
       <div class="mb-0.5 truncate">
-        <img :src="userStore.GetUserById(replyUserId)?.profilePicture" alt="profile picture"
+        <img :src="userStore.GetUserById(reply.senderId)?.profilePicture" alt="profile picture"
              class="rounded-full size-4 inline mr-1">
         <span class="hover:underline hover:text-white hover:cursor-pointer"
-              @click="$emit('scroll-reply',replyId)">
-          <span class="text-sm mr-0.5">{{ userStore.GetUserById(replyUserId)?.userName }}</span>
-          <span class="text-xs">{{ userStore.GetMessageById(replyId)?.messageText }}</span>
+              @click="$emit('scroll-reply',reply.messageId)">
+          <span class="text-sm mr-0.5">{{ userStore.GetUserById(reply.senderId)?.userName }}</span>
+          <span class="text-xs">{{ reply.messageText }}</span>
         </span>
       </div>
     </div>
-    <div class="flex flex-row justify-between border border-black">
+    <div class="flex flex-row justify-between border border-black relative">
       <img :src="userStore.GetUserById(props.message.senderId).profilePicture" alt="profile picture"
            class="rounded-full size-10 ml-1 mr-2 mt-0">
       <div class="flex flex-col grow w-12">
@@ -48,10 +50,16 @@ library.add(faDeleteLeft);
         </div>
         <span class="text-pretty break-words w-full">{{ props.message.messageText }}</span>
       </div>
-      <SimpleButton @click="$emit('delete-book',props.message.messageId)" class="flex-none px-1 py-1 gap-4 h-fit">
-        <span class="hidden sm:inline">delete </span>
-        <font-awesome-icon icon="fa-solid fa-delete-left"/>
-      </SimpleButton>
+      <div class="opacity-0 group-hover:opacity-100 absolute right-0 -top-8 h-8 bg-black/50 rounded-t-lg p-1
+    group-hover:ease-in-out duration-300
+    flex items-center">
+        <SimpleButton @click="ReplyToMessage" class="px-1 py-1 gap-4 h-fit">
+          <i class="fa-solid fa-reply"></i>
+        </SimpleButton>
+        <SimpleButton @click="RemoveChatMessage" class="px-1 py-1 gap-4 h-fit">
+          <i class="fa-solid fa-delete-left"></i>
+        </SimpleButton>
+      </div>
     </div>
   </li>
 </template>

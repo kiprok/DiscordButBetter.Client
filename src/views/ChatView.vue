@@ -3,13 +3,15 @@
 import MessageList from "@/components/MessageList.vue";
 import ChatTopBar from "@/components/ChatTopBar.vue";
 import {useUserStore} from "@/stores/user.js";
+import {useSendingMessageStore} from "@/stores/sendingMessage.js";
 import ChatTextBox from "@/components/ChatTextBox.vue";
-import { watch} from "vue";
+import {watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
+const sendMessageStore = useSendingMessageStore();
 
 if (route.params.id in userStore.GetALLConversations() === false) {
   router.push({name: "friendList"});
@@ -21,14 +23,26 @@ watch(() => route.params.id, newId => {
     router.push({name: "friendList"});
 })
 
-function SendChatMessage(message) {
-  userStore.SendMessage(route.params.id, {
+function SendChatMessage() {
+  let messageToSend = {
     senderId: userStore.myId,
     convoId: route.params.id,
-    messageText: message,
+    messageText: sendMessageStore.messageText,
     timeSend: Date.now(),
     meta: {}
-  });
+  };
+
+  if (sendMessageStore.replyTo) {
+    messageToSend.meta['reply'] = {
+      messageId: sendMessageStore.replyTo.messageId,
+      userId: sendMessageStore.replyTo.senderId
+    };
+  }
+
+  userStore.SendMessage(route.params.id, messageToSend);
+  sendMessageStore.messageText = "";
+  sendMessageStore.messageEditing = null;
+  sendMessageStore.replyTo = null;
 }
 
 </script>
@@ -41,6 +55,15 @@ function SendChatMessage(message) {
       </h1>
     </ChatTopBar>
     <message-list :convoId="userStore.GetConversationById(route.params.id)?.convoId"/>
+    <div class="bg-gray-500 flex-none h-6 px-4 flex" v-if="sendMessageStore.replyTo">
+      <span class="text-white mr-1">replying to </span>
+      <span class="text-white font-bold">
+        {{ userStore.GetUserById(sendMessageStore.replyTo.senderId)?.userName }}
+      </span>
+      <span class="ml-auto text-white hover:text-gray-600" @click="()=> {sendMessageStore.replyTo = null}">
+        <i class="fa-solid fa-xmark"></i>
+      </span>
+    </div>
     <div class="bg-gray-600 h-14 flex-none flex flex-row items-center px-6">
       <ChatTextBox class="w-full" @send-chat-message="SendChatMessage"/>
     </div>

@@ -1,6 +1,7 @@
 <script setup>
 import SimpleButton from "@/components/SimpleButton.vue";
 import {useUserStore} from "@/stores/user.js";
+import {useSendingMessageStore} from "@/stores/sendingMessage.js";
 import MessageListItem from "@/components/MessageListItem.vue";
 
 const props = defineProps(['convoId']);
@@ -9,11 +10,6 @@ const userStore = useUserStore();
 
 function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
-}
-
-function RemoveChatMessage(id) {
-  userStore.DeleteMessage(id);
-
 }
 
 function RemoveAllChatMessages() {
@@ -60,7 +56,6 @@ function ScrollToMessage(messageId) {
         <message-list-item :key="index" :data-msg-id="message.messageId"
                       v-for="(message, index) in userStore.GetMessagesFromConversation(props.convoId)"
                       :message="message"
-                      @delete-book="RemoveChatMessage"
                       @scroll-reply="ScrollToMessage"/>
       </ul>
     </div>
