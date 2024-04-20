@@ -17,17 +17,20 @@ const reply = computed(() => {
 
 function RemoveChatMessage() {
   userStore.DeleteMessage(props.message.messageId);
-  //sendMessageStore.replyTo = userStore.GetMessageById(props.message.messageId);
 }
 
 function ReplyToMessage() {
   sendMessageStore.replyTo = userStore.GetMessageById(props.message.messageId);
 }
 
+function EditMessage() {
+  sendMessageStore.EditMessage(props.message, reply.value);
+}
+
 </script>
 
 <template>
-  <li class="flex flex-col group relative">
+  <li class="flex flex-col relative">
     <div class="flex flex-row items-end" v-if="reply">
       <div class="w-8 ml-6 h-3 shrink-0 border border-b-0 border-r-0 border-black rounded-tl"></div>
       <div class="mb-0.5 truncate">
@@ -40,7 +43,7 @@ function ReplyToMessage() {
         </span>
       </div>
     </div>
-    <div class="flex flex-row justify-between border border-black relative">
+    <div class="flex flex-row justify-between group border border-black relative">
       <img :src="userStore.GetUserById(props.message.senderId).profilePicture" alt="profile picture"
            class="rounded-full size-10 ml-1 mr-2 mt-0">
       <div class="flex flex-col grow w-12">
@@ -55,6 +58,9 @@ function ReplyToMessage() {
     flex items-center">
         <SimpleButton @click="ReplyToMessage" class="px-1 py-1 gap-4 h-fit">
           <i class="fa-solid fa-reply"></i>
+        </SimpleButton>
+        <SimpleButton @click="EditMessage" class="px-1 py-1 gap-4 h-fit">
+          <i class="fa-solid fa-pen-to-square"></i>
         </SimpleButton>
         <SimpleButton @click="RemoveChatMessage" class="px-1 py-1 gap-4 h-fit">
           <i class="fa-solid fa-delete-left"></i>

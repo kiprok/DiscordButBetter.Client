@@ -32,11 +32,18 @@ function SendChatMessage() {
     meta: {}
   };
 
+  if(sendMessageStore.messageEditing){
+    messageToSend = sendMessageStore.messageEditing;
+    messageToSend.messageText = sendMessageStore.messageText;
+  }
+
   if (sendMessageStore.replyTo) {
     messageToSend.meta['reply'] = {
       messageId: sendMessageStore.replyTo.messageId,
       userId: sendMessageStore.replyTo.senderId
     };
+  }else if (messageToSend.meta.hasOwnProperty('reply')){
+    delete messageToSend.meta.reply;
   }
 
   userStore.SendMessage(route.params.id, messageToSend);
@@ -55,6 +62,12 @@ function SendChatMessage() {
       </h1>
     </ChatTopBar>
     <message-list :convoId="userStore.GetConversationById(route.params.id)?.convoId"/>
+    <div class="bg-gray-500 flex-none h-6 px-4 flex" v-if="sendMessageStore.messageEditing">
+      <span class="text-white mr-1">Editing message</span>
+      <span class="ml-auto text-white hover:text-gray-600" @click="()=> {sendMessageStore.StopEditingMessage()}">
+        <i class="fa-solid fa-xmark"></i>
+      </span>
+    </div>
     <div class="bg-gray-500 flex-none h-6 px-4 flex" v-if="sendMessageStore.replyTo">
       <span class="text-white mr-1">replying to </span>
       <span class="text-white font-bold">

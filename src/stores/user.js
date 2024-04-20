@@ -43,7 +43,7 @@ export const useUserStore = defineStore("user", () => {
         });
 
         function SendMessage(convoId, message) {
-            let newId = crypto.randomUUID();
+            let newId = message.hasOwnProperty('messageId') ? message.messageId : crypto.randomUUID();
             messages[newId] = {
                 messageId: newId,
                 senderId: message.senderId,
@@ -52,27 +52,29 @@ export const useUserStore = defineStore("user", () => {
                 timeSend: message.timeSend,
                 meta: message.meta
             };
-            conversations[message.convoId].messages.push(newId);
+            if (!message.hasOwnProperty('messageId'))
+                conversations[message.convoId].messages.push(newId);
             return newId;
         }
 
-        function GetUserById(id){
+        function GetUserById(id) {
             return users[id];
         }
 
         function GetMessageById(id) {
             return messages[id];
         }
+
         function GetConversationById(id) {
             return conversations[id];
         }
 
-        function GetFriendList(){
+        function GetFriendList() {
             console.log("Getting friends list");
             return friends.map((friend) => users[friend]);
         }
 
-        function GetALLConversations(){
+        function GetALLConversations() {
             console.log("Getting conversations");
             return conversations;
         }
@@ -92,6 +94,7 @@ export const useUserStore = defineStore("user", () => {
         }
 
         function GetMessagesFromConversation(id) {
+            console.log("Getting messages")
             if (id in conversations)
                 return conversations[id].messages.map(messageId => messages[messageId]);
 
@@ -114,10 +117,6 @@ export const useUserStore = defineStore("user", () => {
             friends.push(userId);
         }
 
-        function GetFriends() {
-            return friends.map(friend => users[friend])
-        }
-
 
         return {
             myUserName,
@@ -138,7 +137,6 @@ export const useUserStore = defineStore("user", () => {
             GetMessageById,
             GetALLConversations,
             GetFriendList,
-            GetFriends
         };
     }
 )
