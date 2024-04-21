@@ -38,7 +38,7 @@ function EditMessage() {
 </script>
 
 <template>
-  <li class="flex flex-col relative">
+  <li class="flex flex-col relative hover:bg-gray-400">
     <div class="flex flex-row items-end" v-if="reply">
       <div class="w-8 ml-6 h-3 shrink-0 border border-b-0 border-r-0 border-black rounded-tl"></div>
       <div class="mb-0.5 truncate">
@@ -51,7 +51,7 @@ function EditMessage() {
         </span>
       </div>
     </div>
-    <div class="flex flex-row justify-between group hover:bg-gray-400 relative">
+    <div class="flex flex-row justify-between group relative">
       <img :src="userStore.GetUserById(props.message.senderId).profilePicture" alt="profile picture"
            class="rounded-full size-10 ml-1 mr-2 mt-0">
       <div class="flex flex-col grow w-12">
