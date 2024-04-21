@@ -34,9 +34,9 @@ async function getFriends() {
 
   for (let i = 0; i < 100; i++) {
     lastMsgId = userStore.SendMessage(newConvoId, {
-      senderId: newUID,
+      senderId: (i%2 === 0) ? newUID : userStore.myId,
       convoId: newConvoId,
-      messageText: `person ${name} says random message ${i}`,
+      messageText: `Random message ${i}`,
       timeSend: Date.now(),
       meta: lastMsgId !== null ? {reply: {messageId: lastMsgId, userId: newUID}} : {}
     });
