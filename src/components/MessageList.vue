@@ -47,7 +47,7 @@ watch(() => route.params.id, () => {
 
 <template>
   <div class="flex flex-col flex-nowrap h-full">
-    <div class="flex flex-col-reverse grow h-16 bg-gray-300 overflow-auto" id="list-container">
+    <div class="flex flex-col-reverse grow h-16 overflow-auto" id="list-container">
       <ul class="flex flex-col gap-2 p-4" id="message-list">
         <message-list-item :key="index" :data-msg-id="message.messageId"
                            v-for="(message, index) in userStore.GetMessagesFromConversation(props.convoId)"

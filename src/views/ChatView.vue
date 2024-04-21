@@ -1,12 +1,14 @@
 <script setup>
-
-import MessageList from "@/components/MessageList.vue";
 import ChatTopBar from "@/components/ChatTopBar.vue";
 import {useUserStore} from "@/stores/user.js";
 import {useSendingMessageStore} from "@/stores/sendingMessage.js";
 import ChatTextBox from "@/components/ChatTextBox.vue";
-import {watch} from "vue";
+import {defineAsyncComponent, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
+
+const MessageList = defineAsyncComponent(
+    () => import('@/components/MessageList.vue')
+)
 
 const route = useRoute();
 const router = useRouter();
@@ -80,7 +82,9 @@ function SendChatMessage() {
         {{ userStore.GetConversationById(route.params.id)?.convoName }}
       </h1>
     </ChatTopBar>
-    <message-list :convoId="userStore.GetConversationById(route.params.id)?.convoId"/>
+    <div class="h-full bg-gray-300">
+      <message-list :convoId="userStore.GetConversationById(route.params.id)?.convoId"/>
+    </div>
     <div class="bg-gray-500 flex-none h-6 px-4 flex" v-if="sendMessageStore.messageEditing">
       <span class="text-white mr-1">Editing message</span>
       <span class="ml-auto text-white hover:text-gray-600" @click="()=> {sendMessageStore.StopEditingMessage()}">
