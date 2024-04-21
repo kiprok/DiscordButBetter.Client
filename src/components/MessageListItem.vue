@@ -21,10 +21,18 @@ function RemoveChatMessage() {
 
 function ReplyToMessage() {
   sendMessageStore.replyTo = userStore.GetMessageById(props.message.messageId);
+  let chatInput = document.querySelector('#chat-input');
+  if (chatInput) {
+    chatInput.focus();
+  }
 }
 
 function EditMessage() {
   sendMessageStore.EditMessage(props.message, reply.value);
+  let chatInput = document.querySelector('#chat-input');
+  if (chatInput) {
+    chatInput.focus();
+  }
 }
 
 </script>
