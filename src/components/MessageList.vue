@@ -29,7 +29,7 @@ function ScrollToMessage(messageId) {
 }
 
 function ScrollChatToBottomLocation() {
-  const msgList = document.querySelector('#list-container');
+  let msgList = document.querySelector('#list-container');
   if (msgList)
     msgList.scroll({
       top: 0

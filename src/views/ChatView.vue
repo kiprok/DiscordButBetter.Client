@@ -34,7 +34,7 @@ function SendChatMessage() {
     meta: {}
   };
 
-  if(sendMessageStore.messageEditing){
+  if (sendMessageStore.messageEditing) {
     messageToSend = sendMessageStore.messageEditing;
     messageToSend.messageText = sendMessageStore.messageText;
   }
@@ -44,21 +44,31 @@ function SendChatMessage() {
       messageId: sendMessageStore.replyTo.messageId,
       userId: sendMessageStore.replyTo.senderId
     };
-  }else if (messageToSend.meta.hasOwnProperty('reply')){
+  } else if (messageToSend.meta.hasOwnProperty('reply')) {
     delete messageToSend.meta.reply;
   }
 
-  userStore.SendMessage(route.params.id, messageToSend);
-  sendMessageStore.messageText = "";
-  sendMessageStore.messageEditing = null;
-  sendMessageStore.replyTo = null;
 
-  const msgList = document.querySelector('#list-container');
-  if (msgList)
+  userStore.SendMessage(route.params.id, messageToSend);
+
+  let msgList = document.querySelector('#list-container');
+  if (msgList && !sendMessageStore.messageEditing) {
     msgList.scroll({
       top: 0,
       behavior: "smooth"
     })
+  } else {
+    let msgElement = document.querySelector(`#message-list [data-msg-id="${sendMessageStore.messageEditing.messageId}"]`);
+    if (msgElement)
+      msgElement.scrollIntoView({
+        block: 'center',
+        behavior: 'smooth'
+      });
+  }
+
+  sendMessageStore.messageText = "";
+  sendMessageStore.messageEditing = null;
+  sendMessageStore.replyTo = null;
 }
 
 </script>
