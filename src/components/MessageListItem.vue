@@ -59,10 +59,10 @@ function EditMessage() {
         <SimpleButton @click="ReplyToMessage" class="px-1 py-1 gap-4 h-fit">
           <i class="fa-solid fa-reply"></i>
         </SimpleButton>
-        <SimpleButton @click="EditMessage" class="px-1 py-1 gap-4 h-fit">
+        <SimpleButton @click="EditMessage" class="px-1 py-1 gap-4 h-fit" v-if="props.message.senderId === userStore.myId">
           <i class="fa-solid fa-pen-to-square"></i>
         </SimpleButton>
-        <SimpleButton @click="RemoveChatMessage" class="px-1 py-1 gap-4 h-fit">
+        <SimpleButton @click="RemoveChatMessage" class="px-1 py-1 gap-4 h-fit" v-if="props.message.senderId === userStore.myId">
           <i class="fa-solid fa-delete-left"></i>
         </SimpleButton>
       </div>
