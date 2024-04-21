@@ -1,5 +1,4 @@
 <script setup>
-import SimpleButton from "@/components/SimpleButton.vue";
 import {useUserStore} from "@/stores/user.js";
 import {computed} from "vue";
 import {useSendingMessageStore} from "@/stores/sendingMessage.js";
@@ -38,7 +37,7 @@ function EditMessage() {
 </script>
 
 <template>
-  <li class="flex flex-col relative hover:bg-gray-400">
+  <li class="flex flex-col relative group hover:bg-gray-400">
     <div class="flex flex-row items-end" v-if="reply">
       <div class="w-8 ml-6 h-3 shrink-0 border border-b-0 border-r-0 border-black rounded-tl"></div>
       <div class="mb-0.5 truncate">
@@ -51,7 +50,7 @@ function EditMessage() {
         </span>
       </div>
     </div>
-    <div class="flex flex-row justify-between group relative">
+    <div class="flex flex-row justify-between relative">
       <img :src="userStore.GetUserById(props.message.senderId).profilePicture" alt="profile picture"
            class="rounded-full size-10 ml-1 mr-2 mt-0">
       <div class="flex flex-col grow w-12">
@@ -61,19 +60,19 @@ function EditMessage() {
         </div>
         <span class="text-pretty break-words w-full">{{ props.message.messageText }}</span>
       </div>
-      <div class="opacity-0 group-hover:opacity-100 absolute right-0 -top-8 h-8 bg-black/50 rounded-t-lg p-1
+    </div>
+    <div class="opacity-0 group-hover:opacity-100 absolute right-0 -top-5 h-8 p-1
     group-hover:ease-in-out duration-300
     flex items-center">
-        <SimpleButton @click="ReplyToMessage" class="px-1 py-1 gap-4 h-fit">
-          <i class="fa-solid fa-reply"></i>
-        </SimpleButton>
-        <SimpleButton @click="EditMessage" class="px-1 py-1 gap-4 h-fit" v-if="props.message.senderId === userStore.myId">
-          <i class="fa-solid fa-pen-to-square"></i>
-        </SimpleButton>
-        <SimpleButton @click="RemoveChatMessage" class="px-1 py-1 gap-4 h-fit" v-if="props.message.senderId === userStore.myId">
-          <i class="fa-solid fa-delete-left"></i>
-        </SimpleButton>
-      </div>
+      <button @click="ReplyToMessage" class="bg-gray-800 first:rounded-l-lg last:rounded-r-lg px-1 py-1 h-fit hover:bg-gray-700 text-white">
+        <i class="fa-solid fa-reply"></i>
+      </button>
+      <button @click="EditMessage" class="bg-gray-800 first:rounded-l-lg last:rounded-r-lg px-1 py-1 h-fit hover:bg-gray-700 text-white" v-if="props.message.senderId === userStore.myId">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </button>
+      <button @click="RemoveChatMessage" class="bg-gray-800 first:rounded-l-lg last:rounded-r-lg px-1 py-1 h-fit hover:bg-gray-700 text-white" v-if="props.message.senderId === userStore.myId">
+        <i class="fa-solid fa-delete-left"></i>
+      </button>
     </div>
   </li>
 </template>
