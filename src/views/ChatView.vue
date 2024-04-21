@@ -13,12 +13,14 @@ const router = useRouter();
 const userStore = useUserStore();
 const sendMessageStore = useSendingMessageStore();
 
+// noinspection PointlessBooleanExpressionJS
 if (route.params.id in userStore.GetALLConversations() === false) {
   router.push({name: "friendList"});
 }
 
 
 watch(() => route.params.id, newId => {
+  // noinspection PointlessBooleanExpressionJS
   if (newId in userStore.GetALLConversations() === false)
     router.push({name: "friendList"});
 })
@@ -50,6 +52,13 @@ function SendChatMessage() {
   sendMessageStore.messageText = "";
   sendMessageStore.messageEditing = null;
   sendMessageStore.replyTo = null;
+
+  const msgList = document.querySelector('#list-container');
+  if (msgList)
+    msgList.scroll({
+      top: 0,
+      behavior: "smooth"
+    })
 }
 
 </script>

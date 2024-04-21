@@ -1,6 +1,9 @@
 <script setup>
 import {useUserStore} from "@/stores/user.js";
-import {defineAsyncComponent} from "vue";
+import {defineAsyncComponent, watch} from "vue";
+import {useRoute} from "vue-router";
+
+const route = useRoute();
 
 const MessageListItem = defineAsyncComponent(
     () => import('@/components/MessageListItem.vue')
@@ -25,16 +28,31 @@ function ScrollToMessage(messageId) {
   });
 }
 
+function ScrollChatToBottomLocation() {
+  const msgList = document.querySelector('#list-container');
+  if (msgList)
+    msgList.scroll({
+      top: 0
+    })
+}
+
+ScrollChatToBottomLocation();
+
+watch(() => route.params.id, () => {
+  ScrollChatToBottomLocation();
+})
+
+
 </script>
 
 <template>
   <div class="flex flex-col flex-nowrap h-full">
-    <div class="flex flex-col-reverse grow h-16 bg-gray-300 overflow-auto">
+    <div class="flex flex-col-reverse grow h-16 bg-gray-300 overflow-auto" id="list-container">
       <ul class="flex flex-col gap-2 p-4" id="message-list">
         <message-list-item :key="index" :data-msg-id="message.messageId"
-                      v-for="(message, index) in userStore.GetMessagesFromConversation(props.convoId)"
-                      :message="message"
-                      @scroll-reply="ScrollToMessage"/>
+                           v-for="(message, index) in userStore.GetMessagesFromConversation(props.convoId)"
+                           :message="message"
+                           @scroll-reply="ScrollToMessage"/>
       </ul>
     </div>
   </div>
