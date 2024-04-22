@@ -61,7 +61,7 @@ function EditMessage() {
       </div>
     </div>
     <div class="flex flex-row justify-between relative">
-      <div class="w-10  ml-1 mr-2 mt-0">
+      <div class="w-10  ml-1 mr-2 mt-0 flex-none">
         <img :src="userStore.GetUserById(props.message.senderId).profilePicture" alt="profile picture"
              class="rounded-full size-full h-10"
              v-if="!previousAlsoOwner">
