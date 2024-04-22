@@ -21,7 +21,8 @@ if (route.params.id in userStore.GetALLConversations() === false) {
 }
 
 let conversation = userStore.GetConversationById(route.params.id);
-document.title = conversation.convoName;
+if (conversation)
+  document.title = conversation.convoName;
 
 watch(() => route.params.id, newId => {
   // noinspection PointlessBooleanExpressionJS
@@ -29,7 +30,8 @@ watch(() => route.params.id, newId => {
     router.push({name: "friendList"});
 
   conversation = userStore.GetConversationById(route.params.id);
-  document.title = conversation.convoName;
+  if (conversation)
+    document.title = conversation.convoName;
 })
 
 function SendChatMessage() {
