@@ -4,6 +4,8 @@ import {useUserStore} from "@/stores/user.js";
 import SimpleButton from "@/components/SimpleButton.vue";
 import { ref} from "vue";
 
+document.title = "Friends";
+
 const userStore = useUserStore();
 
 const _addingFriend = ref(false);
