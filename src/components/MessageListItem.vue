@@ -65,6 +65,13 @@ function EditMessage() {
         <img :src="userStore.GetUserById(props.message.senderId).profilePicture" alt="profile picture"
              class="rounded-full size-full h-10"
              v-if="!previousAlsoOwner">
+        <div v-if="previousAlsoOwner" class="flex items-center justify-center h-6">
+          <span class="text-xs invisible group-hover:visible">
+            {{ timeSend.toLocaleTimeString([],
+              {
+                  hour: "2-digit", minute: "2-digit"
+              }) }}</span>
+        </div>
       </div>
       <div class="flex flex-col grow w-12">
         <div class="flex items-center gap-1" v-if="!previousAlsoOwner">
@@ -88,7 +95,7 @@ function EditMessage() {
       </button>
       <button @click="RemoveChatMessage"
               class="bg-gray-800 first:rounded-l-lg last:rounded-r-lg px-1 py-1 h-fit hover:bg-gray-700 text-white"
-      >
+              v-if="props.message.senderId === userStore.myId">
         <i class="fa-solid fa-delete-left"></i>
       </button>
     </div>
