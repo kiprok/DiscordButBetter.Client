@@ -48,8 +48,12 @@ watch(() => route.params.id, () => {
 <template>
   <div class="flex flex-col flex-nowrap h-full">
     <div class="flex flex-col-reverse grow h-16 overflow-auto" id="list-container">
-      <ul class="flex flex-col gap-2 p-4" id="message-list">
-        <message-list-item :key="index" :data-msg-id="message.messageId"
+      <ul class="flex flex-col p-4" id="message-list">
+        <message-list-item :key="index"
+                           :data-msg-id="message.messageId"
+                           :data-msg-list-index="index"
+                           :data-msg-sender-id="message.senderId"
+                           :index="index"
                            v-for="(message, index) in userStore.GetMessagesFromConversation(props.convoId)"
                            :message="message"
                            @scroll-reply="ScrollToMessage"/>
