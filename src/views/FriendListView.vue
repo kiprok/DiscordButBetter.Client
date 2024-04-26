@@ -2,7 +2,8 @@
 import ChatTopBar from "@/components/ChatTopBar.vue";
 import {useUserStore} from "@/stores/user.js";
 import SimpleButton from "@/components/SimpleButton.vue";
-import { ref} from "vue";
+import {ref} from "vue";
+import {GenerateUser, GenerateConversation, GenerateConversationMessages} from "@/composables/mock/MockDataGeneration.js";
 
 document.title = "Friends";
 
@@ -10,62 +11,61 @@ const userStore = useUserStore();
 
 const _addingFriend = ref(false);
 
-async function getFriends() {
+const sidePanelView = ref(false);
 
+async function GenFriend(){
   _addingFriend.value = true;
-  let getUserResponse = await fetch("https://randomuser.me/api/");
-  let newUser = await getUserResponse.json();
-  let name = `${newUser.results[0].name.first} ${newUser.results[0].name.last}`;
-  let picture = newUser.results[0].picture.thumbnail;
-  let newUID = userStore.AddUser(name, picture);
+  console.log("test");
+  let userId = await GenerateUser();
+  userStore.AddFriend(userId)
+  console.log(userId);
+  let user = userStore.GetUserById(userId);
+  let newConvo = await GenerateConversation(user.userName, user.profilePicture, userStore.myId, userId);
+  userStore.conversations[newConvo.convoId] = newConvo;
+  console.log(newConvo);
+  await GenerateConversationMessages(newConvo.convoId, userId);
 
-  userStore.AddFriend(newUID);
-
-  let newConvoId = crypto.randomUUID();
-
-  userStore.conversations[newConvoId] = {
-    convoId: newConvoId,
-    convoName: name,
-    convoType: 0,
-    convoPicture: picture,
-    participants: [userStore.myId, newUID],
-    messages: []
-  };
-
-  let lastMsgId = null;
-
-  for (let i = 0; i < 100; i++) {
-    lastMsgId = userStore.SendMessage(newConvoId, {
-      senderId: (i%2 === 0) ? newUID : userStore.myId,
-      convoId: newConvoId,
-      messageText: `Random message ${i}`,
-      timeSend: Date.now(),
-      meta: lastMsgId !== null ? {reply: {messageId: lastMsgId, userId: newUID}} : {}
-    });
-  }
-
-  //await new Promise((resolve) => setTimeout(resolve, 2000));
   _addingFriend.value = false;
-
 }
 
 </script>
 
 <template>
   <div class="w-full flex flex-col flex-nowrap">
-    <ChatTopBar>
-      <h1 class="text-white text-3xl font-bold">
+    <ChatTopBar class="flex-none">
+      <h1 class="text-white text-3xl font-bold block">
         Friends
       </h1>
+      <button @click="sidePanelView = !sidePanelView" class="block text-white ml-auto text-lg hover:text-gray-200 lg:hidden">
+        <i class="fa-solid fa-circle-info"></i>
+      </button>
     </ChatTopBar>
-    <div>
-      <span v-if="userStore.friends.length > 0">
-        {{ userStore.friends.length }} friends
-      </span>
-      <span v-else>
-        no friends
-      </span>
-      <simple-button :disabled="_addingFriend" @click="getFriends">add friend</simple-button>
+    <div class="flex size-full">
+      <div class="bg-gray-300 size-full px-8 pt-8 overflow-auto lg:block" :class="{hidden: sidePanelView}">
+        <div>
+          <span v-if="userStore.friends.length > 0">
+            {{ userStore.friends.length }} friends
+        </span>
+          <span v-else>
+          no friends
+        </span>
+        </div>
+        <div class="w-full bg-gray-400 flex flex-col gap-2">
+          <div v-for="(friend, index) in userStore.GetFriendList()" :key="index" class="flex items-center hover:bg-gray-600/30">
+            <div class="inline-block">
+              <img :src="friend.profilePicture" :alt="friend.userName">
+            </div>
+            <span>
+              {{friend.userName}}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="flex-none w-full lg:flex lg:w-[22rem] bg-gray-600" :class="{hidden: !sidePanelView, flex: sidePanelView}">
+        <div>
+          <simple-button :disabled="_addingFriend" @click="GenFriend">add friend</simple-button>
+        </div>
+      </div>
     </div>
   </div>
 </template>

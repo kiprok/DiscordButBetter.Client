@@ -9,10 +9,13 @@ function ToggleSideMenu() {
 
 <template>
   <header class="bg-gray-800 h-14 flex flex-row items-center flex-none px-4 gap-4">
-    <button @click="ToggleSideMenu"
-            class="h-8 w-8 text-white text-2xl text-center flex justify-center items-center hover:text-gray-300 md:hidden">
-      <i class="fa-solid fa-bars"></i>
-    </button>
+    <div class="block md:hidden size-8">
+      <button @click="ToggleSideMenu"
+              class=" size-8 text-white text-2xl text-center flex justify-center items-center hover:text-gray-300 ">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
     <slot></slot>
   </header>
 </template>
