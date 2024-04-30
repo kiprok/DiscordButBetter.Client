@@ -1,9 +1,13 @@
 <script setup>
 import ChatTopBar from "@/components/ChatTopBar.vue";
-import {useUserStore} from "@/stores/user.js";
+import { useUserStore } from "@/stores/user.js";
 import SimpleButton from "@/components/SimpleButton.vue";
-import {ref} from "vue";
-import {GenerateUser, GenerateConversation, GenerateConversationMessages} from "@/composables/mock/MockDataGeneration.js";
+import { ref } from "vue";
+import {
+  GenerateUser,
+  GenerateConversation,
+  GenerateConversationMessages,
+} from "@/composables/mock/MockDataGeneration.js";
 
 document.title = "Friends";
 
@@ -13,57 +17,72 @@ const _addingFriend = ref(false);
 
 const sidePanelView = ref(false);
 
-async function GenFriend(){
+async function GenFriend() {
   _addingFriend.value = true;
   console.log("test");
   let userId = await GenerateUser();
-  userStore.AddFriend(userId)
+  userStore.AddFriend(userId);
   console.log(userId);
   let user = userStore.GetUserById(userId);
-  let newConvo = await GenerateConversation(user.userName, user.profilePicture, userStore.myId, userId);
+  let newConvo = await GenerateConversation(
+    user.userName,
+    user.profilePicture,
+    userStore.myId,
+    userId,
+  );
   userStore.conversations[newConvo.convoId] = newConvo;
   console.log(newConvo);
   await GenerateConversationMessages(newConvo.convoId, userId);
 
   _addingFriend.value = false;
 }
-
 </script>
 
 <template>
   <div class="w-full flex flex-col flex-nowrap">
     <ChatTopBar class="flex-none">
-      <h1 class="text-white text-3xl font-bold block">
-        Friends
-      </h1>
-      <button @click="sidePanelView = !sidePanelView" class="block text-white ml-auto text-lg hover:text-gray-200 lg:hidden">
+      <h1 class="text-white text-3xl font-bold block">Friends</h1>
+      <button
+        @click="sidePanelView = !sidePanelView"
+        class="block text-white ml-auto text-lg hover:text-gray-200 lg:hidden"
+      >
         <i class="fa-solid fa-circle-info"></i>
       </button>
     </ChatTopBar>
     <div class="flex size-full">
-      <div class="bg-gray-300 size-full px-8 pt-8 overflow-auto lg:block" :class="{hidden: sidePanelView}">
+      <div
+        class="bg-gray-300 size-full px-8 pt-8 overflow-auto lg:block"
+        :class="{ hidden: sidePanelView }"
+      >
         <div>
           <span v-if="userStore.friends.length > 0">
             {{ userStore.friends.length }} friends
-        </span>
-          <span v-else>
-          no friends
-        </span>
+          </span>
+          <span v-else> no friends </span>
         </div>
         <div class="w-full bg-gray-400 flex flex-col gap-2">
-          <div v-for="(friend, index) in userStore.GetFriendList()" :key="index" class="flex items-center hover:bg-gray-600/30">
+          <div
+            v-for="(friend, index) in userStore.GetFriendList()"
+            :key="index"
+            class="flex items-center hover:bg-gray-600/30"
+          >
             <div class="inline-block">
-              <img :src="friend.profilePicture" :alt="friend.userName">
+              <img :src="friend.profilePicture" :alt="friend.userName" />
             </div>
             <span>
-              {{friend.userName}}
+              {{ friend.userName }}
             </span>
           </div>
         </div>
       </div>
-      <div class="flex-none w-full lg:flex lg:w-[22rem] bg-gray-600" :class="{hidden: !sidePanelView, flex: sidePanelView}">
+      <div
+        class="flex-none w-full lg:flex lg:w-[22rem] bg-gray-600"
+        :class="{ hidden: !sidePanelView, flex: sidePanelView }"
+      >
         <div>
-          <simple-button :disabled="_addingFriend" @click="GenFriend">add friend</simple-button>
+          <simple-button :disabled="_addingFriend" @click="GenFriend"
+            >add friend</simple-button
+          >
         </div>
       </div>
     </div>

@@ -1,14 +1,14 @@
 <script setup>
 import ChatTopBar from "@/components/ChatTopBar.vue";
-import {useUserStore} from "@/stores/user.js";
-import {useSendingMessageStore} from "@/stores/sendingMessage.js";
+import { useUserStore } from "@/stores/user.js";
+import { useSendingMessageStore } from "@/stores/sendingMessage.js";
 import ChatTextBox from "@/components/ChatTextBox.vue";
-import {defineAsyncComponent, watch} from "vue";
-import {useRoute, useRouter} from "vue-router";
+import { defineAsyncComponent, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const MessageList = defineAsyncComponent(
-    () => import('@/components/MessageList.vue')
-)
+  () => import("@/components/MessageList.vue"),
+);
 
 const route = useRoute();
 const router = useRouter();
@@ -17,22 +17,23 @@ const sendMessageStore = useSendingMessageStore();
 
 // noinspection PointlessBooleanExpressionJS
 if (route.params.id in userStore.GetALLConversations() === false) {
-  router.push({name: "friendList"});
+  router.push({ name: "friendList" });
 }
 
 let conversation = userStore.GetConversationById(route.params.id);
-if (conversation)
-  document.title = conversation.convoName;
+if (conversation) document.title = conversation.convoName;
 
-watch(() => route.params.id, newId => {
-  // noinspection PointlessBooleanExpressionJS
-  if (newId in userStore.GetALLConversations() === false)
-    router.push({name: "friendList"});
+watch(
+  () => route.params.id,
+  (newId) => {
+    // noinspection PointlessBooleanExpressionJS
+    if (newId in userStore.GetALLConversations() === false)
+      router.push({ name: "friendList" });
 
-  conversation = userStore.GetConversationById(route.params.id);
-  if (conversation)
-    document.title = conversation.convoName;
-})
+    conversation = userStore.GetConversationById(route.params.id);
+    if (conversation) document.title = conversation.convoName;
+  },
+);
 
 function SendChatMessage() {
   let messageToSend = {
@@ -40,7 +41,7 @@ function SendChatMessage() {
     convoId: route.params.id,
     messageText: sendMessageStore.messageText,
     timeSend: Date.now(),
-    meta: {}
+    meta: {},
   };
 
   if (sendMessageStore.messageEditing) {
@@ -49,29 +50,30 @@ function SendChatMessage() {
   }
 
   if (sendMessageStore.replyTo) {
-    messageToSend.meta['reply'] = {
+    messageToSend.meta["reply"] = {
       messageId: sendMessageStore.replyTo.messageId,
-      userId: sendMessageStore.replyTo.senderId
+      userId: sendMessageStore.replyTo.senderId,
     };
-  } else if (messageToSend.meta.hasOwnProperty('reply')) {
+  } else if (messageToSend.meta.hasOwnProperty("reply")) {
     delete messageToSend.meta.reply;
   }
 
-
   userStore.SendMessage(route.params.id, messageToSend);
 
-  let msgList = document.querySelector('#list-container');
+  let msgList = document.querySelector("#list-container");
   if (msgList && !sendMessageStore.messageEditing) {
     msgList.scroll({
       top: 0,
-      behavior: "smooth"
-    })
+      behavior: "smooth",
+    });
   } else {
-    let msgElement = document.querySelector(`#message-list [data-msg-id="${sendMessageStore.messageEditing.messageId}"]`);
+    let msgElement = document.querySelector(
+      `#message-list [data-msg-id="${sendMessageStore.messageEditing.messageId}"]`,
+    );
     if (msgElement)
       msgElement.scrollIntoView({
-        block: 'center',
-        behavior: 'smooth'
+        block: "center",
+        behavior: "smooth",
       });
   }
 
@@ -79,7 +81,6 @@ function SendChatMessage() {
   sendMessageStore.messageEditing = null;
   sendMessageStore.replyTo = null;
 }
-
 </script>
 
 <template>
@@ -90,25 +91,47 @@ function SendChatMessage() {
       </h1>
     </ChatTopBar>
     <div class="h-full bg-gray-300">
-      <message-list :convoId="userStore.GetConversationById(route.params.id)?.convoId"/>
+      <message-list
+        :convoId="userStore.GetConversationById(route.params.id)?.convoId"
+      />
     </div>
-    <div class="bg-gray-500 flex-none h-6 px-4 flex" v-if="sendMessageStore.messageEditing">
+    <div
+      class="bg-gray-500 flex-none h-6 px-4 flex"
+      v-if="sendMessageStore.messageEditing"
+    >
       <span class="text-white mr-1">Editing message</span>
-      <span class="ml-auto text-white hover:text-gray-600" @click="()=> {sendMessageStore.StopEditingMessage()}">
+      <span
+        class="ml-auto text-white hover:text-gray-600"
+        @click="
+          () => {
+            sendMessageStore.StopEditingMessage();
+          }
+        "
+      >
         <i class="fa-solid fa-xmark"></i>
       </span>
     </div>
-    <div class="bg-gray-500 flex-none h-6 px-4 flex" v-if="sendMessageStore.replyTo">
+    <div
+      class="bg-gray-500 flex-none h-6 px-4 flex"
+      v-if="sendMessageStore.replyTo"
+    >
       <span class="text-white mr-1">replying to </span>
       <span class="text-white font-bold">
         {{ userStore.GetUserById(sendMessageStore.replyTo.senderId)?.userName }}
       </span>
-      <span class="ml-auto text-white hover:text-gray-600" @click="()=> {sendMessageStore.replyTo = null}">
+      <span
+        class="ml-auto text-white hover:text-gray-600"
+        @click="
+          () => {
+            sendMessageStore.replyTo = null;
+          }
+        "
+      >
         <i class="fa-solid fa-xmark"></i>
       </span>
     </div>
     <div class="bg-gray-600 h-14 flex-none flex flex-row items-center px-6">
-      <ChatTextBox class="w-full" @send-chat-message="SendChatMessage"/>
+      <ChatTextBox class="w-full" @send-chat-message="SendChatMessage" />
     </div>
   </div>
 </template>
