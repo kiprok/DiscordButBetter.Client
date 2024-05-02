@@ -56,6 +56,20 @@ export const useUserStore = defineStore("user", () => {
     return newId;
   }
 
+  function GetOlderMessages(convoId, startpointId) {
+    return Object.keys(messages)
+      .filter(
+        (key) =>
+          convoId === messages[key].convoId &&
+          (messages[startpointId]?.timeSend ?? 9999999999999999999999) -
+            messages[key].timeSend >
+            0,
+      )
+      .toSorted((a, b) => messages[b].timeSend - messages[a].timeSend)
+      .slice(0, 25)
+      .map((key) => messages[key]);
+  }
+
   function GetUserById(id) {
     return users[id];
   }
@@ -135,6 +149,7 @@ export const useUserStore = defineStore("user", () => {
     DeleteMessage,
     DeleteAllMessages,
     GetMessagesFromConversation,
+    GetOlderMessages,
     GetUserById,
     GetConversationById,
     GetMessageById,

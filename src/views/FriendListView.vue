@@ -19,10 +19,8 @@ const sidePanelView = ref(false);
 
 async function GenFriend() {
   _addingFriend.value = true;
-  console.log("test");
   let userId = await GenerateUser();
   userStore.AddFriend(userId);
-  console.log(userId);
   let user = userStore.GetUserById(userId);
   let newConvo = await GenerateConversation(
     user.userName,
@@ -31,8 +29,7 @@ async function GenFriend() {
     userId,
   );
   userStore.conversations[newConvo.convoId] = newConvo;
-  console.log(newConvo);
-  await GenerateConversationMessages(newConvo.convoId, userId);
+  await GenerateConversationMessages(newConvo.convoId, userId, 1000);
 
   _addingFriend.value = false;
 }

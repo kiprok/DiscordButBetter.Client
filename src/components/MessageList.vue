@@ -37,11 +37,21 @@ function ScrollChatToBottomLocation() {
     });
 }
 
+function LoadOlderMessages() {
+  if (userStore.conversations[props.convoId].messages.length === 0) {
+    userStore.GetOlderMessages(props.convoId, null).forEach((message) => {
+      userStore.conversations[props.convoId].messages.push(message.messageId);
+    });
+  }
+}
+
+LoadOlderMessages();
 ScrollChatToBottomLocation();
 
 watch(
   () => route.params.id,
   () => {
+    LoadOlderMessages();
     ScrollChatToBottomLocation();
   },
 );
@@ -60,9 +70,9 @@ watch(
           :data-msg-list-index="index"
           :data-msg-sender-id="message.senderId"
           :index="index"
-          v-for="(message, index) in userStore.GetMessagesFromConversation(
-            props.convoId,
-          )"
+          v-for="(message, index) in userStore
+            .GetMessagesFromConversation(props.convoId)
+            .toSorted((a, b) => a.timeSend - b.timeSend)"
           :message="message"
           @scroll-reply="ScrollToMessage"
         />

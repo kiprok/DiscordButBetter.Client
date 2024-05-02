@@ -30,20 +30,25 @@ export async function GenerateConversation(
   };
 }
 
-export async function GenerateConversationMessages(convoId, otherId) {
+export async function GenerateConversationMessages(convoId, otherId, amount) {
   const userStore = useUserStore();
 
   let lastMsgId = null;
-  for (let i = 0; i < 100; i++) {
-    lastMsgId = userStore.SendMessage(convoId, {
+  let startTimeOffset = 100000000;
+  for (let i = 0; i < amount; i++) {
+    let timeOffset = startTimeOffset - (startTimeOffset / amount) * i;
+    let newMessageId = crypto.randomUUID();
+    userStore.messages[newMessageId] = {
+      messageId: newMessageId,
       senderId: i % 2 === 0 ? otherId : userStore.myId,
       convoId: convoId,
       messageText: `Random message ${i}`,
-      timeSend: Date.now(),
+      timeSend: Date.now() - timeOffset,
       meta:
         lastMsgId !== null
           ? { reply: { messageId: lastMsgId, userId: otherId } }
           : {},
-    });
+    };
+    lastMsgId = newMessageId;
   }
 }
