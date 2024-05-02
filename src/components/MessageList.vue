@@ -3,6 +3,9 @@ import { useUserStore } from "@/stores/user.js";
 import { defineAsyncComponent, watch } from "vue";
 import { useRoute } from "vue-router";
 
+//TODO add message jumping state
+//TODO add switching between jumping or original lists
+
 const route = useRoute();
 
 const MessageListItem = defineAsyncComponent(
