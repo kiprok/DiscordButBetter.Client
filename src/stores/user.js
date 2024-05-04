@@ -53,7 +53,7 @@ export const useUserStore = defineStore("user", () => {
     };
     if (!message.hasOwnProperty("messageId"))
       conversations[message.convoId].messages.push(newId);
-    return newId;
+    return messages[newId];
   }
 
   function GetOlderMessages(convoId, startpointId) {

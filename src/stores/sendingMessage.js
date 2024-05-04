@@ -5,6 +5,7 @@ export const useSendingMessageStore = defineStore("sendingMessage", () => {
   const messageText = ref("");
   const replyTo = ref(null);
   const messageEditing = ref(null);
+  const sendingMessage = ref("");
 
   function EditMessage(message, reply = null) {
     console.log(reply);
@@ -20,6 +21,7 @@ export const useSendingMessageStore = defineStore("sendingMessage", () => {
   }
 
   return {
+    sendingMessage,
     messageText,
     replyTo,
     messageEditing,

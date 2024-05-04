@@ -5,6 +5,7 @@ import { useSendingMessageStore } from "@/stores/sendingMessage.js";
 import ChatTextBox from "@/components/ChatTextBox.vue";
 import { defineAsyncComponent, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useMessageListStore } from "@/stores/messageList.js";
 
 const MessageList = defineAsyncComponent(
   () => import("@/components/MessageList.vue"),
@@ -13,6 +14,7 @@ const MessageList = defineAsyncComponent(
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
+const messageListStore = useMessageListStore();
 const sendMessageStore = useSendingMessageStore();
 
 // noinspection PointlessBooleanExpressionJS
@@ -58,7 +60,9 @@ function SendChatMessage() {
     delete messageToSend.meta.reply;
   }
 
-  userStore.SendMessage(route.params.id, messageToSend);
+  let msg = userStore.SendMessage(route.params.id, messageToSend);
+  sendMessageStore.sendingMessage = msg.messageId;
+  messageListStore.AddMessage(route.params.id, msg);
 
   let msgList = document.querySelector("#list-container");
   if (msgList && !sendMessageStore.messageEditing) {

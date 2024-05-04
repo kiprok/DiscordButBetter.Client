@@ -3,6 +3,7 @@ import { useUserStore } from "@/stores/user.js";
 import { defineAsyncComponent, onMounted, ref, watch, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 import { useMessageListStore } from "@/stores/messageList.js";
+import { useSendingMessageStore } from "@/stores/sendingMessage.js";
 
 //TODO add message jumping state
 //TODO add switching between jumping or original lists
@@ -17,36 +18,36 @@ const props = defineProps(["convoId"]);
 
 const userStore = useUserStore();
 const messageListStore = useMessageListStore();
+const sendingMessageStore = useSendingMessageStore();
 
 const messageListContainer = ref(null);
 const messageListDom = ref(null);
 const oldScrollHeight = ref(0);
-const mutationConfig = {
-  childList: true,
-};
+const loadingChat = ref(true);
 
 const observer = new MutationObserver(function (mutationList, observer) {
   for (const mutation of mutationList) {
     if (mutation.type === "childList") {
       let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
       if (oldScrollHeight.value !== 0) {
-        if (dif !== 0) {
-          console.log(`dif is ${dif}`);
-          console.log(
-            `aa ${oldScrollHeight.value} ${messageListContainer.value.scrollHeight}`,
-          );
-          messageListContainer.value.scrollTop -= dif;
+        if (
+          dif !== 0 &&
+          sendingMessageStore.sendingMessage !==
+            mutation.addedNodes[0]?.dataset.msgId
+        ) {
+          if (!loadingChat.value) {
+            messageListContainer.value.scrollTop -= dif;
+          } else {
+            messageListContainer.value.scrollTop =
+              messageListStore.GetScrollPosition(props.convoId);
+            loadingChat.value = false;
+          }
         }
       }
-
       oldScrollHeight.value = messageListContainer.value.scrollHeight;
     }
   }
 });
-
-function getRndInteger(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
-}
 
 function ScrollToMessage(messageId) {
   let msgElement = document.querySelector(
@@ -61,11 +62,16 @@ function ScrollToMessage(messageId) {
 }
 
 function ScrollChatToBottomLocation() {
-  let msgList = document.querySelector("#list-container");
-  if (msgList)
-    msgList.scroll({
-      top: 0,
-    });
+  // let msgList = document.querySelector("#list-container");
+  // if (msgList)
+  //   msgList.scroll({
+  //     top: 0,
+  //   });
+
+  if (messageListContainer.value)
+    messageListContainer.value.scrollTop = messageListStore.GetScrollPosition(
+      props.convoId,
+    );
 }
 
 function LoadFirstMessages() {
@@ -89,27 +95,28 @@ function LoadOlderMessages() {
 function OnScrolling(event) {
   const { scrollTop, offsetHeight, scrollHeight } = event.target;
   if (scrollTop - offsetHeight <= -scrollHeight) {
-    console.log(messageListContainer.value?.scrollHeight);
     LoadOlderMessages();
   } else if (scrollTop === 0) {
     console.log("bottom");
   }
-}
 
-LoadFirstMessages();
-ScrollChatToBottomLocation();
+  messageListStore.SetScrollPosition(props.convoId, scrollTop);
+}
 
 watch(
   () => route.params.id,
   () => {
+    loadingChat.value = true;
     LoadFirstMessages();
     ScrollChatToBottomLocation();
   },
+  { immediate: true },
 );
 
 onMounted(() => {
-  console.log(messageListDom.value);
-  observer.observe(messageListDom.value, mutationConfig);
+  observer.observe(messageListDom.value, {
+    childList: true,
+  });
 });
 </script>
 

@@ -19,7 +19,6 @@ export const useMessageListStore = defineStore("messageList", () => {
         scrollPosition: 0,
         viewingOlderMessages: false,
       };
-      console.log(conversations[convoId]);
     }
 
     return conversations[convoId].visibleMessages;
@@ -49,6 +48,17 @@ export const useMessageListStore = defineStore("messageList", () => {
     );
   }
 
+  function SetScrollPosition(convoId, pos) {
+    if (conversations.hasOwnProperty(convoId))
+      conversations[convoId].scrollPosition = pos;
+  }
+
+  function GetScrollPosition(convoId) {
+    if (conversations.hasOwnProperty(convoId))
+      return conversations[convoId].scrollPosition;
+    else return 0;
+  }
+
   return {
     conversations,
     GetVisibleMessages,
@@ -56,5 +66,7 @@ export const useMessageListStore = defineStore("messageList", () => {
     GetLastMessage,
     AddMessage,
     AddMessages,
+    SetScrollPosition,
+    GetScrollPosition,
   };
 });
