@@ -2,10 +2,12 @@
 import { useUserStore } from "@/stores/user.js";
 import { computed } from "vue";
 import { useSendingMessageStore } from "@/stores/sendingMessage.js";
+import { useConversationStore } from "@/stores/conversation.js";
 
 const emits = defineEmits(["scroll-reply"]);
 const props = defineProps(["message", "index"]);
 const userStore = useUserStore();
+const conversationStore = useConversationStore();
 const sendMessageStore = useSendingMessageStore();
 
 const timeSend = new Date(props.message.timeSend);
@@ -27,6 +29,10 @@ const previousAlsoOwner = computed(() => {
 
 function RemoveChatMessage() {
   userStore.DeleteMessage(props.message.messageId);
+  conversationStore.DeleteMessage(
+    props.message.convoId,
+    props.message.messageId,
+  );
 }
 
 function ReplyToMessage() {

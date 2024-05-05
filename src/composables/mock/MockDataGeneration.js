@@ -22,11 +22,12 @@ export async function GenerateConversation(
   return {
     convoId: newConvoId,
     convoName: convoName,
-
-    convoType: 0,
+    convoType: 0, // 0 = private, 1 = group
     convoPicture: convoPicture,
+    visibleMessages: [],
     participants: [userId1, userId2],
-    messages: [],
+    scrollPosition: 0,
+    viewingOlderMessages: false,
   };
 }
 

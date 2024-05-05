@@ -8,10 +8,12 @@ import {
   GenerateConversation,
   GenerateConversationMessages,
 } from "@/composables/mock/MockDataGeneration.js";
+import { useConversationStore } from "@/stores/conversation.js";
 
 document.title = "Friends";
 
 const userStore = useUserStore();
+const conversationStore = useConversationStore();
 
 const _addingFriend = ref(false);
 
@@ -28,7 +30,7 @@ async function GenFriend() {
     userStore.myId,
     userId,
   );
-  userStore.conversations[newConvo.convoId] = newConvo;
+  conversationStore.conversations[newConvo.convoId] = newConvo;
   await GenerateConversationMessages(newConvo.convoId, userId, 1000);
 
   _addingFriend.value = false;

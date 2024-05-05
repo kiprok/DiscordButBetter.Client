@@ -1,7 +1,9 @@
 <script setup>
 import { useUserStore } from "@/stores/user.js";
+import { useConversationStore } from "@/stores/conversation.js";
 
 const userStore = useUserStore();
+const useConversationStore = useConversationStore();
 
 function ToggleSideMenu() {
   let sideMenu = document.querySelector("#SideMenu");
@@ -27,7 +29,7 @@ function ToggleSideMenu() {
           Friends
         </router-link>
         <router-link
-          v-for="(convo, index) in userStore.GetALLConversations()"
+          v-for="(convo, index) in useConversationStore.GetALLConversations()"
           :key="index"
           class="router-link"
           :to="{ name: 'chat', params: { id: convo.convoId } }"

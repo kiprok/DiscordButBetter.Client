@@ -15,16 +15,6 @@ export const useUserStore = defineStore("user", () => {
   });
 
   const friends = reactive([]);
-  const conversations = reactive({
-    /*
-            convoId: "",
-            convoName: "",
-            convoType: 0, // 0 = private, 1 = group
-            convoPicture: "",
-            participants: [],
-            messages: []
-             */
-  });
 
   const messages = reactive({
     /*
@@ -90,46 +80,13 @@ export const useUserStore = defineStore("user", () => {
     return messages[id];
   }
 
-  function GetConversationById(id) {
-    return conversations[id];
-  }
-
   function GetFriendList() {
     console.log("Getting friends list");
     return friends.map((friend) => users[friend]);
   }
 
-  function GetALLConversations() {
-    console.log("Getting conversations");
-    return conversations;
-  }
-
   function DeleteMessage(messageId) {
-    //this is insane
-    conversations[messages[messageId].convoId].messages.splice(
-      conversations[messages[messageId].convoId].messages.indexOf(messageId),
-      1,
-    );
-
     delete messages[messageId];
-  }
-
-  function DeleteAllMessages(convoId) {
-    for (let messageId in conversations[convoId].messages) {
-      delete messages[messageId];
-    }
-    conversations[convoId].messages.splice(
-      0,
-      conversations[convoId].messages.length,
-    );
-  }
-
-  function GetMessagesFromConversation(id) {
-    console.log("Getting messages");
-    if (id in conversations)
-      return conversations[id].messages.map((messageId) => messages[messageId]);
-
-    return [];
   }
 
   function AddUser(name, pfp) {
@@ -153,20 +110,15 @@ export const useUserStore = defineStore("user", () => {
     myProfilePicture,
     users,
     friends,
-    conversations,
     messages,
     AddUser,
     AddFriend,
     SendMessage,
     DeleteMessage,
-    DeleteAllMessages,
-    GetMessagesFromConversation,
     GetOlderMessages,
     GetNewerMessages,
     GetUserById,
-    GetConversationById,
     GetMessageById,
-    GetALLConversations,
     GetFriendList,
   };
 });

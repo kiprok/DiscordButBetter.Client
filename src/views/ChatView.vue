@@ -5,7 +5,7 @@ import { useSendingMessageStore } from "@/stores/sendingMessage.js";
 import ChatTextBox from "@/components/ChatTextBox.vue";
 import { defineAsyncComponent, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useMessageListStore } from "@/stores/messageList.js";
+import { useConversationStore } from "@/stores/conversation.js";
 
 const MessageList = defineAsyncComponent(
   () => import("@/components/MessageList.vue"),
@@ -14,25 +14,25 @@ const MessageList = defineAsyncComponent(
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
-const messageListStore = useMessageListStore();
 const sendMessageStore = useSendingMessageStore();
+const conversationStore = useConversationStore();
 
 // noinspection PointlessBooleanExpressionJS
-if (route.params.id in userStore.GetALLConversations() === false) {
+if (route.params.id in conversationStore.GetALLConversations() === false) {
   router.push({ name: "friendList" });
 }
 
-let conversation = userStore.GetConversationById(route.params.id);
+let conversation = conversationStore.GetConversationById(route.params.id);
 if (conversation) document.title = conversation.convoName;
 
 watch(
   () => route.params.id,
   (newId) => {
     // noinspection PointlessBooleanExpressionJS
-    if (newId in userStore.GetALLConversations() === false)
+    if (newId in conversationStore.GetALLConversations() === false)
       router.push({ name: "friendList" });
 
-    conversation = userStore.GetConversationById(route.params.id);
+    conversation = conversationStore.GetConversationById(route.params.id);
     if (conversation) document.title = conversation.convoName;
   },
 );
@@ -62,7 +62,7 @@ function SendChatMessage() {
 
   let msg = userStore.SendMessage(route.params.id, messageToSend);
   sendMessageStore.sendingMessage = msg.messageId;
-  messageListStore.AddMessage(route.params.id, msg);
+  conversationStore.AddMessage(route.params.id, msg);
 
   let msgList = document.querySelector("#list-container");
   if (msgList && !sendMessageStore.messageEditing) {
@@ -91,12 +91,14 @@ function SendChatMessage() {
   <div class="w-full flex flex-col flex-nowrap">
     <ChatTopBar>
       <h1 class="text-white text-2xl font-bold">
-        {{ userStore.GetConversationById(route.params.id)?.convoName }}
+        {{ conversationStore.GetConversationById(route.params.id)?.convoName }}
       </h1>
     </ChatTopBar>
     <div class="h-full bg-gray-300">
       <message-list
-        :convoId="userStore.GetConversationById(route.params.id)?.convoId"
+        :convoId="
+          conversationStore.GetConversationById(route.params.id)?.convoId
+        "
       />
     </div>
     <div
