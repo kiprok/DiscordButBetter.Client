@@ -62,7 +62,8 @@ function SendChatMessage() {
 
   let msg = userStore.SendMessage(route.params.id, messageToSend);
   sendMessageStore.sendingMessage = msg.messageId;
-  conversationStore.AddMessage(route.params.id, msg);
+  if (!sendMessageStore.messageEditing)
+    conversationStore.AddMessage(route.params.id, msg);
 
   let msgList = document.querySelector("#list-container");
   if (msgList && !sendMessageStore.messageEditing) {
@@ -74,11 +75,11 @@ function SendChatMessage() {
     let msgElement = document.querySelector(
       `#message-list [data-msg-id="${sendMessageStore.messageEditing.messageId}"]`,
     );
-    if (msgElement)
-      msgElement.scrollIntoView({
-        block: "center",
-        behavior: "smooth",
-      });
+    // if (msgElement)
+    //   msgElement.scrollIntoView({
+    //     block: "center",
+    //     behavior: "smooth",
+    //   });
   }
 
   sendMessageStore.messageText = "";

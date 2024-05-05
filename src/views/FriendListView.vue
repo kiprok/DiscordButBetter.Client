@@ -65,8 +65,12 @@ async function GenFriend() {
             :key="index"
             class="flex items-center hover:bg-gray-600/30"
           >
-            <div class="inline-block">
-              <img :src="friend.profilePicture" :alt="friend.userName" />
+            <div class="inline-block mr-2">
+              <img
+                :src="friend.profilePicture"
+                :alt="friend.userName"
+                class="rounded-full"
+              />
             </div>
             <span>
               {{ friend.userName }}

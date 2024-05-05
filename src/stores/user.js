@@ -41,8 +41,6 @@ export const useUserStore = defineStore("user", () => {
       timeSend: message.timeSend,
       meta: message.meta,
     };
-    if (!message.hasOwnProperty("messageId"))
-      conversations[message.convoId].messages.push(newId);
     return messages[newId];
   }
 
