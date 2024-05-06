@@ -61,7 +61,7 @@ function LoadFirstMessages() {
 }
 
 function LoadOlderMessages() {
-  const lastMessage = conversationStore.GetFirstMessage(props.convoId);
+  const lastMessage = conversationStore.GetLastMessage(props.convoId);
   console.log(lastMessage);
   conversationStore.AddMessages(
     props.convoId,
@@ -71,9 +71,9 @@ function LoadOlderMessages() {
 
 function OnScrolling(event) {
   const { scrollTop, offsetHeight, scrollHeight } = event.target;
-  if (scrollTop - offsetHeight <= -scrollHeight) {
+  if (scrollTop === 0) {
     LoadOlderMessages();
-  } else if (scrollTop === 0) {
+  } else if (scrollHeight - (scrollTop + offsetHeight) <= 2) {
     console.log("bottom");
   }
 
