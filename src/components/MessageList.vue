@@ -26,30 +26,6 @@ const oldScrollHeight = ref(0);
 const oldScrollWidth = ref(0);
 const chatIsLoading = ref(true);
 
-const observer = new MutationObserver(function (mutationList, observer) {
-  for (const mutation of mutationList) {
-    if (mutation.type === "childList") {
-      // let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
-      // if (oldScrollHeight.value !== 0) {
-      //   if (
-      //     dif !== 0 &&
-      //     sendingMessageStore.sendingMessage !==
-      //       mutation.addedNodes[0]?.dataset.msgId
-      //   ) {
-      //     if (!loadingChat.value) {
-      //       messageListContainer.value.scrollTop -= dif;
-      //     } else {
-      //       messageListContainer.value.scrollTop =
-      //         conversationStore.GetScrollPosition(props.convoId);
-      //       loadingChat.value = false;
-      //     }
-      //   }
-      // }
-      // oldScrollHeight.value = messageListContainer.value.scrollHeight;
-    }
-  }
-});
-
 function ScrollToMessage(messageId) {
   let msgElement = document.querySelector(
     `#message-list [data-msg-id="${messageId}"]`,
@@ -63,21 +39,7 @@ function ScrollToMessage(messageId) {
 }
 
 function ScrollToSavedLocation() {
-  // let msgList = document.querySelector("#list-container");
-  // if (msgList)
-  //   msgList.scroll({
-  //     top: 0,
-  //   });
-
   if (messageListContainer.value) {
-    console.log("scrolling");
-    console.log(
-      ` scrollposition: ${conversationStore.GetScrollPosition(props.convoId)}`,
-    );
-    console.log(`scrollheight: ${messageListContainer.value.scrollHeight}`);
-    // messageListContainer.value.scrollTop = conversationStore.GetScrollPosition(
-    //   props.convoId,
-    // );
     messageListContainer.value.scrollTo(
       0,
       Math.min(
@@ -156,9 +118,6 @@ function OnHeightUpdate() {
 onMounted(() => {
   let resizeObserver = new ResizeObserver(OnHeightUpdate);
   resizeObserver.observe(messageListDom.value);
-  observer.observe(messageListDom.value, {
-    childList: true,
-  });
 });
 </script>
 
