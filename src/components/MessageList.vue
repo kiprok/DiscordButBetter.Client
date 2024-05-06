@@ -23,28 +23,29 @@ const sendingMessageStore = useSendingMessageStore();
 const messageListContainer = ref(null);
 const messageListDom = ref(null);
 const oldScrollHeight = ref(0);
-const loadingChat = ref(true);
+const oldScrollWidth = ref(0);
+const chatIsLoading = ref(true);
 
 const observer = new MutationObserver(function (mutationList, observer) {
   for (const mutation of mutationList) {
     if (mutation.type === "childList") {
-      let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
-      if (oldScrollHeight.value !== 0) {
-        if (
-          dif !== 0 &&
-          sendingMessageStore.sendingMessage !==
-            mutation.addedNodes[0]?.dataset.msgId
-        ) {
-          if (!loadingChat.value) {
-            messageListContainer.value.scrollTop -= dif;
-          } else {
-            messageListContainer.value.scrollTop =
-              conversationStore.GetScrollPosition(props.convoId);
-            loadingChat.value = false;
-          }
-        }
-      }
-      oldScrollHeight.value = messageListContainer.value.scrollHeight;
+      // let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
+      // if (oldScrollHeight.value !== 0) {
+      //   if (
+      //     dif !== 0 &&
+      //     sendingMessageStore.sendingMessage !==
+      //       mutation.addedNodes[0]?.dataset.msgId
+      //   ) {
+      //     if (!loadingChat.value) {
+      //       messageListContainer.value.scrollTop -= dif;
+      //     } else {
+      //       messageListContainer.value.scrollTop =
+      //         conversationStore.GetScrollPosition(props.convoId);
+      //       loadingChat.value = false;
+      //     }
+      //   }
+      // }
+      // oldScrollHeight.value = messageListContainer.value.scrollHeight;
     }
   }
 });
@@ -61,17 +62,31 @@ function ScrollToMessage(messageId) {
   });
 }
 
-function ScrollChatToBottomLocation() {
+function ScrollToSavedLocation() {
   // let msgList = document.querySelector("#list-container");
   // if (msgList)
   //   msgList.scroll({
   //     top: 0,
   //   });
 
-  if (messageListContainer.value)
-    messageListContainer.value.scrollTop = conversationStore.GetScrollPosition(
-      props.convoId,
+  if (messageListContainer.value) {
+    console.log("scrolling");
+    console.log(
+      ` scrollposition: ${conversationStore.GetScrollPosition(props.convoId)}`,
     );
+    console.log(`scrollheight: ${messageListContainer.value.scrollHeight}`);
+    // messageListContainer.value.scrollTop = conversationStore.GetScrollPosition(
+    //   props.convoId,
+    // );
+    messageListContainer.value.scrollTo(
+      0,
+      Math.min(
+        Math.max(conversationStore.GetScrollPosition(props.convoId), 0),
+        messageListContainer.value.scrollHeight,
+      ),
+    );
+    console.log(`scrollTop: ${messageListContainer.value.scrollTop}`);
+  }
 }
 
 function LoadFirstMessages() {
@@ -106,14 +121,41 @@ function OnScrolling(event) {
 watch(
   () => route.params.id,
   () => {
-    loadingChat.value = true;
     LoadFirstMessages();
-    ScrollChatToBottomLocation();
+    ScrollToSavedLocation();
+    chatIsLoading.value = true;
   },
   { immediate: true },
 );
 
+function OnHeightUpdate() {
+  if (!messageListContainer.value) return;
+  if (sendingMessageStore.sendingMessage) {
+    messageListDom.value.lastElementChild.scrollIntoView({
+      behavior: "smooth",
+    });
+    sendingMessageStore.sendingMessage = null;
+    return;
+  }
+  let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
+  let difWidth = oldScrollWidth.value - messageListContainer.value.scrollWidth;
+  if (oldScrollHeight.value !== 0) {
+    if (dif !== 0 && difWidth === 0) {
+      if (!chatIsLoading.value) {
+        messageListContainer.value.scrollTop -= dif;
+      } else {
+        ScrollToSavedLocation();
+        chatIsLoading.value = false;
+      }
+    }
+  }
+  oldScrollHeight.value = messageListContainer.value.scrollHeight;
+  oldScrollWidth.value = messageListContainer.value.scrollWidth;
+}
+
 onMounted(() => {
+  let resizeObserver = new ResizeObserver(OnHeightUpdate);
+  resizeObserver.observe(messageListDom.value);
   observer.observe(messageListDom.value, {
     childList: true,
   });
@@ -123,7 +165,7 @@ onMounted(() => {
 <template>
   <div class="flex flex-col flex-nowrap h-full">
     <div
-      class="flex flex-col-reverse grow h-16 overflow-auto"
+      class="flex flex-col grow h-16 overflow-auto"
       id="list-container"
       @scroll="OnScrolling"
       ref="messageListContainer"

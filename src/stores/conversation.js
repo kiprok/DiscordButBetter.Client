@@ -33,7 +33,6 @@ export const useConversationStore = defineStore("messageList", () => {
         viewingOlderMessages: false,
       };
     }
-
     return conversations[convoId].visibleMessages;
   }
 
@@ -50,14 +49,14 @@ export const useConversationStore = defineStore("messageList", () => {
   function AddMessage(convoId, message) {
     conversations[convoId].visibleMessages.push(message);
     conversations[convoId].visibleMessages.sort(
-      (a, b) => a.timeSend - b.timeSend,
+      (a, b) => b.timeSend - a.timeSend,
     );
   }
 
   function AddMessages(convoId, messages) {
     conversations[convoId].visibleMessages.push(...messages);
     conversations[convoId].visibleMessages.sort(
-      (a, b) => a.timeSend - b.timeSend,
+      (a, b) => b.timeSend - a.timeSend,
     );
   }
 

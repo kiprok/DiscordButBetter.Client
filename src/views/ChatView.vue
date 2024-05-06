@@ -67,10 +67,10 @@ function SendChatMessage() {
 
   let msgList = document.querySelector("#list-container");
   if (msgList && !sendMessageStore.messageEditing) {
-    msgList.scroll({
-      top: 0,
-      behavior: "smooth",
-    });
+    // msgList.scroll({
+    //   top: msgList.scrollHeight,
+    //   behavior: "smooth",
+    // });
   } else {
     let msgElement = document.querySelector(
       `#message-list [data-msg-id="${sendMessageStore.messageEditing.messageId}"]`,

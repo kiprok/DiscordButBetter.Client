@@ -26,7 +26,7 @@ export async function GenerateConversation(
     convoPicture: convoPicture,
     visibleMessages: [],
     participants: [userId1, userId2],
-    scrollPosition: 0,
+    scrollPosition: Infinity,
     viewingOlderMessages: false,
   };
 }

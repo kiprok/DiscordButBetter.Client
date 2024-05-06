@@ -49,7 +49,7 @@ export const useUserStore = defineStore("user", () => {
       .filter(
         (key) =>
           convoId === messages[key].convoId &&
-          (messages[startpointId]?.timeSend ?? 9999999999999999999999) -
+          (messages[startpointId]?.timeSend ?? Infinity) -
             messages[key].timeSend >
             0,
       )

@@ -8,7 +8,6 @@ export const useSendingMessageStore = defineStore("sendingMessage", () => {
   const sendingMessage = ref("");
 
   function EditMessage(message, reply = null) {
-    console.log(reply);
     messageText.value = message.messageText;
     replyTo.value = reply;
     messageEditing.value = message;
