@@ -64,23 +64,7 @@ function SendChatMessage() {
   sendMessageStore.sendingMessage = msg.messageId;
   if (!sendMessageStore.messageEditing)
     conversationStore.AddMessage(route.params.id, msg);
-
-  let msgList = document.querySelector("#list-container");
-  if (msgList && !sendMessageStore.messageEditing) {
-    // msgList.scroll({
-    //   top: msgList.scrollHeight,
-    //   behavior: "smooth",
-    // });
-  } else {
-    let msgElement = document.querySelector(
-      `#message-list [data-msg-id="${sendMessageStore.messageEditing.messageId}"]`,
-    );
-    // if (msgElement)
-    //   msgElement.scrollIntoView({
-    //     block: "center",
-    //     behavior: "smooth",
-    //   });
-  }
+  else sendMessageStore.sendingMessage = null;
 
   sendMessageStore.messageText = "";
   sendMessageStore.messageEditing = null;
@@ -100,7 +84,23 @@ function SendChatMessage() {
         :convoId="
           conversationStore.GetConversationById(route.params.id)?.convoId
         "
+        :key="$route.path"
       />
+    </div>
+    <div
+      class="bg-gray-500 flex-none h-6 px-4 flex hover:cursor-pointer"
+      v-if="
+        conversationStore.GetConversationById(route.params.id)
+          ?.viewingOlderMessages
+      "
+      @click="() => {}"
+    >
+      <span class="text-white text-sm mr-1"
+        >Viewing older messages click here to return</span
+      >
+      <span class="ml-auto text-white hover:text-gray-600">
+        <i class="fa-solid fa-angles-down"></i>
+      </span>
     </div>
     <div
       class="bg-gray-500 flex-none h-6 px-4 flex"

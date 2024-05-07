@@ -44,7 +44,7 @@ export const useUserStore = defineStore("user", () => {
     return messages[newId];
   }
 
-  function GetOlderMessages(convoId, startpointId) {
+  function GetOlderMessages(convoId, startpointId, amount) {
     return Object.keys(messages)
       .filter(
         (key) =>
@@ -54,11 +54,11 @@ export const useUserStore = defineStore("user", () => {
             0,
       )
       .toSorted((a, b) => messages[b].timeSend - messages[a].timeSend)
-      .slice(0, 25)
+      .slice(0, amount)
       .map((key) => messages[key]);
   }
 
-  function GetNewerMessages(convoId, startpointId) {
+  function GetNewerMessages(convoId, startpointId, amount) {
     return Object.keys(messages)
       .filter(
         (key) =>
@@ -66,7 +66,7 @@ export const useUserStore = defineStore("user", () => {
           (messages[startpointId]?.timeSend ?? 0) - messages[key].timeSend < 0,
       )
       .toSorted((a, b) => messages[a].timeSend - messages[b].timeSend)
-      .slice(0, 25)
+      .slice(0, amount)
       .map((key) => messages[key]);
   }
 
@@ -79,7 +79,6 @@ export const useUserStore = defineStore("user", () => {
   }
 
   function GetFriendList() {
-    console.log("Getting friends list");
     return friends.map((friend) => users[friend]);
   }
 

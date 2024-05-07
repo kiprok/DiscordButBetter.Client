@@ -16,7 +16,6 @@ export const useConversationStore = defineStore("messageList", () => {
   });
 
   function GetALLConversations() {
-    console.log("Getting conversations");
     return conversations;
   }
 
@@ -49,15 +48,26 @@ export const useConversationStore = defineStore("messageList", () => {
   function AddMessage(convoId, message) {
     conversations[convoId].visibleMessages.push(message);
     conversations[convoId].visibleMessages.sort(
-      (a, b) => b.timeSend - a.timeSend,
+      (a, b) => a.timeSend - b.timeSend,
     );
   }
 
   function AddMessages(convoId, messages) {
     conversations[convoId].visibleMessages.push(...messages);
     conversations[convoId].visibleMessages.sort(
-      (a, b) => b.timeSend - a.timeSend,
+      (a, b) => a.timeSend - b.timeSend,
     );
+  }
+
+  function RemoveNewerMessages(convoId, amount) {
+    conversations[convoId].visibleMessages.splice(
+      conversations[convoId].visibleMessages.length - amount,
+      amount,
+    );
+  }
+
+  function RemoveOlderMessages(convoId, amount) {
+    conversations[convoId].visibleMessages.splice(0, amount);
   }
 
   function DeleteMessage(convoId, messageId) {
@@ -90,6 +100,8 @@ export const useConversationStore = defineStore("messageList", () => {
     GetLastMessage,
     AddMessage,
     AddMessages,
+    RemoveNewerMessages,
+    RemoveOlderMessages,
     DeleteMessage,
     SetScrollPosition,
     GetScrollPosition,

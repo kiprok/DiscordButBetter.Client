@@ -1,10 +1,10 @@
 <script setup>
 import { useUserStore } from "@/stores/user.js";
-import { computed } from "vue";
+import { computed, onMounted, onUnmounted } from "vue";
 import { useSendingMessageStore } from "@/stores/sendingMessage.js";
 import { useConversationStore } from "@/stores/conversation.js";
 
-const emits = defineEmits(["scroll-reply"]);
+const emits = defineEmits(["scroll-reply", "OnMountChange"]);
 const props = defineProps(["message", "index"]);
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
@@ -25,6 +25,14 @@ const previousAlsoOwner = computed(() => {
   return (
     previousElement.getAttribute("data-msg-sender-id") == props.message.senderId
   );
+});
+
+onMounted(() => {
+  emits("OnMountChange", props.message, 1);
+});
+
+onUnmounted(() => {
+  emits("OnMountChange", props.message, -1);
 });
 
 function RemoveChatMessage() {
