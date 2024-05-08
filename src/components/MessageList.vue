@@ -19,8 +19,8 @@ const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const sendingMessageStore = useSendingMessageStore();
 
-const messageListContainer = ref(null);
-const messageListDom = ref(null);
+const messageListContainer = ref();
+const messageListDom = ref();
 
 const oldScrollHeight = ref(0);
 
@@ -123,8 +123,17 @@ function OnMessageMountChange(message, eventType) {
   console.log(eventType);
   if (IsLoadingCompleted(waitingMessagesAbove, message)) {
     HandleNewAboveMesssages();
+    return;
   } else if (IsLoadingCompleted(waitingMessagesBelow, message)) {
     HandleNewBelowMessages();
+    return;
+  }
+
+  if (message.messageId === sendingMessageStore.sendingMessage) {
+    messageListContainer.value.scroll({
+      top: messageListContainer.value.scrollHeight,
+      behavior: "smooth",
+    });
   }
 }
 
