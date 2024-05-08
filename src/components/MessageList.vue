@@ -107,15 +107,14 @@ function LoadNewerMessages(startPointId) {
 function OnScrolling(event) {
   const { scrollTop, offsetHeight, scrollHeight } = event.target;
   if (scrollTop === 0) {
-    console.log("top");
-    const firstMessage = conversationStore.GetFirstMessage(props.convoId);
-    LoadOlderMessages(firstMessage.messageId);
-  } else if (scrollHeight - (scrollTop + offsetHeight) <= 2) {
     console.log("bottom");
     const lastMessage = conversationStore.GetLastMessage(props.convoId);
     LoadNewerMessages(lastMessage.messageId);
+  } else if (scrollHeight - (-scrollTop + offsetHeight) <= 2) {
+    console.log("top");
+    const firstMessage = conversationStore.GetFirstMessage(props.convoId);
+    LoadOlderMessages(firstMessage.messageId);
   }
-
   conversationStore.SetScrollPosition(props.convoId, scrollTop);
 }
 
@@ -129,19 +128,18 @@ function OnMessageMountChange(message, eventType) {
     return;
   }
 
-  if (message.messageId === sendingMessageStore.sendingMessage) {
-    messageListContainer.value.scroll({
-      top: messageListContainer.value.scrollHeight,
-      behavior: "smooth",
-    });
+  if (messageListContainer.value) {
+    if (message.messageId === sendingMessageStore.sendingMessage) {
+      messageListContainer.value.scroll({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
   }
 }
 
 function HandleNewAboveMesssages() {
-  let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
   if (!chatIsLoading.value) {
-    messageListContainer.value.scrollTop -= dif;
-
     if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
       conversationStore.RemoveNewerMessages(props.convoId, 25);
       conversationStore.GetConversationById(
@@ -155,7 +153,10 @@ function HandleNewAboveMesssages() {
 }
 
 function HandleNewBelowMessages() {
+  let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
   if (!chatIsLoading.value) {
+    messageListContainer.value.scrollTop += dif;
+
     if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
       conversationStore.RemoveOlderMessages(props.convoId, 25);
     }
@@ -169,7 +170,7 @@ function HandleNewBelowMessages() {
 <template>
   <div class="flex flex-col flex-nowrap h-full">
     <div
-      class="flex flex-col grow h-16 overflow-auto"
+      class="flex flex-col-reverse grow h-16 overflow-auto"
       id="list-container"
       @scroll="OnScrolling"
       ref="messageListContainer"

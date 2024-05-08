@@ -23,7 +23,8 @@ const previousAlsoOwner = computed(() => {
   );
   if (!previousElement) return false;
   return (
-    previousElement.getAttribute("data-msg-sender-id") == props.message.senderId
+    previousElement.getAttribute("data-msg-sender-id") ===
+    props.message.senderId
   );
 });
 
