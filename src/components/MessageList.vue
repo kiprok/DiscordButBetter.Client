@@ -46,7 +46,6 @@ function ScrollToMessage(messageId) {
     `#message-list [data-msg-id="${messageId}"]`,
   );
   if (!msgElement) {
-    console.log(messageId);
     conversationStore.TriggerJumpToMessage(props.convoId, messageId);
     return;
   }
