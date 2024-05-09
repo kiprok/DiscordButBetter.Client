@@ -62,7 +62,10 @@ function SendChatMessage() {
 
   let msg = userStore.SendMessage(route.params.id, messageToSend);
   sendMessageStore.sendingMessage = msg.messageId;
-  if (!sendMessageStore.messageEditing)
+  if (
+    !sendMessageStore.messageEditing &&
+    !conversationStore.GetConversationById(route.params.id).viewingOlderMessages
+  )
     conversationStore.AddMessage(route.params.id, msg);
   else sendMessageStore.sendingMessage = null;
 
