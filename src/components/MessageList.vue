@@ -44,13 +44,10 @@ function ScrollToMessage(messageId) {
 
 function ScrollToSavedLocation() {
   if (messageListContainer.value) {
-    messageListContainer.value.scrollTo(
-      0,
-      Math.min(
-        Math.max(conversationStore.GetScrollPosition(props.convoId), 0),
-        messageListContainer.value.scrollHeight,
-      ),
-    );
+    messageListContainer.value.scrollTo({
+      top: conversationStore.GetScrollPosition(props.convoId),
+      behavior: "instant",
+    });
   }
 }
 
