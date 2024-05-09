@@ -27,14 +27,29 @@ const oldScrollHeight = ref(0);
 const chatIsLoading = ref(true);
 const waitingMessagesAbove = reactive([]);
 const waitingMessagesBelow = reactive([]);
+const waitingMessagesJump = reactive({ focus: null, messages: [] });
 
 LoadFirstMessages();
+
+conversationStore.RegisterJumpCallback((messages, focus) => {
+  if (!focus) {
+    waitingMessagesJump.messages.push(...messages);
+    waitingMessagesJump.focus = null;
+  } else {
+    waitingMessagesJump.messages.push(...messages);
+    waitingMessagesJump.focus = focus;
+  }
+});
 
 function ScrollToMessage(messageId) {
   let msgElement = document.querySelector(
     `#message-list [data-msg-id="${messageId}"]`,
   );
-  if (!msgElement) return;
+  if (!msgElement) {
+    console.log(messageId);
+    conversationStore.TriggerJumpToMessage(props.convoId, messageId);
+    return;
+  }
 
   msgElement.scrollIntoView({
     block: "center",
@@ -123,6 +138,9 @@ function OnMessageMountChange(message, eventType) {
   } else if (IsLoadingCompleted(waitingMessagesBelow, message)) {
     HandleNewBelowMessages();
     return;
+  } else if (IsLoadingCompleted(waitingMessagesJump.messages, message)) {
+    HandleNewJumpMessages();
+    return;
   }
 
   if (messageListContainer.value) {
@@ -160,6 +178,25 @@ function HandleNewBelowMessages() {
   } else {
     ScrollToSavedLocation();
     chatIsLoading.value = false;
+  }
+}
+
+function HandleNewJumpMessages() {
+  if (!waitingMessagesJump.focus) {
+    messageListContainer.value.scrollTop = 0;
+
+    conversationStore.GetConversationById(props.convoId).viewingOlderMessages =
+      false;
+  } else {
+    const focusElement = document.querySelector(
+      `#message-list [data-msg-id="${waitingMessagesJump.focus.messageId}"]`,
+    );
+    focusElement.scrollIntoView({
+      behavior: "instant",
+      block: "center",
+    });
+
+    waitingMessagesJump.focus = null;
   }
 }
 </script>

@@ -26,7 +26,7 @@ export async function GenerateConversation(
     convoPicture: convoPicture,
     visibleMessages: [],
     participants: [userId1, userId2],
-    scrollPosition: Infinity,
+    scrollPosition: 0,
     viewingOlderMessages: false,
   };
 }
@@ -36,9 +36,17 @@ export async function GenerateConversationMessages(convoId, otherId, amount) {
 
   let lastMsgId = null;
   let startTimeOffset = 100000000;
+  let messageToJumpTo = null;
+  let userToJumpTo = null;
   for (let i = 0; i < amount; i++) {
     let timeOffset = startTimeOffset - (startTimeOffset / amount) * i;
     let newMessageId = crypto.randomUUID();
+
+    if (i === 40) {
+      messageToJumpTo = newMessageId;
+      userToJumpTo = i % 2 === 0 ? otherId : userStore.myId;
+    }
+
     userStore.messages[newMessageId] = {
       messageId: newMessageId,
       senderId: i % 2 === 0 ? otherId : userStore.myId,
@@ -52,4 +60,13 @@ export async function GenerateConversationMessages(convoId, otherId, amount) {
     };
     lastMsgId = newMessageId;
   }
+  let newMessageId = crypto.randomUUID();
+  userStore.messages[newMessageId] = {
+    messageId: newMessageId,
+    senderId: userStore.myId,
+    convoId: convoId,
+    messageText: `I replied to the 40th message`,
+    timeSend: Date.now(),
+    meta: { reply: { messageId: messageToJumpTo, userId: userToJumpTo } },
+  };
 }

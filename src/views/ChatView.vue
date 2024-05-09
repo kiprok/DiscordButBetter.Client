@@ -93,7 +93,11 @@ function SendChatMessage() {
         conversationStore.GetConversationById(route.params.id)
           ?.viewingOlderMessages
       "
-      @click="() => {}"
+      @click="
+        () => {
+          conversationStore.TriggerJumpToBottom(route.params.id);
+        }
+      "
     >
       <span class="text-white text-sm mr-1"
         >Viewing older messages click here to return</span

@@ -1,7 +1,10 @@
 import { defineStore } from "pinia";
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
+import { useUserStore } from "@/stores/user.js";
 
 export const useConversationStore = defineStore("messageList", () => {
+  const userStore = useUserStore();
+
   const conversations = reactive({
     // id: {
     //   convoId: "",
@@ -14,6 +17,42 @@ export const useConversationStore = defineStore("messageList", () => {
     //   viewingOlderMessages: false,
     // },
   });
+
+  const jumpToPlaceCallback = ref((messages, focus) => {});
+
+  function RegisterJumpCallback(callback) {
+    jumpToPlaceCallback.value = callback;
+  }
+
+  function TriggerJumpToBottom(convoId) {
+    const olderMessage = userStore.GetOlderMessages(convoId, null, 25);
+    ClearVisibleMessages(convoId);
+    AddMessages(convoId, olderMessage);
+
+    jumpToPlaceCallback.value(olderMessage, null);
+  }
+
+  function TriggerJumpToMessage(convoId, messageId) {
+    const centerMessage = userStore.GetMessageById(messageId);
+    const newerMessages = userStore.GetNewerMessages(
+      convoId,
+      centerMessage.messageId,
+      25,
+    );
+    const olderMessages = userStore.GetOlderMessages(
+      convoId,
+      centerMessage.messageId,
+      25,
+    );
+
+    const final = newerMessages.concat([centerMessage], olderMessages);
+
+    ClearVisibleMessages(convoId);
+    AddMessages(convoId, final);
+
+    conversations[convoId].viewingOlderMessages = true;
+    jumpToPlaceCallback.value(final, centerMessage);
+  }
 
   function GetALLConversations() {
     return conversations;
@@ -33,6 +72,13 @@ export const useConversationStore = defineStore("messageList", () => {
       };
     }
     return conversations[convoId].visibleMessages;
+  }
+
+  function ClearVisibleMessages(convoId) {
+    conversations[convoId].visibleMessages.splice(
+      0,
+      conversations[convoId].visibleMessages.length,
+    );
   }
 
   function GetFirstMessage(convoId) {
@@ -96,6 +142,7 @@ export const useConversationStore = defineStore("messageList", () => {
     GetConversationById,
     GetALLConversations,
     GetVisibleMessages,
+    ClearVisibleMessages,
     GetFirstMessage,
     GetLastMessage,
     AddMessage,
@@ -105,5 +152,8 @@ export const useConversationStore = defineStore("messageList", () => {
     DeleteMessage,
     SetScrollPosition,
     GetScrollPosition,
+    RegisterJumpCallback,
+    TriggerJumpToMessage,
+    TriggerJumpToBottom,
   };
 });
