@@ -32,13 +32,8 @@ const waitingMessagesJump = reactive({ focus: null, messages: [] });
 LoadFirstMessages();
 
 conversationStore.RegisterJumpCallback((messages, focus) => {
-  if (!focus) {
-    waitingMessagesJump.messages.push(...messages);
-    waitingMessagesJump.focus = null;
-  } else {
-    waitingMessagesJump.messages.push(...messages);
-    waitingMessagesJump.focus = focus;
-  }
+  waitingMessagesJump.messages.push(...messages);
+  waitingMessagesJump.focus = focus;
 });
 
 function ScrollToMessage(messageId) {
