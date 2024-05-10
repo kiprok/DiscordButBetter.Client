@@ -24,6 +24,10 @@ export const useConversationStore = defineStore("messageList", () => {
     jumpToPlaceCallback.value = callback;
   }
 
+  function UnRegisterJumpCallback() {
+    jumpToPlaceCallback.value = (messages, focus) => {};
+  }
+
   function TriggerJumpToBottom(convoId) {
     const olderMessage = userStore.GetOlderMessages(convoId, null, 25);
     ClearVisibleMessages(convoId);
@@ -153,6 +157,7 @@ export const useConversationStore = defineStore("messageList", () => {
     SetScrollPosition,
     GetScrollPosition,
     RegisterJumpCallback,
+    UnRegisterJumpCallback,
     TriggerJumpToMessage,
     TriggerJumpToBottom,
   };

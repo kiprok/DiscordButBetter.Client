@@ -36,6 +36,10 @@ conversationStore.RegisterJumpCallback((messages, focus) => {
   waitingMessagesJump.focus = focus;
 });
 
+onMounted(() => {
+  conversationStore.UnRegisterJumpCallback();
+});
+
 function ScrollToMessage(messageId) {
   let msgElement = document.querySelector(
     `#message-list [data-msg-id="${messageId}"]`,
