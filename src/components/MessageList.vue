@@ -1,6 +1,12 @@
 <script setup>
 import { useUserStore } from "@/stores/user.js";
-import { defineAsyncComponent, onMounted, reactive, ref } from "vue";
+import {
+  defineAsyncComponent,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+} from "vue";
 import { useRoute } from "vue-router";
 import { useConversationStore } from "@/stores/conversation.js";
 import { useSendingMessageStore } from "@/stores/sendingMessage.js";
@@ -36,7 +42,7 @@ conversationStore.RegisterJumpCallback((messages, focus) => {
   waitingMessagesJump.focus = focus;
 });
 
-onMounted(() => {
+onUnmounted(() => {
   conversationStore.UnRegisterJumpCallback();
 });
 
