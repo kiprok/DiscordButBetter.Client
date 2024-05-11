@@ -37,9 +37,11 @@ const waitingMessagesJump = reactive({ focus: null, messages: [] });
 
 LoadFirstMessages();
 
-conversationStore.RegisterJumpCallback((messages, focus) => {
-  waitingMessagesJump.messages.push(...messages);
-  waitingMessagesJump.focus = focus;
+onMounted(() => {
+  conversationStore.RegisterJumpCallback((messages, focus) => {
+    waitingMessagesJump.messages.push(...messages);
+    waitingMessagesJump.focus = focus;
+  });
 });
 
 onUnmounted(() => {

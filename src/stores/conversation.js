@@ -18,17 +18,18 @@ export const useConversationStore = defineStore("messageList", () => {
     // },
   });
 
-  const jumpToPlaceCallback = ref((messages, focus) => {});
+  const jumpToPlaceCallback = ref(null);
 
   function RegisterJumpCallback(callback) {
     jumpToPlaceCallback.value = callback;
   }
 
   function UnRegisterJumpCallback() {
-    jumpToPlaceCallback.value = (messages, focus) => {};
+    jumpToPlaceCallback.value = null;
   }
 
   function TriggerJumpToBottom(convoId) {
+    if (!jumpToPlaceCallback.value) return;
     const olderMessage = userStore.GetOlderMessages(convoId, null, 25);
     ClearVisibleMessages(convoId);
     AddMessages(convoId, olderMessage);
@@ -37,6 +38,7 @@ export const useConversationStore = defineStore("messageList", () => {
   }
 
   function TriggerJumpToMessage(convoId, messageId) {
+    if (!jumpToPlaceCallback.value) return;
     const centerMessage = userStore.GetMessageById(messageId);
     const newerMessages = userStore.GetNewerMessages(
       convoId,
