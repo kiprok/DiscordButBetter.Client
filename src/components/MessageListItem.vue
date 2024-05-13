@@ -63,7 +63,7 @@ function EditMessage() {
 
 <template>
   <li
-    class="flex flex-col relative group hover:bg-gray-400"
+    class="flex flex-col relative group/item hover:bg-gray-400"
     :class="{ 'mt-2': !previousAlsoOwner }"
   >
     <div class="flex flex-row items-end" v-if="reply">
@@ -99,7 +99,7 @@ function EditMessage() {
           v-if="previousAlsoOwner"
           class="flex items-center justify-center h-6"
         >
-          <span class="text-xs invisible group-hover:visible">
+          <span class="text-xs invisible group-hover/item:visible">
             {{
               timeSend.toLocaleTimeString([], {
                 hour: "2-digit",
@@ -124,7 +124,7 @@ function EditMessage() {
       </div>
     </div>
     <div
-      class="opacity-0 group-hover:opacity-100 absolute right-0 -top-5 h-8 p-1 group-hover:ease-in-out duration-300 flex items-center"
+      class="opacity-0 group-hover/item:opacity-100 absolute right-0 -top-5 h-8 p-1 group-hover/item:ease-in-out duration-300 flex items-center"
     >
       <button
         @click="ReplyToMessage"

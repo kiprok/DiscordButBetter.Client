@@ -198,7 +198,7 @@ function HandleNewJumpMessages() {
       `#message-list [data-msg-id="${waitingMessagesJump.focus.messageId}"]`,
     );
     focusElement.scrollIntoView({
-      behavior: "instant",
+      behavior: "smooth",
       block: "center",
     });
 
