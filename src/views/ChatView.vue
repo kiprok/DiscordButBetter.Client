@@ -99,7 +99,7 @@ function SendChatMessage() {
         <i class="fa-solid fa-magnifying-glass"></i>
       </label>
     </ChatTopBar>
-    <div class="grow bg-purple-600 flex flex-row">
+    <div class="grow relative bg-purple-600 flex flex-row">
       <div class="grow bg-blue-600 flex flex-col flex-nowrap">
         <div class="grow bg-gray-300">
           <message-list
@@ -156,7 +156,7 @@ function SendChatMessage() {
         </div>
       </div>
       <div
-        class="flex-none absolute w-screen h-full lg:relative hidden lg:!block group-[.sidebar-checked]:block lg:w-[22rem] bg-gray-600"
+        class="flex-none absolute w-full h-full lg:relative hidden lg:!block group-[.sidebar-checked]:block lg:w-[22rem] bg-gray-600"
       ></div>
     </div>
   </div>
