@@ -11,17 +11,18 @@ function SendChatMessage() {
 </script>
 
 <template>
-  <div class="flex flex-row items-center">
-    <input
-      @keyup.enter="SendChatMessage"
-      v-model="sendMessageStore.messageText"
-      id="chat-input"
-      class="grow h-6"
-    />
-    <SimpleButton
-      @click="SendChatMessage"
-      class="flex-none px-2 w-fit h-6 rounded-l-none"
-      >send</SimpleButton
-    >
+  <div class="">
+    <form class="w-full flex" @submit.prevent="SendChatMessage">
+      <input
+        v-model="sendMessageStore.messageText"
+        id="chat-input"
+        class="grow h-6 rounded-l-lg"
+        type="text"
+        autocomplete="off"
+      />
+      <button class="flex-none px-2 w-fit h-6 bg-white rounded-r-lg">
+        <i class="fa-solid fa-share"></i>
+      </button>
+    </form>
   </div>
 </template>
