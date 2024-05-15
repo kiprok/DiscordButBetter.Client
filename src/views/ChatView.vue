@@ -7,6 +7,8 @@ import { defineAsyncComponent, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useConversationStore } from "@/stores/conversation.js";
 import ChatAreaInfoBar from "@/components/ChatAreaInfoBar.vue";
+import ChatLeftSideMenuButton from "@/components/ChatLeftSideMenuButton.vue";
+import { useSearchStore } from "@/stores/search.js";
 
 const MessageList = defineAsyncComponent(
   () => import("@/components/MessageList.vue"),
@@ -17,6 +19,7 @@ const router = useRouter();
 const userStore = useUserStore();
 const sendMessageStore = useSendingMessageStore();
 const conversationStore = useConversationStore();
+const searchStore = useSearchStore();
 
 const sideBarIsShowing = ref(false);
 
@@ -87,6 +90,14 @@ function SendChatMessage() {
     :class="{ 'sidebar-checked': sideBarIsShowing }"
   >
     <ChatTopBar class="flex-none">
+      <chat-left-side-menu-button class="group-[.sidebar-checked]:hidden" />
+      <label
+        for="sidebar-check"
+        class="text-white text-xl hover:text-gray-300 hidden group-[.sidebar-checked]:block lg:!hidden"
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </label>
+
       <h1
         class="text-white text-2xl font-bold group-[.sidebar-checked]:hidden lg:!block"
       >
@@ -94,10 +105,21 @@ function SendChatMessage() {
       </h1>
       <label
         for="sidebar-check"
-        class="ml-auto text-white text-xl lg:hidden hover:text-gray-300"
+        class="ml-auto text-white text-xl group-[.sidebar-checked]:hidden lg:hidden hover:text-gray-300"
       >
         <i class="fa-solid fa-magnifying-glass"></i>
       </label>
+      <form
+        @submit.prevent="
+          () => {
+            searchStore.GetSearchDataById(route.params.id).searchIsShowing =
+              !searchStore.GetSearchDataById(route.params.id).searchIsShowing;
+          }
+        "
+        class="w-full hidden group-[.sidebar-checked]:block lg:max-w-[16rem] ml-auto lg:!block"
+      >
+        <input class="w-full" type="text" placeholder="Search for text" />
+      </form>
     </ChatTopBar>
     <div class="grow relative bg-purple-600 flex flex-row">
       <div class="grow bg-blue-600 flex flex-col flex-nowrap">
@@ -156,8 +178,39 @@ function SendChatMessage() {
         </div>
       </div>
       <div
-        class="flex-none absolute w-full h-full lg:relative hidden lg:!block group-[.sidebar-checked]:block lg:w-[22rem] bg-gray-600"
-      ></div>
+        class="flex-none absolute w-full h-full lg:relative hidden lg:!block group-[.sidebar-checked]:block bg-gray-600 p-4"
+        :class="{
+          'lg:w-[18rem]': !searchStore.GetShowingStatus(route.params.id),
+          'lg:w-[22rem]': searchStore.GetShowingStatus(route.params.id),
+        }"
+      >
+        <div
+          class=""
+          :class="{ hidden: !searchStore.GetShowingStatus(route.params.id) }"
+        ></div>
+        <div :class="{ hidden: searchStore.GetShowingStatus(route.params.id) }">
+          <span class="text-white font-bold p-2">Members</span>
+          <ul class="flex flex-col overflow-auto">
+            <li
+              v-for="(
+                participant, index
+              ) in conversationStore.GetConversationById(route.params.id)
+                ?.participants"
+              :key="participant"
+              class="text-xl text-white hover:bg-black/30 p-2 transition-colors ease-in-out rounded-lg"
+            >
+              <div class="flex flex-nowrap flex-row items-center gap-2">
+                <img
+                  :src="userStore.GetUserById(participant).profilePicture"
+                  alt="pfp"
+                  class="rounded-full size-10 flex-none"
+                />
+                <span> {{ userStore.GetUserById(participant).userName }} </span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </template>

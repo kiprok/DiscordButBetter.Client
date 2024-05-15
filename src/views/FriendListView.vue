@@ -9,6 +9,7 @@ import {
   GenerateConversationMessages,
 } from "@/composables/mock/MockDataGeneration.js";
 import { useConversationStore } from "@/stores/conversation.js";
+import ChatLeftSideMenuButton from "@/components/ChatLeftSideMenuButton.vue";
 
 document.title = "Friends";
 
@@ -40,6 +41,7 @@ async function GenFriend() {
 <template>
   <div class="w-full flex flex-col flex-nowrap">
     <ChatTopBar class="flex-none">
+      <chat-left-side-menu-button />
       <h1 class="text-white text-3xl font-bold block">Friends</h1>
       <button
         @click="sidePanelView = !sidePanelView"
