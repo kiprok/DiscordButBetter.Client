@@ -11,16 +11,16 @@ function SendChatMessage() {
 </script>
 
 <template>
-  <div class="">
-    <form class="w-full flex" @submit.prevent="SendChatMessage">
+  <div class="size-full">
+    <form class="size-full flex items-center" @submit.prevent="SendChatMessage">
       <input
         v-model="sendMessageStore.messageText"
         id="chat-input"
-        class="grow h-6 rounded-l-lg"
+        class="grow h-4/6 rounded-l-lg"
         type="text"
         autocomplete="off"
       />
-      <button class="flex-none px-2 w-fit h-6 bg-white rounded-r-lg">
+      <button class="flex-none px-2 w-fit h-4/6 bg-white rounded-r-lg">
         <i class="fa-solid fa-share"></i>
       </button>
     </form>

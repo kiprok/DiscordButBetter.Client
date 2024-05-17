@@ -86,7 +86,7 @@ function SendChatMessage() {
     class="hidden"
   />
   <div
-    class="w-full flex flex-col flex-nowrap group"
+    class="w-full h-full flex flex-col flex-nowrap group"
     :class="{ 'sidebar-checked': sideBarIsShowing }"
   >
     <ChatTopBar class="flex-none">
@@ -114,15 +114,21 @@ function SendChatMessage() {
           () => {
             searchStore.GetSearchDataById(route.params.id).searchIsShowing =
               !searchStore.GetSearchDataById(route.params.id).searchIsShowing;
+            searchStore.SearchMessages(route.params.id);
           }
         "
         class="w-full hidden group-[.sidebar-checked]:block lg:max-w-[16rem] ml-auto lg:!block"
       >
-        <input class="w-full" type="text" placeholder="Search for text" />
+        <input
+          class="w-full"
+          type="text"
+          v-model="searchStore.GetSearchDataById(route.params.id).searchQuery"
+          placeholder="Search for text"
+        />
       </form>
     </ChatTopBar>
-    <div class="grow relative bg-purple-600 flex flex-row">
-      <div class="grow bg-blue-600 flex flex-col flex-nowrap">
+    <div class="h-full static bg-purple-600 flex flex-row">
+      <div class="grow bg-blue-600 flex flex-col">
         <div class="grow bg-gray-300">
           <message-list
             :convoId="
@@ -174,20 +180,37 @@ function SendChatMessage() {
           </span>
         </chat-area-info-bar>
         <div class="bg-gray-600 h-14 flex-none flex flex-row items-center px-6">
-          <ChatTextBox class="w-full" @send-chat-message="SendChatMessage" />
+          <ChatTextBox @send-chat-message="SendChatMessage" />
         </div>
       </div>
       <div
-        class="flex-none absolute w-full h-full lg:relative hidden lg:!block group-[.sidebar-checked]:block bg-gray-600 p-4"
+        class="flex-none absolute w-full h-full overflow-hidden lg:static hidden lg:!block group-[.sidebar-checked]:block bg-gray-600 p-4"
         :class="{
           'lg:w-[18rem]': !searchStore.GetShowingStatus(route.params.id),
-          'lg:w-[22rem]': searchStore.GetShowingStatus(route.params.id),
+          'lg:w-[24rem]': searchStore.GetShowingStatus(route.params.id),
         }"
       >
         <div
-          class=""
+          class="text-white h-full overflow-hidden flex flex-col"
           :class="{ hidden: !searchStore.GetShowingStatus(route.params.id) }"
-        ></div>
+        >
+          <div class="size-full overflow-hidden block fixed">
+            <span class="font-bold text-lg h-fit flex-none"
+              >search results</span
+            >
+            <ul class="overflow-hidden block w-full h-full bg-blue-600">
+              <li
+                v-for="(result, index) in searchStore.GetSearchResults(
+                  route.params.id,
+                )"
+                key="result.messageId"
+                class="h-8"
+              >
+                {{ result.messageText }}
+              </li>
+            </ul>
+          </div>
+        </div>
         <div :class="{ hidden: searchStore.GetShowingStatus(route.params.id) }">
           <span class="text-white font-bold p-2">Members</span>
           <ul class="flex flex-col overflow-auto">
