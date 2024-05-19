@@ -36,7 +36,10 @@ export const useSearchStore = defineStore('search', () => {
     const userStore = useUserStore();
     const results = Object.keys(userStore.messages)
       .filter((message) => {
-        return userStore.messages[message].messageText.includes(GetSearchDataById(searchId).searchQuery);
+        return (
+          userStore.messages[message].messageText.includes(GetSearchDataById(searchId).searchQuery) &&
+          userStore.messages[message].convoId === searchId
+        );
       })
       .map((message) => userStore.messages[message]);
     GetSearchDataById(searchId).searchResults = results;
