@@ -1,24 +1,16 @@
 <script setup>
-import { useUserStore } from "@/stores/user.js";
-import {
-  defineAsyncComponent,
-  onMounted,
-  onUnmounted,
-  reactive,
-  ref,
-} from "vue";
-import { useRoute } from "vue-router";
-import { useConversationStore } from "@/stores/conversation.js";
-import { useSendingMessageStore } from "@/stores/sendingMessage.js";
-import { IsLoadingCompleted } from "@/composables/utility.js";
+import { useUserStore } from '@/stores/user.js';
+import { defineAsyncComponent, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { useConversationStore } from '@/stores/conversation.js';
+import { useSendingMessageStore } from '@/stores/sendingMessage.js';
+import { IsLoadingCompleted } from '@/composables/utility.js';
 
 const route = useRoute();
 
-const MessageListItem = defineAsyncComponent(
-  () => import("@/components/MessageListItem.vue"),
-);
+const MessageListItem = defineAsyncComponent(() => import('@/components/MessageListItem.vue'));
 
-const props = defineProps(["convoId"]);
+const props = defineProps(['convoId']);
 const amountToLoad = 25;
 
 const userStore = useUserStore();
@@ -49,17 +41,15 @@ onUnmounted(() => {
 });
 
 function ScrollToMessage(messageId) {
-  let msgElement = document.querySelector(
-    `#message-list [data-msg-id="${messageId}"]`,
-  );
+  let msgElement = document.querySelector(`#message-list [data-msg-id="${messageId}"]`);
   if (!msgElement) {
     conversationStore.TriggerJumpToMessage(props.convoId, messageId);
     return;
   }
 
   msgElement.scrollIntoView({
-    block: "center",
-    behavior: "smooth",
+    block: 'center',
+    behavior: 'smooth',
   });
 }
 
@@ -67,7 +57,7 @@ function ScrollToSavedLocation() {
   if (messageListContainer.value) {
     messageListContainer.value.scrollTo({
       top: conversationStore.GetScrollPosition(props.convoId),
-      behavior: "instant",
+      behavior: 'instant',
     });
   }
 }
@@ -76,20 +66,13 @@ function LoadFirstMessages() {
   if (conversationStore.GetVisibleMessages(props.convoId).length === 0) {
     LoadOlderMessages(null);
   } else {
-    waitingMessagesAbove.push(
-      ...conversationStore.GetVisibleMessages(props.convoId),
-    );
+    waitingMessagesAbove.push(...conversationStore.GetVisibleMessages(props.convoId));
   }
 }
 
 function LoadOlderMessages(startPointId) {
-  if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0)
-    return;
-  const newMessages = userStore.GetOlderMessages(
-    props.convoId,
-    startPointId,
-    amountToLoad,
-  );
+  if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0) return;
+  const newMessages = userStore.GetOlderMessages(props.convoId, startPointId, amountToLoad);
   waitingMessagesAbove.push(...newMessages);
 
   conversationStore.AddMessages(props.convoId, newMessages);
@@ -97,22 +80,13 @@ function LoadOlderMessages(startPointId) {
 }
 
 function LoadNewerMessages(startPointId) {
-  if (
-    !conversationStore.GetConversationById(props.convoId).viewingOlderMessages
-  )
-    return;
-  if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0)
-    return;
+  if (!conversationStore.GetConversationById(props.convoId).viewingOlderMessages) return;
+  if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0) return;
 
-  const newMessages = userStore.GetNewerMessages(
-    props.convoId,
-    startPointId,
-    amountToLoad,
-  );
+  const newMessages = userStore.GetNewerMessages(props.convoId, startPointId, amountToLoad);
 
   if (newMessages.length < amountToLoad) {
-    conversationStore.GetConversationById(props.convoId).viewingOlderMessages =
-      false;
+    conversationStore.GetConversationById(props.convoId).viewingOlderMessages = false;
     return;
   }
 
@@ -125,11 +99,11 @@ function LoadNewerMessages(startPointId) {
 function OnScrolling(event) {
   const { scrollTop, offsetHeight, scrollHeight } = event.target;
   if (scrollTop === 0) {
-    console.log("bottom");
+    console.log('bottom');
     const lastMessage = conversationStore.GetLastMessage(props.convoId);
     LoadNewerMessages(lastMessage.messageId);
   } else if (scrollHeight - (-scrollTop + offsetHeight) <= 2) {
-    console.log("top");
+    console.log('top');
     const firstMessage = conversationStore.GetFirstMessage(props.convoId);
     LoadOlderMessages(firstMessage.messageId);
   }
@@ -153,7 +127,7 @@ function OnMessageMountChange(message, eventType) {
     if (message.messageId === sendingMessageStore.sendingMessage) {
       messageListContainer.value.scroll({
         top: 0,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     }
   }
@@ -163,9 +137,7 @@ function HandleNewAboveMesssages() {
   if (!chatIsLoading.value) {
     if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
       conversationStore.RemoveNewerMessages(props.convoId, 25);
-      conversationStore.GetConversationById(
-        props.convoId,
-      ).viewingOlderMessages = true;
+      conversationStore.GetConversationById(props.convoId).viewingOlderMessages = true;
     }
   } else {
     ScrollToSavedLocation();
@@ -191,15 +163,12 @@ function HandleNewJumpMessages() {
   if (!waitingMessagesJump.focus) {
     messageListContainer.value.scrollTop = 0;
 
-    conversationStore.GetConversationById(props.convoId).viewingOlderMessages =
-      false;
+    conversationStore.GetConversationById(props.convoId).viewingOlderMessages = false;
   } else {
-    const focusElement = document.querySelector(
-      `#message-list [data-msg-id="${waitingMessagesJump.focus.messageId}"]`,
-    );
+    const focusElement = document.querySelector(`#message-list [data-msg-id="${waitingMessagesJump.focus.messageId}"]`);
     focusElement.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
+      behavior: 'smooth',
+      block: 'center',
     });
 
     waitingMessagesJump.focus = null;
@@ -222,9 +191,7 @@ function HandleNewJumpMessages() {
           :data-msg-list-index="index"
           :data-msg-sender-id="message.senderId"
           :index="index"
-          v-for="(message, index) in conversationStore.GetVisibleMessages(
-            props.convoId,
-          )"
+          v-for="(message, index) in conversationStore.GetVisibleMessages(props.convoId)"
           :message="message"
           @scroll-reply="ScrollToMessage"
           @on-mount-change="OnMessageMountChange"

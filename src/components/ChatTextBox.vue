@@ -1,12 +1,12 @@
 <script setup>
-import SimpleButton from "@/components/SimpleButton.vue";
-import { useSendingMessageStore } from "@/stores/sendingMessage.js";
+import SimpleButton from '@/components/SimpleButton.vue';
+import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 const sendMessageStore = useSendingMessageStore();
-const emit = defineEmits(["SendChatMessage"]);
+const emit = defineEmits(['SendChatMessage']);
 
 function SendChatMessage() {
   if (!sendMessageStore.messageText) return;
-  emit("SendChatMessage");
+  emit('SendChatMessage');
 }
 </script>
 

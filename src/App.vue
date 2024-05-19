@@ -1,5 +1,5 @@
 <script setup>
-import ChatSideMenu from "@/components/ChatSideMenu.vue";
+import ChatSideMenu from '@/components/ChatSideMenu.vue';
 </script>
 
 <template>

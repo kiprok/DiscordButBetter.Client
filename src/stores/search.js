@@ -1,12 +1,12 @@
-import { defineStore } from "pinia";
-import { reactive } from "vue";
-import { useUserStore } from "@/stores/user.js";
+import { defineStore } from 'pinia';
+import { reactive } from 'vue';
+import { useUserStore } from '@/stores/user.js';
 
-export const useSearchStore = defineStore("search", () => {
+export const useSearchStore = defineStore('search', () => {
   const searchData = reactive({
     id: {
-      searchId: "convoId",
-      searchQuery: "",
+      searchId: 'convoId',
+      searchQuery: '',
       searchIsShowing: false,
       searchResults: [],
       searchPagePlace: 1,
@@ -17,7 +17,7 @@ export const useSearchStore = defineStore("search", () => {
     if (!searchData[searchId]) {
       searchData[searchId] = {
         searchId: searchId,
-        searchQuery: "",
+        searchQuery: '',
         searchIsShowing: false,
         searchResults: [],
         searchPagePlace: 1,
@@ -36,9 +36,7 @@ export const useSearchStore = defineStore("search", () => {
     const userStore = useUserStore();
     const results = Object.keys(userStore.messages)
       .filter((message) => {
-        return userStore.messages[message].messageText.includes(
-          GetSearchDataById(searchId).searchQuery,
-        );
+        return userStore.messages[message].messageText.includes(GetSearchDataById(searchId).searchQuery);
       })
       .map((message) => userStore.messages[message]);
     GetSearchDataById(searchId).searchResults = results;

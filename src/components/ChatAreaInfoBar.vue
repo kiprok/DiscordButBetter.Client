@@ -1,6 +1,6 @@
 <script setup>
-const props = defineProps(["visible", "buttonClass", "barClick"]);
-const emit = defineEmits(["onClick"]);
+const props = defineProps(['visible', 'buttonClass', 'barClick']);
+const emit = defineEmits(['onClick']);
 </script>
 
 <template>

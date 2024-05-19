@@ -1,13 +1,13 @@
 <script setup>
-import { useUserStore } from "@/stores/user.js";
-import { useConversationStore } from "@/stores/conversation.js";
+import { useUserStore } from '@/stores/user.js';
+import { useConversationStore } from '@/stores/conversation.js';
 
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
 
 function ToggleSideMenu() {
-  let sideMenu = document.querySelector("#SideMenu");
-  sideMenu.classList.toggle("hidden");
+  let sideMenu = document.querySelector('#SideMenu');
+  sideMenu.classList.toggle('hidden');
 }
 </script>
 
@@ -21,13 +21,7 @@ function ToggleSideMenu() {
         <h2 class="text-white text-3xl font-bold">Menu</h2>
       </div>
       <div class="bg-gray-500 grow flex flex-col px-2 overflow-auto">
-        <router-link
-          class="router-link"
-          @click="ToggleSideMenu"
-          :to="{ name: 'friendList' }"
-        >
-          Friends
-        </router-link>
+        <router-link class="router-link" @click="ToggleSideMenu" :to="{ name: 'friendList' }"> Friends </router-link>
         <router-link
           v-for="(convo, index) in conversationStore.GetALLConversations()"
           :key="index"
@@ -36,22 +30,14 @@ function ToggleSideMenu() {
           @click="ToggleSideMenu"
         >
           <div class="flex flex-nowrap flex-row items-center gap-2">
-            <img
-              :src="convo.convoPicture"
-              alt="pfp"
-              class="rounded-full size-10 flex-none"
-            />
+            <img :src="convo.convoPicture" alt="pfp" class="rounded-full size-10 flex-none" />
             <span>{{ convo.convoName }}</span>
           </div>
         </router-link>
       </div>
       <div class="w-full h-14 bg-gray-800 mt-auto flex-none">
         <div class="flex flex-nowrap flex-row items-center gap-2 h-full w-full">
-          <img
-            :src="userStore.myProfilePicture"
-            alt="pfp"
-            class="rounded-full size-10 flex-none"
-          />
+          <img :src="userStore.myProfilePicture" alt="pfp" class="rounded-full size-10 flex-none" />
           <span class="text-xl text-white">{{ userStore.myUserName }}</span>
         </div>
       </div>

@@ -1,11 +1,11 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
-export const useSendingMessageStore = defineStore("sendingMessage", () => {
-  const messageText = ref("");
+export const useSendingMessageStore = defineStore('sendingMessage', () => {
+  const messageText = ref('');
   const replyTo = ref(null);
   const messageEditing = ref(null);
-  const sendingMessage = ref("");
+  const sendingMessage = ref('');
 
   function EditMessage(message, reply = null) {
     messageText.value = message.messageText;
@@ -14,7 +14,7 @@ export const useSendingMessageStore = defineStore("sendingMessage", () => {
   }
 
   function StopEditingMessage() {
-    messageText.value = "";
+    messageText.value = '';
     replyTo.value = null;
     messageEditing.value = null;
   }

@@ -1,11 +1,11 @@
 <script setup>
-import { useUserStore } from "@/stores/user.js";
-import { computed, onMounted, onUnmounted } from "vue";
-import { useSendingMessageStore } from "@/stores/sendingMessage.js";
-import { useConversationStore } from "@/stores/conversation.js";
+import { useUserStore } from '@/stores/user.js';
+import { computed, onMounted, onUnmounted } from 'vue';
+import { useSendingMessageStore } from '@/stores/sendingMessage.js';
+import { useConversationStore } from '@/stores/conversation.js';
 
-const emits = defineEmits(["scroll-reply", "OnMountChange"]);
-const props = defineProps(["message", "index"]);
+const emits = defineEmits(['scroll-reply', 'OnMountChange']);
+const props = defineProps(['message', 'index']);
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const sendMessageStore = useSendingMessageStore();
@@ -18,35 +18,27 @@ const reply = computed(() => {
 
 const previousAlsoOwner = computed(() => {
   if (reply.value) return false;
-  let previousElement = document.querySelector(
-    `#message-list [data-msg-list-index="${props.index - 1}"]`,
-  );
+  let previousElement = document.querySelector(`#message-list [data-msg-list-index="${props.index - 1}"]`);
   if (!previousElement) return false;
-  return (
-    previousElement.getAttribute("data-msg-sender-id") ===
-    props.message.senderId
-  );
+  return previousElement.getAttribute('data-msg-sender-id') === props.message.senderId;
 });
 
 onMounted(() => {
-  emits("OnMountChange", props.message, 1);
+  emits('OnMountChange', props.message, 1);
 });
 
 onUnmounted(() => {
-  emits("OnMountChange", props.message, -1);
+  emits('OnMountChange', props.message, -1);
 });
 
 function RemoveChatMessage() {
   userStore.DeleteMessage(props.message.messageId);
-  conversationStore.DeleteMessage(
-    props.message.convoId,
-    props.message.messageId,
-  );
+  conversationStore.DeleteMessage(props.message.convoId, props.message.messageId);
 }
 
 function ReplyToMessage() {
   sendMessageStore.replyTo = userStore.GetMessageById(props.message.messageId);
-  let chatInput = document.querySelector("#chat-input");
+  let chatInput = document.querySelector('#chat-input');
   if (chatInput) {
     chatInput.focus();
   }
@@ -54,7 +46,7 @@ function ReplyToMessage() {
 
 function EditMessage() {
   sendMessageStore.EditMessage(props.message, reply.value);
-  let chatInput = document.querySelector("#chat-input");
+  let chatInput = document.querySelector('#chat-input');
   if (chatInput) {
     chatInput.focus();
   }
@@ -62,27 +54,17 @@ function EditMessage() {
 </script>
 
 <template>
-  <li
-    class="flex flex-col relative group/item hover:bg-gray-400"
-    :class="{ 'mt-2': !previousAlsoOwner }"
-  >
+  <li class="flex flex-col relative group/item hover:bg-gray-400" :class="{ 'mt-2': !previousAlsoOwner }">
     <div class="flex flex-row items-end" v-if="reply">
-      <div
-        class="w-8 ml-6 h-3 shrink-0 border border-b-0 border-r-0 border-black rounded-tl"
-      ></div>
+      <div class="w-8 ml-6 h-3 shrink-0 border border-b-0 border-r-0 border-black rounded-tl"></div>
       <div class="mb-0.5 truncate">
         <img
           :src="userStore.GetUserById(reply.senderId)?.profilePicture"
           alt="profile picture"
           class="rounded-full size-4 inline mr-1"
         />
-        <span
-          class="hover:underline hover:text-white hover:cursor-pointer"
-          @click="$emit('scroll-reply', reply.messageId)"
-        >
-          <span class="text-sm mr-0.5">{{
-            userStore.GetUserById(reply.senderId)?.userName
-          }}</span>
+        <span class="hover:underline hover:text-white hover:cursor-pointer" @click="$emit('scroll-reply', reply.messageId)">
+          <span class="text-sm mr-0.5">{{ userStore.GetUserById(reply.senderId)?.userName }}</span>
           <span class="text-xs">{{ reply.messageText }}</span>
         </span>
       </div>
@@ -95,15 +77,12 @@ function EditMessage() {
           class="rounded-full size-full h-10"
           v-if="!previousAlsoOwner"
         />
-        <div
-          v-if="previousAlsoOwner"
-          class="flex items-center justify-center h-6"
-        >
+        <div v-if="previousAlsoOwner" class="flex items-center justify-center h-6">
           <span class="text-xs invisible group-hover/item:visible">
             {{
               timeSend.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
+                hour: '2-digit',
+                minute: '2-digit',
               })
             }}</span
           >
@@ -114,13 +93,9 @@ function EditMessage() {
           <h3 class="text-lg block truncate">
             {{ userStore.GetUserById(props.message.senderId).userName }}
           </h3>
-          <span class="text-xs block shrink-0">{{
-            timeSend.toLocaleTimeString()
-          }}</span>
+          <span class="text-xs block shrink-0">{{ timeSend.toLocaleTimeString() }}</span>
         </div>
-        <span class="text-pretty break-words w-full">{{
-          props.message.messageText
-        }}</span>
+        <span class="text-pretty break-words w-full">{{ props.message.messageText }}</span>
       </div>
     </div>
     <div

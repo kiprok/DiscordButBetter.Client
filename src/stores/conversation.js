@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import { reactive, ref } from "vue";
-import { useUserStore } from "@/stores/user.js";
+import { defineStore } from 'pinia';
+import { reactive, ref } from 'vue';
+import { useUserStore } from '@/stores/user.js';
 
-export const useConversationStore = defineStore("messageList", () => {
+export const useConversationStore = defineStore('messageList', () => {
   const userStore = useUserStore();
 
   const conversations = reactive({
@@ -40,16 +40,8 @@ export const useConversationStore = defineStore("messageList", () => {
   function TriggerJumpToMessage(convoId, messageId) {
     if (!jumpToPlaceCallback.value) return;
     const centerMessage = userStore.GetMessageById(messageId);
-    const newerMessages = userStore.GetNewerMessages(
-      convoId,
-      centerMessage.messageId,
-      25,
-    );
-    const olderMessages = userStore.GetOlderMessages(
-      convoId,
-      centerMessage.messageId,
-      25,
-    );
+    const newerMessages = userStore.GetNewerMessages(convoId, centerMessage.messageId, 25);
+    const olderMessages = userStore.GetOlderMessages(convoId, centerMessage.messageId, 25);
 
     const final = newerMessages.concat([centerMessage], olderMessages);
 
@@ -81,10 +73,7 @@ export const useConversationStore = defineStore("messageList", () => {
   }
 
   function ClearVisibleMessages(convoId) {
-    conversations[convoId].visibleMessages.splice(
-      0,
-      conversations[convoId].visibleMessages.length,
-    );
+    conversations[convoId].visibleMessages.splice(0, conversations[convoId].visibleMessages.length);
   }
 
   function GetFirstMessage(convoId) {
@@ -92,30 +81,21 @@ export const useConversationStore = defineStore("messageList", () => {
   }
 
   function GetLastMessage(convoId) {
-    return conversations[convoId].visibleMessages[
-      conversations[convoId].visibleMessages.length - 1
-    ];
+    return conversations[convoId].visibleMessages[conversations[convoId].visibleMessages.length - 1];
   }
 
   function AddMessage(convoId, message) {
     conversations[convoId].visibleMessages.push(message);
-    conversations[convoId].visibleMessages.sort(
-      (a, b) => a.timeSend - b.timeSend,
-    );
+    conversations[convoId].visibleMessages.sort((a, b) => a.timeSend - b.timeSend);
   }
 
   function AddMessages(convoId, messages) {
     conversations[convoId].visibleMessages.push(...messages);
-    conversations[convoId].visibleMessages.sort(
-      (a, b) => a.timeSend - b.timeSend,
-    );
+    conversations[convoId].visibleMessages.sort((a, b) => a.timeSend - b.timeSend);
   }
 
   function RemoveNewerMessages(convoId, amount) {
-    conversations[convoId].visibleMessages.splice(
-      conversations[convoId].visibleMessages.length - amount,
-      amount,
-    );
+    conversations[convoId].visibleMessages.splice(conversations[convoId].visibleMessages.length - amount, amount);
   }
 
   function RemoveOlderMessages(convoId, amount) {
@@ -125,21 +105,17 @@ export const useConversationStore = defineStore("messageList", () => {
   function DeleteMessage(convoId, messageId) {
     //this is insane
     conversations[convoId].visibleMessages.splice(
-      conversations[convoId].visibleMessages.findIndex(
-        (x) => x.messageId === messageId,
-      ),
+      conversations[convoId].visibleMessages.findIndex((x) => x.messageId === messageId),
       1,
     );
   }
 
   function SetScrollPosition(convoId, pos) {
-    if (conversations.hasOwnProperty(convoId))
-      conversations[convoId].scrollPosition = pos;
+    if (conversations.hasOwnProperty(convoId)) conversations[convoId].scrollPosition = pos;
   }
 
   function GetScrollPosition(convoId) {
-    if (conversations.hasOwnProperty(convoId))
-      return conversations[convoId].scrollPosition;
+    if (conversations.hasOwnProperty(convoId)) return conversations[convoId].scrollPosition;
     else return 0;
   }
 

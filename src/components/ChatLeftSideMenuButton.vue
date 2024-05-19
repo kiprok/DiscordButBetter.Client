@@ -1,7 +1,7 @@
 <script setup>
 function ToggleSideMenu() {
-  let sideMenu = document.querySelector("#SideMenu");
-  sideMenu.classList.toggle("hidden");
+  let sideMenu = document.querySelector('#SideMenu');
+  sideMenu.classList.toggle('hidden');
 }
 </script>
 

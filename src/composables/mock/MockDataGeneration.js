@@ -1,9 +1,9 @@
-import { useUserStore } from "@/stores/user.js";
+import { useUserStore } from '@/stores/user.js';
 
 export async function GenerateUser() {
   const userStore = useUserStore();
 
-  let getUserResponse = await fetch("https://randomuser.me/api/");
+  let getUserResponse = await fetch('https://randomuser.me/api/');
   let newUser = await getUserResponse.json();
   let name = `${newUser.results[0].name.first} ${newUser.results[0].name.last}`;
   let picture = newUser.results[0].picture.thumbnail;
@@ -11,12 +11,7 @@ export async function GenerateUser() {
   return userStore.AddUser(name, picture);
 }
 
-export async function GenerateConversation(
-  convoName,
-  convoPicture,
-  userId1,
-  userId2,
-) {
+export async function GenerateConversation(convoName, convoPicture, userId1, userId2) {
   let newConvoId = crypto.randomUUID();
 
   return {
@@ -53,10 +48,7 @@ export async function GenerateConversationMessages(convoId, otherId, amount) {
       convoId: convoId,
       messageText: `Random message ${i}`,
       timeSend: Date.now() - timeOffset,
-      meta:
-        lastMsgId !== null
-          ? { reply: { messageId: lastMsgId, userId: otherId } }
-          : {},
+      meta: lastMsgId !== null ? { reply: { messageId: lastMsgId, userId: otherId } } : {},
     };
     lastMsgId = newMessageId;
   }
