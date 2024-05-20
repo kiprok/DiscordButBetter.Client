@@ -16,7 +16,7 @@ function SendChatMessage() {
       <input
         v-model="sendMessageStore.messageText"
         id="chat-input"
-        class="grow h-4/6 rounded-l-lg"
+        class="grow h-4/6 rounded-l-lg no-underline focus-visible:outline-none"
         type="text"
         autocomplete="off"
       />
