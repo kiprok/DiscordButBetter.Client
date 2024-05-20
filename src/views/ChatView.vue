@@ -167,6 +167,7 @@ function SendChatMessage() {
                   @click="
                     () => {
                       searchStore.GetSearchDataById(route.params.id).searchIsShowing = false;
+                      searchStore.GetSearchDataById(route.params.id).searchQuery = '';
                     }
                   "
                   class="text-white hover:text-gray-300 text-lg"
