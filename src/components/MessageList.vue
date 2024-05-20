@@ -31,8 +31,18 @@ LoadFirstMessages();
 
 onMounted(() => {
   conversationStore.RegisterJumpCallback((messages, focus) => {
-    waitingMessagesJump.messages.push(...messages);
-    waitingMessagesJump.focus = focus;
+    if (messages.length !== 0) {
+      waitingMessagesJump.messages.push(...messages);
+      waitingMessagesJump.focus = focus;
+    } else {
+      let msgElement = document.querySelector(`#message-list [data-msg-id="${focus.messageId}"]`);
+      if (msgElement) {
+        msgElement.scrollIntoView({
+          block: 'center',
+          behavior: 'smooth',
+        });
+      }
+    }
   });
 });
 

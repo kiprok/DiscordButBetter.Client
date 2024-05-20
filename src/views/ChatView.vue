@@ -160,15 +160,52 @@ function SendChatMessage() {
       >
         <div class="text-white size-full" :class="{ hidden: !searchStore.GetShowingStatus(route.params.id) }">
           <div class="size-full flex flex-col">
-            <span class="font-bold text-lg h-fit flex-none"> search results </span>
-            <div class="flex-grow overflow-auto bg-blue-600">
-              <ul class="size-full flex flex-col">
+            <div class="flex">
+              <span class="font-bold text-lg h-fit flex-none"> search results </span>
+              <div class="flex-none ml-auto">
+                <button
+                  @click="
+                    () => {
+                      searchStore.GetSearchDataById(route.params.id).searchIsShowing = false;
+                    }
+                  "
+                  class="text-white hover:text-gray-300 text-lg"
+                >
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex-grow overflow-auto">
+              <ul class="size-full flex flex-col p-2">
                 <li
                   v-for="(result, index) in searchStore.GetSearchResults(route.params.id)"
                   key="result.messageId"
-                  class="h-8 flex-none text-white hover:bg-black/30 p-2 transition-colors ease-in-out"
+                  class="flex flex-col relative group/item bg-black/20 hover:bg-black/10 hover:cursor-pointer transition-colors ease-in-out rounded-md p-3 mt-2"
+                  @click="
+                    () => {
+                      conversationStore.TriggerJumpToMessage(route.params.id, result.messageId);
+                    }
+                  "
                 >
-                  {{ result.messageText }}
+                  <div class="flex flex-row justify-between relative">
+                    <div class="w-10 ml-1 mr-2 mt-0 flex-none">
+                      <img
+                        :src="userStore.GetUserById(result.senderId).profilePicture"
+                        alt="profile picture"
+                        class="rounded-full size-full h-10"
+                      />
+                    </div>
+                    <div class="flex flex-col grow w-12">
+                      <div class="flex items-center gap-1">
+                        <h3 class="text-lg block truncate">
+                          {{ userStore.GetUserById(result.senderId).userName }}
+                        </h3>
+                        <span class="text-xs block shrink-0">{{ new Date(result.timeSend).toLocaleTimeString() }}</span>
+                      </div>
+                      <span class="text-pretty break-words w-full">{{ result.messageText }}</span>
+                    </div>
+                  </div>
                 </li>
               </ul>
             </div>

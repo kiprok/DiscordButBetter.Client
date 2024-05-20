@@ -39,16 +39,25 @@ export const useConversationStore = defineStore('messageList', () => {
 
   function TriggerJumpToMessage(convoId, messageId) {
     if (!jumpToPlaceCallback.value) return;
-    const centerMessage = userStore.GetMessageById(messageId);
-    const newerMessages = userStore.GetNewerMessages(convoId, centerMessage.messageId, 25);
-    const olderMessages = userStore.GetOlderMessages(convoId, centerMessage.messageId, 25);
 
-    const final = newerMessages.concat([centerMessage], olderMessages);
+    let centerMessage = null;
+    let final = [];
 
-    ClearVisibleMessages(convoId);
-    AddMessages(convoId, final);
+    if (GetVisibleMessages(convoId).findIndex((x) => x.messageId === messageId) === -1) {
+      centerMessage = userStore.GetMessageById(messageId);
+      const newerMessages = userStore.GetNewerMessages(convoId, centerMessage.messageId, 25);
+      const olderMessages = userStore.GetOlderMessages(convoId, centerMessage.messageId, 25);
 
-    conversations[convoId].viewingOlderMessages = true;
+      final = newerMessages.concat([centerMessage], olderMessages);
+
+      ClearVisibleMessages(convoId);
+      AddMessages(convoId, final);
+
+      conversations[convoId].viewingOlderMessages = true;
+    } else {
+      centerMessage = userStore.GetMessageById(messageId);
+    }
+
     jumpToPlaceCallback.value(final, centerMessage);
   }
 
