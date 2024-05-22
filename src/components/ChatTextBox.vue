@@ -43,7 +43,10 @@ function OnEnter(event) {
 watch(
   () => sendMessageStore.messageText,
   () => {
-    autoResize();
+    console.log('test');
+    setTimeout(() => {
+      autoResize();
+    }, 0);
   },
 );
 </script>
