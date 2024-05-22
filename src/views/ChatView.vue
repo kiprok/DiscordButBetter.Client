@@ -90,8 +90,7 @@ function SendChatMessage() {
       <form
         @submit.prevent="
           () => {
-            searchStore.GetSearchDataById(route.params.id).searchIsShowing = !searchStore.GetSearchDataById(route.params.id)
-              .searchIsShowing;
+            searchStore.GetSearchDataById(route.params.id).searchIsShowing = true;
             searchStore.SearchMessages(route.params.id);
           }
         "
@@ -147,7 +146,7 @@ function SendChatMessage() {
             {{ userStore.GetUserById(sendMessageStore.replyTo.senderId)?.userName }}
           </span>
         </chat-area-info-bar>
-        <div class="bg-gray-600 h-14 flex-none flex flex-row items-center px-6">
+        <div class="bg-gray-600 h-fit flex-none flex flex-row items-center py-2 px-6">
           <ChatTextBox @send-chat-message="SendChatMessage" />
         </div>
       </div>
@@ -180,7 +179,7 @@ function SendChatMessage() {
             <div class="flex-grow overflow-auto">
               <ul class="size-full flex flex-col p-2">
                 <li
-                  v-for="(result, index) in searchStore.GetSearchResults(route.params.id)"
+                  v-for="result in searchStore.GetSearchResults(route.params.id)"
                   key="result.messageId"
                   class="flex flex-col relative group/item bg-black/20 hover:bg-black/10 hover:cursor-pointer transition-colors ease-in-out rounded-md p-3 mt-2"
                   @click="
@@ -216,7 +215,7 @@ function SendChatMessage() {
           <span class="text-white font-bold p-2">Members</span>
           <ul class="flex flex-col overflow-auto">
             <li
-              v-for="(participant, index) in conversationStore.GetConversationById(route.params.id)?.participants"
+              v-for="participant in conversationStore.GetConversationById(route.params.id)?.participants"
               :key="participant"
               class="text-xl text-white hover:bg-black/30 p-2 transition-colors ease-in-out rounded-lg"
             >

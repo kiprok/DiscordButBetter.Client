@@ -16,11 +16,27 @@ const reply = computed(() => {
   return userStore.GetMessageById(props.message.meta.reply?.messageId) ?? null;
 });
 
+const escapeHtml = (original) => {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+
+  return original.replace(/[&<>"']/g, (m) => map[m]);
+};
+
+const finalMessage = computed(() => {
+  return escapeHtml(props.message.messageText).replaceAll('\n', '<br>');
+});
+
 const previousAlsoOwner = computed(() => {
   if (reply.value) return false;
-  let previousElement = document.querySelector(`#message-list [data-msg-list-index="${props.index - 1}"]`);
+  let previousElement = conversationStore.GetVisibleMessages(props.message.convoId)[props.index - 1];
   if (!previousElement) return false;
-  return previousElement.getAttribute('data-msg-sender-id') === props.message.senderId;
+  return previousElement.senderId === props.message.senderId;
 });
 
 onMounted(() => {
@@ -95,7 +111,7 @@ function EditMessage() {
           </h3>
           <span class="text-xs block shrink-0">{{ timeSend.toLocaleTimeString() }}</span>
         </div>
-        <span class="text-pretty break-words w-full">{{ props.message.messageText }}</span>
+        <span class="text-pretty break-words w-full" v-html="finalMessage"></span>
       </div>
     </div>
     <div
