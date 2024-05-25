@@ -7,7 +7,7 @@ const emit = defineEmits(['SendChatMessage']);
 const textarea = ref();
 
 function SendChatMessage() {
-  if (!sendMessageStore.messageText) return;
+  if (!sendMessageStore.messageText.trim()) return;
   emit('SendChatMessage');
 }
 

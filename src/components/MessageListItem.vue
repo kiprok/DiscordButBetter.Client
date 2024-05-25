@@ -33,8 +33,11 @@ const finalMessage = computed(() => {
 });
 
 const previousAlsoOwner = computed(() => {
+  if (props.message.meta.edited) return false;
   if (reply.value) return false;
-  let previousElement = conversationStore.GetVisibleMessages(props.message.convoId)[props.index - 1];
+  let previousElement = conversationStore.GetVisibleMessages(
+    props.message.convoId,
+  )[props.index - 1];
   if (!previousElement) return false;
   return previousElement.senderId === props.message.senderId;
 });
@@ -49,7 +52,10 @@ onUnmounted(() => {
 
 function RemoveChatMessage() {
   userStore.DeleteMessage(props.message.messageId);
-  conversationStore.DeleteMessage(props.message.convoId, props.message.messageId);
+  conversationStore.DeleteMessage(
+    props.message.convoId,
+    props.message.messageId,
+  );
 }
 
 function ReplyToMessage() {
@@ -70,17 +76,27 @@ function EditMessage() {
 </script>
 
 <template>
-  <li class="flex flex-col relative group/item hover:bg-gray-400" :class="{ 'mt-2': !previousAlsoOwner }">
+  <li
+    class="flex flex-col relative group/item hover:bg-gray-400"
+    :class="{ 'mt-2': !previousAlsoOwner }"
+  >
     <div class="flex flex-row items-end" v-if="reply">
-      <div class="w-8 ml-6 h-3 shrink-0 border border-b-0 border-r-0 border-black rounded-tl"></div>
+      <div
+        class="w-8 ml-6 h-3 shrink-0 border border-b-0 border-r-0 border-black rounded-tl"
+      ></div>
       <div class="mb-0.5 truncate">
         <img
           :src="userStore.GetUserById(reply.senderId)?.profilePicture"
           alt="profile picture"
           class="rounded-full size-4 inline mr-1"
         />
-        <span class="hover:underline hover:text-white hover:cursor-pointer" @click="$emit('scroll-reply', reply.messageId)">
-          <span class="text-sm mr-0.5">{{ userStore.GetUserById(reply.senderId)?.userName }}</span>
+        <span
+          class="hover:underline hover:text-white hover:cursor-pointer"
+          @click="$emit('scroll-reply', reply.messageId)"
+        >
+          <span class="text-sm mr-0.5">{{
+            userStore.GetUserById(reply.senderId)?.userName
+          }}</span>
           <span class="text-xs">{{ reply.messageText }}</span>
         </span>
       </div>
@@ -93,15 +109,18 @@ function EditMessage() {
           class="rounded-full size-full h-10"
           v-if="!previousAlsoOwner"
         />
-        <div v-if="previousAlsoOwner" class="flex items-center justify-center h-6">
+        <div
+          v-if="previousAlsoOwner"
+          class="flex items-center justify-center h-6"
+        >
           <span class="text-xs invisible group-hover/item:visible">
             {{
               timeSend.toLocaleTimeString([], {
                 hour: '2-digit',
                 minute: '2-digit',
               })
-            }}</span
-          >
+            }}
+          </span>
         </div>
       </div>
       <div class="flex flex-col grow w-12">
@@ -109,9 +128,21 @@ function EditMessage() {
           <h3 class="text-lg block truncate">
             {{ userStore.GetUserById(props.message.senderId).userName }}
           </h3>
-          <span class="text-xs block shrink-0">{{ timeSend.toLocaleTimeString() }}</span>
+          <span class="text-xs block shrink-0">
+            {{ timeSend.toLocaleTimeString() }}
+          </span>
+          <span
+            class="text-xs block shrink-0"
+            v-if="props.message.meta.edited"
+            title="edited"
+          >
+            <i class="fa-solid fa-pencil"></i>
+          </span>
         </div>
-        <span class="text-pretty break-words w-full" v-html="finalMessage"></span>
+        <span
+          class="text-pretty break-words w-full"
+          v-html="finalMessage"
+        ></span>
       </div>
     </div>
     <div
