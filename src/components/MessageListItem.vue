@@ -47,17 +47,19 @@ const escapeHtml = (original) => {
 
 const finalMessage = computed(() => {
   let escapedMessage = escapeHtml(props.message.messageText);
-  return parseMarkdown(escapedMessage);
+  return parseMarkdown(escapedMessage).replaceAll('\n', '<br>');
 });
 
 const previousAlsoOwner = computed(() => {
-  if (props.message.meta.edited) return false;
-  if (reply.value) return false;
-  let previousElement = conversationStore.GetVisibleMessages(
-    props.message.convoId,
-  )[props.index - 1];
-  if (!previousElement) return false;
-  return previousElement.senderId === props.message.senderId;
+  const prevMsg = conversationStore.GetVisibleMessages(props.message.convoId)[
+    props.index - 1
+  ];
+  return (
+    !props.message.meta.edited &&
+    !reply.value &&
+    prevMsg &&
+    prevMsg.senderId === props.message.senderId
+  );
 });
 
 onMounted(() => {
