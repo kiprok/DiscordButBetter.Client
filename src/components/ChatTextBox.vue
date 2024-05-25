@@ -1,65 +1,74 @@
 <script setup>
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import { ref, watch } from 'vue';
+import { insertAtCursor } from '@/composables/utility.js';
 const sendMessageStore = useSendingMessageStore();
 const emit = defineEmits(['SendChatMessage']);
 
-const textarea = ref();
+const textBox = ref();
 
 function SendChatMessage() {
   if (!sendMessageStore.messageText.trim()) return;
   emit('SendChatMessage');
 }
 
-function autoResize() {
-  if (
-    sendMessageStore.messageText === '' ||
-    sendMessageStore.messageText.split('\n').length === 1
-  ) {
-    textarea.value.style.height = '';
-    return;
-  }
-  if (
-    textarea.value.scrollHeight >
-    parseFloat(getComputedStyle(textarea.value).fontSize) * 2
-  ) {
-    textarea.value.style.height = 'auto';
-    textarea.value.style.height = `${textarea.value.scrollHeight}px`;
-  }
+function onPaste(event) {
+  const paste = (event.clipboardData || window.clipboardData).getData(
+    'text/plain',
+  );
+
+  //document.execCommand('insertText', false, paste);
+  insertAtCursor(paste.split('\n').reverse());
+
+  onInput();
 }
 
-function OnEnter(event) {
-  if (textarea.value.selectionStart !== textarea.value.selectionEnd) return;
-
-  const isCursorAtEnd =
-    textarea.value.selectionEnd === textarea.value.value.length;
-  if (event.key === 'Enter' && !event.shiftKey && isCursorAtEnd) {
-    SendChatMessage();
+function OnKeyDown(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
+    SendChatMessage();
+  }
+  if (event.key === 'Tab') {
+    event.preventDefault();
+    insertAtCursor(['\u00a0\u00a0\u00a0\u00a0']);
+    onInput();
   }
 }
 
 watch(
   () => sendMessageStore.messageText,
-  () => {
-    setTimeout(() => {
-      autoResize();
-    }, 0);
+  (newVal) => {
+    if (textBox.value)
+      if (textBox.value?.innerText !== newVal) {
+        textBox.value.innerText = newVal;
+      }
   },
+  { immediate: true },
 );
+
+function onInput() {
+  sendMessageStore.messageText = textBox.value?.innerText ?? '';
+}
 </script>
 
 <template>
   <div class="size-full">
     <form class="size-full flex items-center" @submit.prevent="SendChatMessage">
-      <textarea
-        v-model="sendMessageStore.messageText"
-        ref="textarea"
-        id="chat-input"
-        class="grow h-[2em] pl-2 pt-1 rounded-l-lg no-underline focus-visible:outline-none max-h-32 resize-none"
-        @keydown.enter="OnEnter"
-        autocomplete="off"
-      ></textarea>
+      <div
+        class="grow content-center h-fit w-24 min-h-8 rounded-l-lg bg-white max-h-44 overflow-y-scroll"
+        @click="textBox.focus"
+      >
+        <div
+          contenteditable="true"
+          @paste.prevent="onPaste"
+          ref="textBox"
+          class="h-fit w-full break-words pl-2 py-2 focus-visible:outline-none"
+          @keydown="OnKeyDown"
+          @input="onInput"
+          @blur="onInput"
+          id="chat-input"
+        ></div>
+      </div>
       <button class="flex-none px-2 w-fit h-full bg-white rounded-r-lg">
         <i class="fa-solid fa-share"></i>
       </button>
