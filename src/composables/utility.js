@@ -14,13 +14,11 @@ export function IsLoadingCompleted(messageList, message) {
   return false;
 }
 
-export function insertAtCursor(text) {
+export function insertAtCursor(lines) {
   const selection = window.getSelection();
   if (!selection.rangeCount) return false;
   const range = selection.getRangeAt(0);
   range.deleteContents();
-
-  const lines = text.split('\n');
 
   for (let i = 0; i < lines.length; i++) {
     const node = document.createTextNode(lines[i]);
