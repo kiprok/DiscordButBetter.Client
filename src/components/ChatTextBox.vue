@@ -12,11 +12,17 @@ function SendChatMessage() {
 }
 
 function autoResize() {
-  if (sendMessageStore.messageText === '') {
+  if (
+    sendMessageStore.messageText === '' ||
+    sendMessageStore.messageText.split('\n').length === 1
+  ) {
     textarea.value.style.height = '';
     return;
   }
-  if (textarea.value.scrollHeight > parseFloat(getComputedStyle(textarea.value).fontSize) * 2) {
+  if (
+    textarea.value.scrollHeight >
+    parseFloat(getComputedStyle(textarea.value).fontSize) * 2
+  ) {
     textarea.value.style.height = 'auto';
     textarea.value.style.height = `${textarea.value.scrollHeight}px`;
   }
@@ -25,7 +31,8 @@ function autoResize() {
 function OnEnter(event) {
   if (textarea.value.selectionStart !== textarea.value.selectionEnd) return;
 
-  const isCursorAtEnd = textarea.value.selectionEnd === textarea.value.value.length;
+  const isCursorAtEnd =
+    textarea.value.selectionEnd === textarea.value.value.length;
   if (event.key === 'Enter' && !event.shiftKey && isCursorAtEnd) {
     SendChatMessage();
     event.preventDefault();
