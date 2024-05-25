@@ -16,6 +16,23 @@ const reply = computed(() => {
   return userStore.GetMessageById(props.message.meta.reply?.messageId) ?? null;
 });
 
+const parseMarkdown = (text) => {
+  text = text.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
+
+  text = text.replace(/([*_])(.*?)\1/g, '<em>$2</em>');
+  text = text.replace(
+    /(\|\|)(.*?)\1/g,
+    '<span class="bg-black hover:bg-black/50 hover:text-white rounded">$2</span>',
+  );
+
+  text = text.replace(
+    /\[(.*?)]\((.*?)\)/g,
+    '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
+  );
+
+  return text;
+};
+
 const escapeHtml = (original) => {
   const map = {
     '&': '&amp;',
@@ -29,7 +46,8 @@ const escapeHtml = (original) => {
 };
 
 const finalMessage = computed(() => {
-  return escapeHtml(props.message.messageText).replaceAll('\n', '<br>');
+  let escapedMessage = escapeHtml(props.message.messageText);
+  return parseMarkdown(escapedMessage);
 });
 
 const previousAlsoOwner = computed(() => {
