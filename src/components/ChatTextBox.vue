@@ -17,8 +17,8 @@ function onPaste(event) {
     'text/plain',
   );
 
-  document.execCommand('insertText', false, paste);
-  //insertAtCursor(paste);
+  //document.execCommand('insertText', false, paste);
+  insertAtCursor(paste);
 
   onInput();
 }
