@@ -18,7 +18,7 @@ function onPaste(event) {
   );
 
   //document.execCommand('insertText', false, paste);
-  insertAtCursor(paste);
+  insertAtCursor(paste.reverse());
 
   onInput();
 }

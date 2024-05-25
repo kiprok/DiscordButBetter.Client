@@ -21,6 +21,7 @@ export function insertAtCursor(text) {
   range.deleteContents();
 
   const lines = text.split('\n');
+
   for (let i = 0; i < lines.length; i++) {
     const node = document.createTextNode(lines[i]);
     range.insertNode(node);
@@ -28,6 +29,7 @@ export function insertAtCursor(text) {
       range.insertNode(document.createElement('br'));
     }
   }
+
   range.collapse(false);
   selection.removeAllRanges();
   selection.addRange(range);
