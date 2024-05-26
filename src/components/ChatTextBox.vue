@@ -16,6 +16,8 @@ function onPaste(event) {
   const paste = (event.clipboardData || window.clipboardData).getData(
     'text/plain',
   );
+  console.log(paste);
+  console.log(paste.split('\n'));
 
   //document.execCommand('insertText', false, paste);
   insertAtCursor(paste.split('\n').reverse());
@@ -30,7 +32,7 @@ function OnKeyDown(event) {
   }
   if (event.key === 'Tab') {
     event.preventDefault();
-    insertAtCursor(['\u00a0\u00a0\u00a0\u00a0']);
+    insertAtCursor(['\t']);
     onInput();
   }
 }
@@ -62,7 +64,8 @@ function onInput() {
           contenteditable="true"
           @paste.prevent="onPaste"
           ref="textBox"
-          class="h-fit w-full break-words py-2 pl-2 focus-visible:outline-none"
+          class="h-fit w-full whitespace-pre-wrap break-words py-2 pl-2
+            focus-visible:outline-none"
           @keydown="OnKeyDown"
           @input="onInput"
           @blur="onInput"
