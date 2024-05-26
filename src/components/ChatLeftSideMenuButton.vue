@@ -6,11 +6,11 @@ function ToggleSideMenu() {
 </script>
 
 <template>
-  <div class="block md:hidden size-8">
+  <div class="block size-8 md:hidden">
     <button
       @click="ToggleSideMenu"
-      class="size-8 text-white text-2xl text-center flex justify-center items-center hover:text-gray-300"
-    >
+      class="flex size-8 items-center justify-center text-center text-2xl text-white
+        hover:text-gray-300">
       <i class="fa-solid fa-bars"></i>
     </button>
   </div>

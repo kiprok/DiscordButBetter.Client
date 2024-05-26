@@ -1,6 +1,12 @@
 <script setup>
 import { useUserStore } from '@/stores/user.js';
-import { defineAsyncComponent, onMounted, onUnmounted, reactive, ref } from 'vue';
+import {
+  defineAsyncComponent,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+} from 'vue';
 import { useRoute } from 'vue-router';
 import { useConversationStore } from '@/stores/conversation.js';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
@@ -8,7 +14,9 @@ import { IsLoadingCompleted } from '@/composables/utility.js';
 
 const route = useRoute();
 
-const MessageListItem = defineAsyncComponent(() => import('@/components/MessageListItem.vue'));
+const MessageListItem = defineAsyncComponent(
+  () => import('@/components/MessageListItem.vue'),
+);
 
 const props = defineProps(['convoId']);
 const amountToLoad = 25;
@@ -35,7 +43,9 @@ onMounted(() => {
       waitingMessagesJump.messages.push(...messages);
       waitingMessagesJump.focus = focus;
     } else {
-      let msgElement = document.querySelector(`#message-list [data-msg-id="${focus.messageId}"]`);
+      let msgElement = document.querySelector(
+        `#message-list [data-msg-id="${focus.messageId}"]`,
+      );
       if (msgElement) {
         msgElement.scrollIntoView({
           block: 'center',
@@ -51,7 +61,9 @@ onUnmounted(() => {
 });
 
 function ScrollToMessage(messageId) {
-  let msgElement = document.querySelector(`#message-list [data-msg-id="${messageId}"]`);
+  let msgElement = document.querySelector(
+    `#message-list [data-msg-id="${messageId}"]`,
+  );
   if (!msgElement) {
     conversationStore.TriggerJumpToMessage(props.convoId, messageId);
     return;
@@ -76,13 +88,20 @@ function LoadFirstMessages() {
   if (conversationStore.GetVisibleMessages(props.convoId).length === 0) {
     LoadOlderMessages(null);
   } else {
-    waitingMessagesAbove.push(...conversationStore.GetVisibleMessages(props.convoId));
+    waitingMessagesAbove.push(
+      ...conversationStore.GetVisibleMessages(props.convoId),
+    );
   }
 }
 
 function LoadOlderMessages(startPointId) {
-  if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0) return;
-  const newMessages = userStore.GetOlderMessages(props.convoId, startPointId, amountToLoad);
+  if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0)
+    return;
+  const newMessages = userStore.GetOlderMessages(
+    props.convoId,
+    startPointId,
+    amountToLoad,
+  );
   waitingMessagesAbove.push(...newMessages);
 
   conversationStore.AddMessages(props.convoId, newMessages);
@@ -90,13 +109,22 @@ function LoadOlderMessages(startPointId) {
 }
 
 function LoadNewerMessages(startPointId) {
-  if (!conversationStore.GetConversationById(props.convoId).viewingOlderMessages) return;
-  if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0) return;
+  if (
+    !conversationStore.GetConversationById(props.convoId).viewingOlderMessages
+  )
+    return;
+  if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0)
+    return;
 
-  const newMessages = userStore.GetNewerMessages(props.convoId, startPointId, amountToLoad);
+  const newMessages = userStore.GetNewerMessages(
+    props.convoId,
+    startPointId,
+    amountToLoad,
+  );
 
   if (newMessages.length < amountToLoad) {
-    conversationStore.GetConversationById(props.convoId).viewingOlderMessages = false;
+    conversationStore.GetConversationById(props.convoId).viewingOlderMessages =
+      false;
     return;
   }
 
@@ -147,7 +175,9 @@ function HandleNewAboveMesssages() {
   if (!chatIsLoading.value) {
     if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
       conversationStore.RemoveNewerMessages(props.convoId, 25);
-      conversationStore.GetConversationById(props.convoId).viewingOlderMessages = true;
+      conversationStore.GetConversationById(
+        props.convoId,
+      ).viewingOlderMessages = true;
     }
   } else {
     ScrollToSavedLocation();
@@ -173,9 +203,12 @@ function HandleNewJumpMessages() {
   if (!waitingMessagesJump.focus) {
     messageListContainer.value.scrollTop = 0;
 
-    conversationStore.GetConversationById(props.convoId).viewingOlderMessages = false;
+    conversationStore.GetConversationById(props.convoId).viewingOlderMessages =
+      false;
   } else {
-    const focusElement = document.querySelector(`#message-list [data-msg-id="${waitingMessagesJump.focus.messageId}"]`);
+    const focusElement = document.querySelector(
+      `#message-list [data-msg-id="${waitingMessagesJump.focus.messageId}"]`,
+    );
     focusElement.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
@@ -187,13 +220,12 @@ function HandleNewJumpMessages() {
 </script>
 
 <template>
-  <div class="flex flex-col flex-nowrap h-full">
+  <div class="flex h-full flex-col flex-nowrap">
     <div
-      class="flex flex-col-reverse grow h-16 overflow-auto"
+      class="flex h-16 grow flex-col-reverse overflow-auto"
       id="list-container"
       @scroll="OnScrolling"
-      ref="messageListContainer"
-    >
+      ref="messageListContainer">
       <ul class="flex flex-col p-4" id="message-list" ref="messageListDom">
         <message-list-item
           :key="message.messageId"
@@ -201,11 +233,12 @@ function HandleNewJumpMessages() {
           :data-msg-list-index="index"
           :data-msg-sender-id="message.senderId"
           :index="index"
-          v-for="(message, index) in conversationStore.GetVisibleMessages(props.convoId)"
+          v-for="(message, index) in conversationStore.GetVisibleMessages(
+            props.convoId,
+          )"
           :message="message"
           @scroll-reply="ScrollToMessage"
-          @on-mount-change="OnMessageMountChange"
-        />
+          @on-mount-change="OnMessageMountChange" />
       </ul>
     </div>
   </div>

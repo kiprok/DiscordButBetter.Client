@@ -85,30 +85,27 @@ function SendChatMessage() {
     type="checkbox"
     id="sidebar-check"
     v-model="sideBarIsShowing"
-    class="hidden"
-  />
+    class="hidden" />
   <div
-    class="size-full flex flex-col group"
-    :class="{ 'sidebar-checked': sideBarIsShowing }"
-  >
-    <ChatTopBar class="flex-none h-14">
+    class="group flex size-full flex-col"
+    :class="{ 'sidebar-checked': sideBarIsShowing }">
+    <ChatTopBar class="h-14 flex-none">
       <chat-left-side-menu-button class="group-[.sidebar-checked]:hidden" />
       <label
         for="sidebar-check"
-        class="text-white text-xl hover:text-gray-300 hidden group-[.sidebar-checked]:block lg:!hidden"
-      >
+        class="hidden text-xl text-white hover:text-gray-300 group-[.sidebar-checked]:block
+          lg:!hidden">
         <i class="fa-solid fa-chevron-left"></i>
       </label>
 
       <h1
-        class="text-white text-2xl font-bold group-[.sidebar-checked]:hidden lg:!block"
-      >
+        class="text-2xl font-bold text-white group-[.sidebar-checked]:hidden lg:!block">
         {{ conversationStore.GetConversationById(route.params.id)?.convoName }}
       </h1>
       <label
         for="sidebar-check"
-        class="ml-auto text-white text-xl group-[.sidebar-checked]:hidden lg:hidden hover:text-gray-300"
-      >
+        class="ml-auto text-xl text-white hover:text-gray-300 group-[.sidebar-checked]:hidden
+          lg:hidden">
         <i class="fa-solid fa-magnifying-glass"></i>
       </label>
       <form
@@ -119,27 +116,23 @@ function SendChatMessage() {
             searchStore.SearchMessages(route.params.id);
           }
         "
-        class="w-full hidden group-[.sidebar-checked]:block lg:max-w-[16rem] ml-auto lg:!block"
-      >
+        class="ml-auto hidden w-full group-[.sidebar-checked]:block lg:!block lg:max-w-[16rem]">
         <input
           class="w-full"
           type="text"
           v-model="searchStore.GetSearchDataById(route.params.id).searchQuery"
-          placeholder="Search for text"
-        />
+          placeholder="Search for text" />
       </form>
     </ChatTopBar>
-    <div class="grow static bg-purple-600 overflow-hidden flex flex-row">
+    <div class="static flex grow flex-row overflow-hidden bg-purple-600">
       <div
-        class="grow bg-blue-600 flex flex-col lg:!flex group-[.sidebar-checked]:hidden"
-      >
+        class="flex grow flex-col bg-blue-600 group-[.sidebar-checked]:hidden lg:!flex">
         <div class="grow bg-gray-300">
           <message-list
             :convoId="
               conversationStore.GetConversationById(route.params.id)?.convoId
             "
-            :key="$route.path"
-          />
+            :key="$route.path" />
         </div>
         <chat-area-info-bar
           :visible="
@@ -152,8 +145,7 @@ function SendChatMessage() {
             () => {
               conversationStore.TriggerJumpToBottom(route.params.id);
             }
-          "
-        >
+          ">
           Viewing older messages click here to return
         </chat-area-info-bar>
         <chat-area-info-bar
@@ -163,8 +155,7 @@ function SendChatMessage() {
             () => {
               sendMessageStore.StopEditingMessage();
             }
-          "
-        >
+          ">
           Editing message
         </chat-area-info-bar>
         <chat-area-info-bar
@@ -174,38 +165,35 @@ function SendChatMessage() {
             () => {
               sendMessageStore.replyTo = null;
             }
-          "
-        >
-          <span class="text-white mr-1">replying to </span>
-          <span class="text-white font-bold">
+          ">
+          <span class="mr-1 text-white">replying to </span>
+          <span class="font-bold text-white">
             {{
               userStore.GetUserById(sendMessageStore.replyTo.senderId)?.userName
             }}
           </span>
         </chat-area-info-bar>
         <div
-          class="bg-gray-600 h-fit flex-none flex flex-row items-center py-2 px-6"
-        >
+          class="flex h-fit flex-none flex-row items-center bg-gray-600 px-6 py-2">
           <ChatTextBox @send-chat-message="SendChatMessage" />
         </div>
       </div>
       <div
-        class="flex-none w-full h-full hidden overflow-hidden lg:!block group-[.sidebar-checked]:block bg-gray-600 p-4"
+        class="hidden h-full w-full flex-none overflow-hidden bg-gray-600 p-4
+          group-[.sidebar-checked]:block lg:!block"
         :class="{
           'lg:w-[18rem]': !searchStore.GetShowingStatus(route.params.id),
           'lg:w-[24rem]': searchStore.GetShowingStatus(route.params.id),
-        }"
-      >
+        }">
         <div
-          class="text-white size-full"
-          :class="{ hidden: !searchStore.GetShowingStatus(route.params.id) }"
-        >
-          <div class="size-full flex flex-col">
+          class="size-full text-white"
+          :class="{ hidden: !searchStore.GetShowingStatus(route.params.id) }">
+          <div class="flex size-full flex-col">
             <div class="flex">
-              <span class="font-bold text-lg h-fit flex-none">
+              <span class="h-fit flex-none text-lg font-bold">
                 search results
               </span>
-              <div class="flex-none ml-auto">
+              <div class="ml-auto flex-none">
                 <button
                   @click="
                     () => {
@@ -217,21 +205,21 @@ function SendChatMessage() {
                       ).searchQuery = '';
                     }
                   "
-                  class="text-white hover:text-gray-300 text-lg"
-                >
+                  class="text-lg text-white hover:text-gray-300">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
             </div>
 
             <div class="flex-grow overflow-auto">
-              <ul class="size-full flex flex-col p-2">
+              <ul class="flex size-full flex-col p-2">
                 <li
                   v-for="result in searchStore.GetSearchResults(
                     route.params.id,
                   )"
                   key="result.messageId"
-                  class="flex flex-col relative group/item bg-black/20 hover:bg-black/10 hover:cursor-pointer transition-colors ease-in-out rounded-md p-3 mt-2"
+                  class="group/item relative mt-2 flex flex-col rounded-md bg-black/20 p-3
+                    transition-colors ease-in-out hover:cursor-pointer hover:bg-black/10"
                   @click="
                     () => {
                       conversationStore.TriggerJumpToMessage(
@@ -239,28 +227,26 @@ function SendChatMessage() {
                         result.messageId,
                       );
                     }
-                  "
-                >
-                  <div class="flex flex-row justify-between relative">
-                    <div class="w-10 ml-1 mr-2 mt-0 flex-none">
+                  ">
+                  <div class="relative flex flex-row justify-between">
+                    <div class="ml-1 mr-2 mt-0 w-10 flex-none">
                       <img
                         :src="
                           userStore.GetUserById(result.senderId).profilePicture
                         "
                         alt="profile picture"
-                        class="rounded-full size-full h-10"
-                      />
+                        class="size-full h-10 rounded-full" />
                     </div>
-                    <div class="flex flex-col grow w-12">
+                    <div class="flex w-12 grow flex-col">
                       <div class="flex items-center gap-1">
-                        <h3 class="text-lg block truncate">
+                        <h3 class="block truncate text-lg">
                           {{ userStore.GetUserById(result.senderId).userName }}
                         </h3>
-                        <span class="text-xs block shrink-0">{{
+                        <span class="block shrink-0 text-xs">{{
                           new Date(result.timeSend).toLocaleTimeString()
                         }}</span>
                       </div>
-                      <span class="text-pretty break-words w-full">{{
+                      <span class="w-full text-pretty break-words">{{
                         result.messageText
                       }}</span>
                     </div>
@@ -271,21 +257,20 @@ function SendChatMessage() {
           </div>
         </div>
         <div :class="{ hidden: searchStore.GetShowingStatus(route.params.id) }">
-          <span class="text-white font-bold p-2">Members</span>
+          <span class="p-2 font-bold text-white">Members</span>
           <ul class="flex flex-col overflow-auto">
             <li
               v-for="participant in conversationStore.GetConversationById(
                 route.params.id,
               )?.participants"
               :key="participant"
-              class="text-xl text-white hover:bg-black/30 p-2 transition-colors ease-in-out rounded-lg"
-            >
-              <div class="flex flex-nowrap flex-row items-center gap-2">
+              class="rounded-lg p-2 text-xl text-white transition-colors ease-in-out
+                hover:bg-black/30">
+              <div class="flex flex-row flex-nowrap items-center gap-2">
                 <img
                   :src="userStore.GetUserById(participant).profilePicture"
                   alt="pfp"
-                  class="rounded-full size-10 flex-none"
-                />
+                  class="size-10 flex-none rounded-full" />
                 <span> {{ userStore.GetUserById(participant).userName }} </span>
               </div>
             </li>

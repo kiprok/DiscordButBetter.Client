@@ -3,7 +3,7 @@ import ChatSideMenu from '@/components/ChatSideMenu.vue';
 </script>
 
 <template>
-  <div class="h-svh flex flex-row items-stretch bg-amber-500 overflow-hidden">
+  <div class="flex h-svh flex-row items-stretch overflow-hidden bg-amber-500">
     <ChatSideMenu />
     <router-view />
   </div>

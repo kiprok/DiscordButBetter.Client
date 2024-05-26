@@ -53,23 +53,22 @@ function onInput() {
 
 <template>
   <div class="size-full">
-    <form class="size-full flex items-center" @submit.prevent="SendChatMessage">
+    <form class="flex size-full items-center" @submit.prevent="SendChatMessage">
       <div
-        class="grow content-center h-fit w-24 min-h-8 rounded-l-lg bg-white max-h-44 overflow-y-scroll"
-        @click="textBox.focus"
-      >
+        class="h-fit max-h-44 min-h-8 w-24 grow content-center overflow-y-scroll rounded-l-lg
+          bg-white"
+        @click="textBox.focus">
         <div
           contenteditable="true"
           @paste.prevent="onPaste"
           ref="textBox"
-          class="h-fit w-full break-words pl-2 py-2 focus-visible:outline-none"
+          class="h-fit w-full break-words py-2 pl-2 focus-visible:outline-none"
           @keydown="OnKeyDown"
           @input="onInput"
           @blur="onInput"
-          id="chat-input"
-        ></div>
+          id="chat-input"></div>
       </div>
-      <button class="flex-none px-2 w-fit h-full bg-white rounded-r-lg">
+      <button class="h-full w-fit flex-none rounded-r-lg bg-white px-2">
         <i class="fa-solid fa-share"></i>
       </button>
     </form>

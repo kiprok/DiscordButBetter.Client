@@ -11,7 +11,12 @@ export async function GenerateUser() {
   return userStore.AddUser(name, picture);
 }
 
-export async function GenerateConversation(convoName, convoPicture, userId1, userId2) {
+export async function GenerateConversation(
+  convoName,
+  convoPicture,
+  userId1,
+  userId2,
+) {
   let newConvoId = crypto.randomUUID();
 
   return {
@@ -48,7 +53,10 @@ export async function GenerateConversationMessages(convoId, otherId, amount) {
       convoId: convoId,
       messageText: `Random message ${i}`,
       timeSend: Date.now() - timeOffset,
-      meta: lastMsgId !== null ? { reply: { messageId: lastMsgId, userId: otherId } } : {},
+      meta:
+        lastMsgId !== null
+          ? { reply: { messageId: lastMsgId, userId: otherId } }
+          : {},
     };
     lastMsgId = newMessageId;
   }

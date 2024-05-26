@@ -14,30 +14,40 @@ function ToggleSideMenu() {
 <template>
   <div
     id="SideMenu"
-    class="z-10 bg-green-600 row-span-3 absolute top-0 left-0 h-screen w-screen flex-none hidden md:block md:w-72 md:h-full md:top-auto md:left-auto md:relative"
-  >
-    <div class="w-full h-full flex flex-col">
-      <div class="h-14 bg-gray-800 flex-none flex items-center p-4">
-        <h2 class="text-white text-3xl font-bold">Menu</h2>
+    class="absolute left-0 top-0 z-10 row-span-3 hidden h-screen w-screen flex-none
+      bg-green-600 md:relative md:left-auto md:top-auto md:block md:h-full md:w-72">
+    <div class="flex h-full w-full flex-col">
+      <div class="flex h-14 flex-none items-center bg-gray-800 p-4">
+        <h2 class="text-3xl font-bold text-white">Menu</h2>
       </div>
-      <div class="bg-gray-500 grow flex flex-col px-2 overflow-auto">
-        <router-link class="router-link" @click="ToggleSideMenu" :to="{ name: 'friendList' }"> Friends </router-link>
+      <div class="flex grow flex-col overflow-auto bg-gray-500 px-2">
+        <router-link
+          class="router-link"
+          @click="ToggleSideMenu"
+          :to="{ name: 'friendList' }">
+          Friends
+        </router-link>
         <router-link
           v-for="(convo, index) in conversationStore.GetALLConversations()"
           :key="index"
           class="router-link"
           :to="{ name: 'chat', params: { id: convo.convoId } }"
-          @click="ToggleSideMenu"
-        >
-          <div class="flex flex-nowrap flex-row items-center gap-2">
-            <img :src="convo.convoPicture" alt="pfp" class="rounded-full size-10 flex-none" />
+          @click="ToggleSideMenu">
+          <div class="flex flex-row flex-nowrap items-center gap-2">
+            <img
+              :src="convo.convoPicture"
+              alt="pfp"
+              class="size-10 flex-none rounded-full" />
             <span>{{ convo.convoName }}</span>
           </div>
         </router-link>
       </div>
-      <div class="w-full h-14 bg-gray-800 mt-auto flex-none">
-        <div class="flex flex-nowrap flex-row items-center gap-2 h-full w-full">
-          <img :src="userStore.myProfilePicture" alt="pfp" class="rounded-full size-10 flex-none" />
+      <div class="mt-auto h-14 w-full flex-none bg-gray-800">
+        <div class="flex h-full w-full flex-row flex-nowrap items-center gap-2">
+          <img
+            :src="userStore.myProfilePicture"
+            alt="pfp"
+            class="size-10 flex-none rounded-full" />
           <span class="text-xl text-white">{{ userStore.myUserName }}</span>
         </div>
       </div>
@@ -47,7 +57,7 @@ function ToggleSideMenu() {
 
 <style scoped>
 .router-link {
-  @apply text-xl text-white hover:bg-gray-600/30 py-2 px-4 transition-colors ease-in-out rounded-lg;
+  @apply rounded-lg px-4 py-2 text-xl text-white transition-colors ease-in-out hover:bg-gray-600/30;
 }
 
 .router-link-exact-active {

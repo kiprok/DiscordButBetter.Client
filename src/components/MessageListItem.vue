@@ -94,43 +94,37 @@ function EditMessage() {
 
 <template>
   <li
-    class="flex flex-col relative group/item hover:bg-gray-400"
-    :class="{ 'mt-2': !previousAlsoOwner }"
-  >
+    class="group/item relative flex flex-col hover:bg-gray-400"
+    :class="{ 'mt-2': !previousAlsoOwner }">
     <div class="flex flex-row items-end" v-if="reply">
       <div
-        class="w-8 ml-6 h-3 shrink-0 border border-b-0 border-r-0 border-black rounded-tl"
-      ></div>
+        class="ml-6 h-3 w-8 shrink-0 rounded-tl border border-b-0 border-r-0 border-black"></div>
       <div class="mb-0.5 truncate">
         <img
           :src="userStore.GetUserById(reply.senderId)?.profilePicture"
           alt="profile picture"
-          class="rounded-full size-4 inline mr-1"
-        />
+          class="mr-1 inline size-4 rounded-full" />
         <span
-          class="hover:underline hover:text-white hover:cursor-pointer"
-          @click="$emit('scroll-reply', reply.messageId)"
-        >
-          <span class="text-sm mr-0.5">{{
+          class="hover:cursor-pointer hover:text-white hover:underline"
+          @click="$emit('scroll-reply', reply.messageId)">
+          <span class="mr-0.5 text-sm">{{
             userStore.GetUserById(reply.senderId)?.userName
           }}</span>
           <span class="text-xs">{{ reply.messageText }}</span>
         </span>
       </div>
     </div>
-    <div class="flex flex-row justify-between relative">
-      <div class="w-10 ml-1 mr-2 mt-0 flex-none">
+    <div class="relative flex flex-row justify-between">
+      <div class="ml-1 mr-2 mt-0 w-10 flex-none">
         <img
           :src="userStore.GetUserById(props.message.senderId).profilePicture"
           alt="profile picture"
-          class="rounded-full size-full h-10"
-          v-if="!previousAlsoOwner"
-        />
+          class="size-full h-10 rounded-full"
+          v-if="!previousAlsoOwner" />
         <div
           v-if="previousAlsoOwner"
-          class="flex items-center justify-center h-6"
-        >
-          <span class="text-xs invisible group-hover/item:visible">
+          class="flex h-6 items-center justify-center">
+          <span class="invisible text-xs group-hover/item:visible">
             {{
               timeSend.toLocaleTimeString([], {
                 hour: '2-digit',
@@ -140,49 +134,47 @@ function EditMessage() {
           </span>
         </div>
       </div>
-      <div class="flex flex-col grow w-12">
+      <div class="flex w-12 grow flex-col">
         <div class="flex items-center gap-1" v-if="!previousAlsoOwner">
-          <h3 class="text-lg block truncate">
+          <h3 class="block truncate text-lg">
             {{ userStore.GetUserById(props.message.senderId).userName }}
           </h3>
-          <span class="text-xs block shrink-0">
+          <span class="block shrink-0 text-xs">
             {{ timeSend.toLocaleTimeString() }}
           </span>
           <span
-            class="text-xs block shrink-0"
+            class="block shrink-0 text-xs"
             v-if="props.message.meta.edited"
-            title="edited"
-          >
+            title="edited">
             <i class="fa-solid fa-pencil"></i>
           </span>
         </div>
         <span
-          class="text-pretty break-words w-full"
-          v-html="finalMessage"
-        ></span>
+          class="w-full text-pretty break-words"
+          v-html="finalMessage"></span>
       </div>
     </div>
     <div
-      class="opacity-0 group-hover/item:opacity-100 absolute right-0 -top-5 h-8 p-1 group-hover/item:ease-in-out duration-300 flex items-center"
-    >
+      class="absolute -top-5 right-0 flex h-8 items-center p-1 opacity-0 duration-300
+        group-hover/item:opacity-100 group-hover/item:ease-in-out">
       <button
         @click="ReplyToMessage"
-        class="bg-gray-800 first:rounded-l-lg last:rounded-r-lg px-1 py-1 h-fit hover:bg-gray-700 text-white"
-      >
+        class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg
+          hover:bg-gray-700">
         <i class="fa-solid fa-reply"></i>
       </button>
       <button
         @click="EditMessage"
-        class="bg-gray-800 first:rounded-l-lg last:rounded-r-lg px-1 py-1 h-fit hover:bg-gray-700 text-white"
-        v-if="props.message.senderId === userStore.myId"
-      >
+        class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg
+          hover:bg-gray-700"
+        v-if="props.message.senderId === userStore.myId">
         <i class="fa-solid fa-pen-to-square"></i>
       </button>
       <button
         @click="RemoveChatMessage"
-        class="bg-gray-800 first:rounded-l-lg last:rounded-r-lg px-1 py-1 h-fit hover:bg-gray-700 text-white"
-        v-if="props.message.senderId === userStore.myId"
-      >
+        class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg
+          hover:bg-gray-700"
+        v-if="props.message.senderId === userStore.myId">
         <i class="fa-solid fa-delete-left"></i>
       </button>
     </div>

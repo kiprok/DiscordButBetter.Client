@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <header class="bg-gray-800 flex flex-row items-center px-4 gap-4">
+  <header class="flex flex-row items-center gap-4 bg-gray-800 px-4">
     <slot></slot>
   </header>
 </template>

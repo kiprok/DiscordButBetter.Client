@@ -30,7 +30,9 @@ export const useUserStore = defineStore('user', () => {
   });
 
   function SendMessage(convoId, message) {
-    let newId = message.hasOwnProperty('messageId') ? message.messageId : crypto.randomUUID();
+    let newId = message.hasOwnProperty('messageId')
+      ? message.messageId
+      : crypto.randomUUID();
     messages[newId] = {
       messageId: newId,
       senderId: message.senderId,
@@ -45,7 +47,11 @@ export const useUserStore = defineStore('user', () => {
   function GetOlderMessages(convoId, startpointId, amount) {
     return Object.keys(messages)
       .filter(
-        (key) => convoId === messages[key].convoId && (messages[startpointId]?.timeSend ?? Infinity) - messages[key].timeSend > 0,
+        (key) =>
+          convoId === messages[key].convoId &&
+          (messages[startpointId]?.timeSend ?? Infinity) -
+            messages[key].timeSend >
+            0,
       )
       .toSorted((a, b) => messages[b].timeSend - messages[a].timeSend)
       .slice(0, amount)
@@ -54,7 +60,11 @@ export const useUserStore = defineStore('user', () => {
 
   function GetNewerMessages(convoId, startpointId, amount) {
     return Object.keys(messages)
-      .filter((key) => convoId === messages[key].convoId && (messages[startpointId]?.timeSend ?? 0) - messages[key].timeSend < 0)
+      .filter(
+        (key) =>
+          convoId === messages[key].convoId &&
+          (messages[startpointId]?.timeSend ?? 0) - messages[key].timeSend < 0,
+      )
       .toSorted((a, b) => messages[a].timeSend - messages[b].timeSend)
       .slice(0, amount)
       .map((key) => messages[key]);
