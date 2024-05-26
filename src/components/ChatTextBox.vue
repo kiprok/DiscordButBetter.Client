@@ -57,8 +57,8 @@ function onInput() {
   <div class="size-full">
     <form class="flex size-full items-center" @submit.prevent="SendChatMessage">
       <div
-        class="h-fit max-h-44 min-h-8 w-24 grow content-center overflow-y-scroll rounded-l-lg
-          bg-white"
+        class="h-fit max-h-44 md:max-h-96 min-h-8 w-24 grow content-center overflow-y-scroll
+          rounded-l-lg bg-white"
         @click="textBox.focus">
         <div
           contenteditable="true"
