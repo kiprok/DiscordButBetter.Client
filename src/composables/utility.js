@@ -32,3 +32,27 @@ export function insertAtCursor(lines) {
   selection.removeAllRanges();
   selection.addRange(range);
 }
+
+export function reverseEscapeHtml(original) {
+  const map = {
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&#039;': "'",
+  };
+
+  return original.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, (m) => map[m]);
+}
+
+export function escapeHtml(original) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+
+  return original.replace(/[&<>"']/g, (m) => map[m]);
+}

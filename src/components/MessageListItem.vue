@@ -1,14 +1,18 @@
 <script setup>
 import { useUserStore } from '@/stores/user.js';
-import { computed, onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import { useConversationStore } from '@/stores/conversation.js';
+import hljs from 'highlight.js';
+import { escapeHtml, reverseEscapeHtml } from '@/composables/utility.js';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'index']);
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const sendMessageStore = useSendingMessageStore();
+
+const refTextMessage = ref();
 
 const timeSend = new Date(props.message.timeSend);
 
@@ -27,24 +31,22 @@ const parseMarkdown = (text) => {
     .replace(
       /\[(.*?)]\((.*?)\)/g,
       '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
+    )
+    .replace(
+      /```(.*?)\n([\s\S]*?)```/g,
+      (match, p1, p2) =>
+        `<pre class="border border-black my-1 rounded overflow-x-auto"><code class="hljs">${
+          hljs.highlight(reverseEscapeHtml(p2), {
+            language: p1 ? p1 : 'plaintext',
+            ignoreIllegals: true,
+          }).value
+        }</code></pre>`,
     );
-};
-
-const escapeHtml = (original) => {
-  const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
-  };
-
-  return original.replace(/[&<>"']/g, (m) => map[m]);
 };
 
 const finalMessage = computed(() => {
   let escapedMessage = escapeHtml(props.message.messageText);
-  return parseMarkdown(escapedMessage).replaceAll('\n', '<br>');
+  return parseMarkdown(escapedMessage);
 });
 
 const previousAlsoOwner = computed(() => {
@@ -62,6 +64,11 @@ const previousAlsoOwner = computed(() => {
 onMounted(() => {
   emits('OnMountChange', props.message, 1);
 });
+
+watch(
+  () => props.message.messageText,
+  () => {},
+);
 
 onUnmounted(() => {
   emits('OnMountChange', props.message, -1);
@@ -150,8 +157,9 @@ function EditMessage() {
           </span>
         </div>
         <span
-          class="w-full text-pretty break-words"
-          v-html="finalMessage"></span>
+          class="w-full whitespace-pre-wrap text-pretty break-words"
+          v-html="finalMessage"
+          ref="refTextMessage"></span>
       </div>
     </div>
     <div
