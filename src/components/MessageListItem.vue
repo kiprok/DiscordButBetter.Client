@@ -37,7 +37,7 @@ const parseMarkdown = (text) => {
       (match, p1, p2) =>
         `<pre class="border border-black my-1 rounded overflow-x-auto"><code class="hljs">${
           hljs.highlight(reverseEscapeHtml(p2), {
-            language: p1 ? p1 : 'plaintext',
+            language: hljs.getLanguage(p1) ? p1 : 'plaintext',
             ignoreIllegals: true,
           }).value
         }</code></pre>`,

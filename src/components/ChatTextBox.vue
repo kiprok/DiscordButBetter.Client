@@ -16,8 +16,6 @@ function onPaste(event) {
   const paste = (event.clipboardData || window.clipboardData).getData(
     'text/plain',
   );
-  console.log(paste);
-  console.log(paste.split('\n'));
 
   //document.execCommand('insertText', false, paste);
   insertAtCursor(paste.split('\n').reverse());
