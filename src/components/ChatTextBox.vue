@@ -17,8 +17,7 @@ function onPaste(event) {
     'text/plain',
   );
 
-  //document.execCommand('insertText', false, paste);
-  insertAtCursor(paste.split('\n').reverse());
+  insertAtCursor(paste);
 
   onInput();
 }
@@ -30,7 +29,7 @@ function OnKeyDown(event) {
   }
   if (event.key === 'Tab') {
     event.preventDefault();
-    insertAtCursor(['\t']);
+    insertAtCursor('\t');
     onInput();
   }
 }

@@ -14,19 +14,14 @@ export function IsLoadingCompleted(messageList, message) {
   return false;
 }
 
-export function insertAtCursor(lines) {
+export function insertAtCursor(text) {
   const selection = window.getSelection();
   if (!selection.rangeCount) return false;
   const range = selection.getRangeAt(0);
   range.deleteContents();
 
-  for (let i = 0; i < lines.length; i++) {
-    const node = document.createTextNode(lines[i]);
-    range.insertNode(node);
-    if (i < lines.length - 1) {
-      range.insertNode(document.createElement('br'));
-    }
-  }
+  const node = document.createTextNode(text);
+  range.insertNode(node);
 
   range.collapse(false);
   selection.removeAllRanges();
