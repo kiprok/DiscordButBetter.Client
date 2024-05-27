@@ -63,10 +63,10 @@ export function GetMarkdownSize(length, text) {
 }
 
 export function GetBlockQuoteMarkDown(text) {
-  const blockQuote = '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2">';
+  const blockQuote = '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2 mr-3 ">';
   let blockQuoteLines = text.split('\n');
   let blockQuoteList = [];
-  let result = blockQuote;
+  let result = '';
 
   //map out each line of the blockquote and how many indents it has
   blockQuoteLines.forEach((line) => {
@@ -76,19 +76,25 @@ export function GetBlockQuoteMarkDown(text) {
 
   //build the string based on the indents
   for (let i = 0; i < blockQuoteList.length; i++) {
-    //comparer for if the next line has a different indent
+    //comparer function to compare the current line to the next line and return the difference
+    //if is out of bounds, it will return the current line indentation
     const comparer = (m) => {
-      if (i + m < 0 || i + m >= blockQuoteList.length) return true;
-      return blockQuoteList[i][0] !== blockQuoteList[i + m][0];
+      if (i + m < 0 || i + m >= blockQuoteList.length) return blockQuoteList[i][0];
+      return blockQuoteList[i][0] - blockQuoteList[i + m][0];
     };
 
-    result += comparer(-1) ? blockQuote.repeat(blockQuoteList[i][0] - 1) : '';
-    result += comparer(-1) ? '<p class="py-2">' : '';
+    //result is build based on the indentation difference returned by the comparer function
+    //if the difference up is higher than 0, it means we need to add a blockquote tag with the difference as the number of tags
+    result += comparer(-1) > 0 ? blockQuote.repeat(Math.abs(comparer(-1))) : '';
+    //if the difference up is 0 we don't need to add a paragraph tag
+    result += comparer(-1) !== 0 ? '<p class="py-2">' : '';
+    //add the line of text
     result += `${blockQuoteList[i][1]}\n`;
-    result += comparer(+1) ? '</p>' : '';
-    result += comparer(+1) ? '</blockquote>'.repeat(blockQuoteList[i][0] - 1) : '';
+    //if the difference below is 0 we don't need to add a paragraph closing tag
+    result += comparer(1) !== 0 ? '</p>' : '';
+    //if the difference below is higher than 0, it means we need to close the blockquote tag with the difference as the number of tags
+    result += comparer(1) > 0 ? '</blockquote>'.repeat(Math.abs(comparer(1))) : '';
   }
 
-  result += '</blockquote>';
   return result;
 }
