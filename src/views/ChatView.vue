@@ -3,7 +3,7 @@ import ChatTopBar from '@/components/ChatTopBar.vue';
 import { useUserStore } from '@/stores/user.js';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import ChatTextBox from '@/components/ChatTextBox.vue';
-import { defineAsyncComponent, ref, watch } from 'vue';
+import { defineAsyncComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useConversationStore } from '@/stores/conversation.js';
 import ChatAreaInfoBar from '@/components/ChatAreaInfoBar.vue';
@@ -20,6 +20,8 @@ const userStore = useUserStore();
 const sendMessageStore = useSendingMessageStore();
 const conversationStore = useConversationStore();
 const searchStore = useSearchStore();
+
+const messageListRef = ref();
 
 const sideBarIsShowing = ref(false);
 
@@ -39,6 +41,15 @@ watch(
   },
   { immediate: true },
 );
+
+onMounted(() => {
+  messageListRef.value.addEventListener('click', (event) => {
+    let target = event.target.closest('.hidden-text');
+    if (!target) return;
+    target.classList.toggle('!bg-black/50');
+    target.classList.toggle('!text-white');
+  });
+});
 
 function SendChatMessage() {
   let messageToSend = {
@@ -126,7 +137,8 @@ function SendChatMessage() {
     </ChatTopBar>
     <div class="static flex grow flex-row overflow-hidden bg-purple-600">
       <div
-        class="flex grow flex-col bg-blue-600 group-[.sidebar-checked]:hidden lg:!flex">
+        class="flex grow flex-col bg-blue-600 group-[.sidebar-checked]:hidden lg:!flex"
+        ref="messageListRef">
         <div class="grow bg-gray-300">
           <message-list
             :convoId="
