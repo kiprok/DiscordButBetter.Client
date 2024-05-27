@@ -30,9 +30,7 @@ export const useUserStore = defineStore('user', () => {
   });
 
   function SendMessage(convoId, message) {
-    let newId = message.hasOwnProperty('messageId')
-      ? message.messageId
-      : crypto.randomUUID();
+    let newId = message.hasOwnProperty('messageId') ? message.messageId : crypto.randomUUID();
     messages[newId] = {
       messageId: newId,
       senderId: message.senderId,
@@ -49,9 +47,7 @@ export const useUserStore = defineStore('user', () => {
       .filter(
         (key) =>
           convoId === messages[key].convoId &&
-          (messages[startpointId]?.timeSend ?? Infinity) -
-            messages[key].timeSend >
-            0,
+          (messages[startpointId]?.timeSend ?? Infinity) - messages[key].timeSend > 0,
       )
       .toSorted((a, b) => messages[b].timeSend - messages[a].timeSend)
       .slice(0, amount)

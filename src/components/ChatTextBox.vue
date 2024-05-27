@@ -13,9 +13,7 @@ function SendChatMessage() {
 }
 
 function onPaste(event) {
-  const paste = (event.clipboardData || window.clipboardData).getData(
-    'text/plain',
-  );
+  const paste = (event.clipboardData || window.clipboardData).getData('text/plain');
 
   insertAtCursor(paste);
 
@@ -54,15 +52,13 @@ function onInput() {
   <div class="size-full">
     <form class="flex size-full items-center" @submit.prevent="SendChatMessage">
       <div
-        class="h-fit max-h-44 md:max-h-96 min-h-8 w-24 grow content-center overflow-y-scroll
-          rounded-l-lg bg-white"
+        class="h-fit max-h-44 md:max-h-96 min-h-8 w-24 grow content-center overflow-y-scroll rounded-l-lg bg-white"
         @click="textBox.focus">
         <div
           contenteditable="true"
           @paste.prevent="onPaste"
           ref="textBox"
-          class="h-fit w-full whitespace-pre-wrap break-words py-2 pl-2
-            focus-visible:outline-none"
+          class="h-fit w-full whitespace-pre-wrap break-words py-2 pl-2 focus-visible:outline-none"
           @keydown="OnKeyDown"
           @input="onInput"
           @blur="onInput"

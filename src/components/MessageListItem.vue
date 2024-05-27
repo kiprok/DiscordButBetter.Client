@@ -29,13 +29,8 @@ const parseMarkdown = (text) => {
   return text
     .replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>')
     .replace(/([*_])(.*?)\1/g, '<em>$2</em>')
-    .replace(
-      /(\|\|)(.*?)\1/g,
-      '<span class="hidden-text bg-black rounded">$2</span>',
-    )
-    .replace(/(^|\n)(#{1,6})(.+)/g, (match, p1, p2, p3) =>
-      GetMarkdownSize(p2.length, p3),
-    )
+    .replace(/(\|\|)(.*?)\1/g, '<span class="hidden-text bg-black rounded">$2</span>')
+    .replace(/(^|\n)(#{1,6})(.+)/g, (match, p1, p2, p3) => GetMarkdownSize(p2.length, p3))
     .replace(
       /\[(.*?)]\((.*?)\)/g,
       '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
@@ -59,9 +54,7 @@ const finalMessage = computed(() => {
 });
 
 const previousAlsoOwner = computed(() => {
-  const prevMsg = conversationStore.GetVisibleMessages(props.message.convoId)[
-    props.index - 1
-  ];
+  const prevMsg = conversationStore.GetVisibleMessages(props.message.convoId)[props.index - 1];
   return (
     !props.message.meta.edited &&
     !reply.value &&
@@ -85,10 +78,7 @@ onUnmounted(() => {
 
 function RemoveChatMessage() {
   userStore.DeleteMessage(props.message.messageId);
-  conversationStore.DeleteMessage(
-    props.message.convoId,
-    props.message.messageId,
-  );
+  conversationStore.DeleteMessage(props.message.convoId, props.message.messageId);
 }
 
 function ReplyToMessage() {
@@ -113,8 +103,7 @@ function EditMessage() {
     class="group/item relative flex flex-col hover:bg-gray-400"
     :class="{ 'mt-2': !previousAlsoOwner }">
     <div class="flex flex-row items-end" v-if="reply">
-      <div
-        class="ml-6 h-3 w-8 shrink-0 rounded-tl border border-b-0 border-r-0 border-black"></div>
+      <div class="ml-6 h-3 w-8 shrink-0 rounded-tl border border-b-0 border-r-0 border-black"></div>
       <div class="mb-0.5 truncate">
         <img
           :src="userStore.GetUserById(reply.senderId)?.profilePicture"
@@ -123,9 +112,7 @@ function EditMessage() {
         <span
           class="hover:cursor-pointer hover:text-white hover:underline"
           @click="$emit('scroll-reply', reply.messageId)">
-          <span class="mr-0.5 text-sm">{{
-            userStore.GetUserById(reply.senderId)?.userName
-          }}</span>
+          <span class="mr-0.5 text-sm">{{ userStore.GetUserById(reply.senderId)?.userName }}</span>
           <span class="text-xs">{{ reply.messageText }}</span>
         </span>
       </div>
@@ -137,9 +124,7 @@ function EditMessage() {
           alt="profile picture"
           class="size-full h-10 rounded-full"
           v-if="!previousAlsoOwner" />
-        <div
-          v-if="previousAlsoOwner"
-          class="flex h-6 items-center justify-center">
+        <div v-if="previousAlsoOwner" class="flex h-6 items-center justify-center">
           <span class="invisible text-xs group-hover/item:visible">
             {{
               timeSend.toLocaleTimeString([], {
@@ -158,10 +143,7 @@ function EditMessage() {
           <span class="block shrink-0 text-xs">
             {{ timeSend.toLocaleTimeString() }}
           </span>
-          <span
-            class="block shrink-0 text-xs"
-            v-if="props.message.meta.edited"
-            title="edited">
+          <span class="block shrink-0 text-xs" v-if="props.message.meta.edited" title="edited">
             <i class="fa-solid fa-pencil"></i>
           </span>
         </div>
@@ -176,21 +158,18 @@ function EditMessage() {
         group-hover/item:opacity-100 group-hover/item:ease-in-out">
       <button
         @click="ReplyToMessage"
-        class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg
-          hover:bg-gray-700">
+        class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700">
         <i class="fa-solid fa-reply"></i>
       </button>
       <button
         @click="EditMessage"
-        class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg
-          hover:bg-gray-700"
+        class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700"
         v-if="props.message.senderId === userStore.myId">
         <i class="fa-solid fa-pen-to-square"></i>
       </button>
       <button
         @click="RemoveChatMessage"
-        class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg
-          hover:bg-gray-700"
+        class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700"
         v-if="props.message.senderId === userStore.myId">
         <i class="fa-solid fa-delete-left"></i>
       </button>

@@ -54,9 +54,7 @@ async function GenFriend() {
         class="size-full overflow-auto bg-gray-300 px-8 pt-8 lg:block"
         :class="{ hidden: sidePanelView }">
         <div>
-          <span v-if="userStore.friends.length > 0">
-            {{ userStore.friends.length }} friends
-          </span>
+          <span v-if="userStore.friends.length > 0"> {{ userStore.friends.length }} friends </span>
           <span v-else> no friends </span>
         </div>
         <div class="flex w-full flex-col gap-2 bg-gray-400">
@@ -65,10 +63,7 @@ async function GenFriend() {
             :key="index"
             class="flex items-center hover:bg-gray-600/30">
             <div class="mr-2 inline-block">
-              <img
-                :src="friend.profilePicture"
-                :alt="friend.userName"
-                class="rounded-full" />
+              <img :src="friend.profilePicture" :alt="friend.userName" class="rounded-full" />
             </div>
             <span>
               {{ friend.userName }}
@@ -80,9 +75,7 @@ async function GenFriend() {
         class="w-full flex-none bg-gray-600 lg:flex lg:w-[22rem]"
         :class="{ hidden: !sidePanelView, flex: sidePanelView }">
         <div>
-          <simple-button :disabled="_addingFriend" @click="GenFriend"
-            >add friend</simple-button
-          >
+          <simple-button :disabled="_addingFriend" @click="GenFriend">add friend</simple-button>
         </div>
       </div>
     </div>

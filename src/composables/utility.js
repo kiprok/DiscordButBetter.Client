@@ -1,8 +1,6 @@
 export function IsLoadingCompleted(messageList, message) {
   if (messageList.length > 0) {
-    const index = messageList.findIndex(
-      (x) => x.messageId === message.messageId,
-    );
+    const index = messageList.findIndex((x) => x.messageId === message.messageId);
     if (index !== -1) {
       messageList.splice(index, 1);
 
@@ -65,8 +63,7 @@ export function GetMarkdownSize(length, text) {
 }
 
 export function GetBlockQuoteMarkDown(text) {
-  const blockQuote =
-    '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2">';
+  const blockQuote = '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2">';
   let blockQuoteLines = text.split('\n');
   let blockQuoteList = [];
   let result = blockQuote;
@@ -81,15 +78,11 @@ export function GetBlockQuoteMarkDown(text) {
       return blockQuoteList[i][0] !== blockQuoteList[i + m][0];
     };
 
-    result += comparer(i, -1)
-      ? blockQuote.repeat(blockQuoteList[i][0] - 1)
-      : '';
+    result += comparer(i, -1) ? blockQuote.repeat(blockQuoteList[i][0] - 1) : '';
     result += comparer(i, -1) ? '<p class="py-2">' : '';
     result += `${blockQuoteList[i][1]}\n`;
     result += comparer(i, +1) ? '</p>' : '';
-    result += comparer(i, +1)
-      ? '</blockquote>'.repeat(blockQuoteList[i][0] - 1)
-      : '';
+    result += comparer(i, +1) ? '</blockquote>'.repeat(blockQuoteList[i][0] - 1) : '';
   }
 
   result += '</blockquote>';

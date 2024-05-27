@@ -9,8 +9,7 @@ function ToggleSideMenu() {
   <div class="block size-8 md:hidden">
     <button
       @click="ToggleSideMenu"
-      class="flex size-8 items-center justify-center text-center text-2xl text-white
-        hover:text-gray-300">
+      class="flex size-8 items-center justify-center text-center text-2xl text-white hover:text-gray-300">
       <i class="fa-solid fa-bars"></i>
     </button>
   </div>
