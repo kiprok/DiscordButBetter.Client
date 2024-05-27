@@ -33,7 +33,7 @@ const parseMarkdown = (text) => {
       '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
     )
     .replace(
-      /(`*)(.*?)\n([\s\S]*?)\1/g,
+      /(`{3,})(.*?)\n([\s\S]*?)\1/g,
       (match, p1, p2, p3) =>
         `<pre class="border border-black my-1 rounded overflow-x-auto"><code class="hljs">${
           hljs.highlight(reverseEscapeHtml(p3), {
