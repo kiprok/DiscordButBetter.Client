@@ -68,12 +68,15 @@ export function GetBlockQuoteMarkDown(text) {
   let blockQuoteList = [];
   let result = blockQuote;
 
+  //map out each line of the blockquote and how many indents it has
   blockQuoteLines.forEach((line) => {
     let info = /((?:&gt;)+)(.*)/.exec(line);
     if (info) blockQuoteList.push([info[1].match(/&gt;/g).length, info[2]]);
   });
 
+  //build the string based on the indents
   for (let i = 0; i < blockQuoteList.length; i++) {
+    //comparer for if the next line has a different indent
     const comparer = (m) => {
       if (i + m < 0 || i + m >= blockQuoteList.length) return true;
       return blockQuoteList[i][0] !== blockQuoteList[i + m][0];
