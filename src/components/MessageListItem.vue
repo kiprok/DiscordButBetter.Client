@@ -6,6 +6,7 @@ import { useConversationStore } from '@/stores/conversation.js';
 import hljs from 'highlight.js';
 import {
   escapeHtml,
+  GetBlockQuoteMarkDown,
   GetMarkdownSize,
   reverseEscapeHtml,
 } from '@/composables/utility.js';
@@ -39,6 +40,7 @@ const parseMarkdown = (text) => {
       /\[(.*?)]\((.*?)\)/g,
       '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
     )
+    .replace(/(?:^(?:&gt;)+.*\n?)+/gm, (match) => GetBlockQuoteMarkDown(match))
     .replace(
       /(`{3,})(.*?)\n([\s\S]*?)\1/g,
       (match, p1, p2, p3) =>

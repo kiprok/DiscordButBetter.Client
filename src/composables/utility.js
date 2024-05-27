@@ -63,3 +63,16 @@ export function GetMarkdownSize(length, text) {
   ];
   return sizes[length - 1];
 }
+
+export function GetBlockQuoteMarkDown(text) {
+  let blockQuoteLines = text.split('\n');
+  let blockQuoteList = [];
+  //console.log(blockQuoteLines);
+  blockQuoteLines.forEach((line) => {
+    let info = /((?:&gt;)+)(.*)/.exec(line);
+    console.log(info);
+    console.log(info[1].match(/&gt;/g).length);
+    blockQuoteList.push([info[1].match(/&gt;/g).length, info[2]]);
+  });
+  return '';
+}
