@@ -74,16 +74,16 @@ export function GetBlockQuoteMarkDown(text) {
   });
 
   for (let i = 0; i < blockQuoteList.length; i++) {
-    const comparer = (i, m) => {
+    const comparer = (m) => {
       if (i + m < 0 || i + m >= blockQuoteList.length) return true;
       return blockQuoteList[i][0] !== blockQuoteList[i + m][0];
     };
 
-    result += comparer(i, -1) ? blockQuote.repeat(blockQuoteList[i][0] - 1) : '';
-    result += comparer(i, -1) ? '<p class="py-2">' : '';
+    result += comparer(-1) ? blockQuote.repeat(blockQuoteList[i][0] - 1) : '';
+    result += comparer(-1) ? '<p class="py-2">' : '';
     result += `${blockQuoteList[i][1]}\n`;
-    result += comparer(i, +1) ? '</p>' : '';
-    result += comparer(i, +1) ? '</blockquote>'.repeat(blockQuoteList[i][0] - 1) : '';
+    result += comparer(+1) ? '</p>' : '';
+    result += comparer(+1) ? '</blockquote>'.repeat(blockQuoteList[i][0] - 1) : '';
   }
 
   result += '</blockquote>';
