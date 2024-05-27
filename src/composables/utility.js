@@ -63,7 +63,8 @@ export function GetMarkdownSize(length, text) {
 }
 
 export function GetBlockQuoteMarkDown(text) {
-  const blockQuote = '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2 mr-3 ">';
+  const blockQuote =
+    '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2 mr-3 pr-1 shadow">';
   let blockQuoteLines = text.split('\n');
   let blockQuoteList = [];
   let result = '';
