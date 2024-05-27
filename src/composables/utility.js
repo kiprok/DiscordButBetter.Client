@@ -65,7 +65,8 @@ export function GetMarkdownSize(length, text) {
 export function GetBlockQuoteMarkDown(text) {
   const blockQuote =
     '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2 mr-3 pr-1 shadow">';
-  let blockQuoteLines = text.split('\n');
+  const QuoteParagraph = '<p class="py-2">';
+  const blockQuoteLines = text.split('\n');
   let blockQuoteList = [];
   let result = '';
 
@@ -89,7 +90,7 @@ export function GetBlockQuoteMarkDown(text) {
     //if the difference with the upper is higher than 0, it means we need to add a blockquote tag with the difference as the number of tags
     result += differenceUp > 0 ? blockQuote.repeat(Math.abs(differenceUp)) : '';
     //if the difference with the upper is 0 we don't need to add a paragraph tag
-    result += differenceUp !== 0 ? '<p class="py-2">' : '';
+    result += differenceUp !== 0 ? QuoteParagraph : '';
     //add the line of text
     result += `${blockQuoteList[i][1]}\n`;
     //if the difference with the lower is 0 we don't need to add a paragraph closing tag
