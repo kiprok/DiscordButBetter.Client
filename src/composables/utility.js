@@ -70,7 +70,7 @@ export function GetBlockQuoteMarkDown(text) {
 
   blockQuoteLines.forEach((line) => {
     let info = /((?:&gt;)+)(.*)/.exec(line);
-    blockQuoteList.push([info[1].match(/&gt;/g).length, info[2]]);
+    if (info) blockQuoteList.push([info[1].match(/&gt;/g).length, info[2]]);
   });
 
   for (let i = 0; i < blockQuoteList.length; i++) {
