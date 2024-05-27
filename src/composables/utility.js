@@ -67,6 +67,7 @@ export function GetBlockQuoteMarkDown(text) {
   let blockQuoteLines = text.split('\n');
   let blockQuoteList = [];
   let result = blockQuote;
+
   blockQuoteLines.forEach((line) => {
     let info = /((?:&gt;)+)(.*)/.exec(line);
     blockQuoteList.push([info[1].match(/&gt;/g).length, info[2]]);
