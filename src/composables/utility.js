@@ -65,14 +65,33 @@ export function GetMarkdownSize(length, text) {
 }
 
 export function GetBlockQuoteMarkDown(text) {
+  const blockQuote =
+    '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2">';
   let blockQuoteLines = text.split('\n');
   let blockQuoteList = [];
-  //console.log(blockQuoteLines);
+  let result = blockQuote;
   blockQuoteLines.forEach((line) => {
     let info = /((?:&gt;)+)(.*)/.exec(line);
-    console.log(info);
-    console.log(info[1].match(/&gt;/g).length);
     blockQuoteList.push([info[1].match(/&gt;/g).length, info[2]]);
   });
-  return '';
+
+  for (let i = 0; i < blockQuoteList.length; i++) {
+    const comparer = (i, m) => {
+      if (i + m < 0 || i + m >= blockQuoteList.length) return true;
+      return blockQuoteList[i][0] !== blockQuoteList[i + m][0];
+    };
+
+    result += comparer(i, -1)
+      ? blockQuote.repeat(blockQuoteList[i][0] - 1)
+      : '';
+    result += comparer(i, -1) ? '<p class="py-2">' : '';
+    result += `${blockQuoteList[i][1]}\n`;
+    result += comparer(i, +1) ? '</p>' : '';
+    result += comparer(i, +1)
+      ? '</blockquote>'.repeat(blockQuoteList[i][0] - 1)
+      : '';
+  }
+
+  result += '</blockquote>';
+  return result;
 }
