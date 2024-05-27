@@ -51,3 +51,15 @@ export function escapeHtml(original) {
 
   return original.replace(/[&<>"']/g, (m) => map[m]);
 }
+
+export function GetMarkdownSize(length, text) {
+  const sizes = [
+    `<h1 class="text-4xl">${text}</h1>`,
+    `<h2 class="text-3xl">${text}</h2>`,
+    `<h3 class="text-2xl">${text}</h3>`,
+    `<h4 class="text-xl">${text}</h4>`,
+    `<h5 class="text-lg">${text}</h5>`,
+    `<h6 class="text-base">${text}</h6>`,
+  ];
+  return sizes[length - 1];
+}

@@ -4,7 +4,11 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import hljs from 'highlight.js';
-import { escapeHtml, reverseEscapeHtml } from '@/composables/utility.js';
+import {
+  escapeHtml,
+  GetMarkdownSize,
+  reverseEscapeHtml,
+} from '@/composables/utility.js';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'index']);
@@ -26,7 +30,10 @@ const parseMarkdown = (text) => {
     .replace(/([*_])(.*?)\1/g, '<em>$2</em>')
     .replace(
       /(\|\|)(.*?)\1/g,
-      '<span class="bg-black hover:bg-black/50 hover:text-white rounded">$2</span>',
+      '<span class="hidden-text bg-black rounded">$2</span>',
+    )
+    .replace(/(^|\n)(#{1,6})(.+)/g, (match, p1, p2, p3) =>
+      GetMarkdownSize(p2.length, p3),
     )
     .replace(
       /\[(.*?)]\((.*?)\)/g,
