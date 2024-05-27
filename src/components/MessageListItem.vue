@@ -33,11 +33,11 @@ const parseMarkdown = (text) => {
       '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
     )
     .replace(
-      /```(.*?)\n([\s\S]*?)```/g,
-      (match, p1, p2) =>
+      /(`*)(.*?)\n([\s\S]*?)\1/g,
+      (match, p1, p2, p3) =>
         `<pre class="border border-black my-1 rounded overflow-x-auto"><code class="hljs">${
-          hljs.highlight(reverseEscapeHtml(p2), {
-            language: hljs.getLanguage(p1) ? p1 : 'plaintext',
+          hljs.highlight(reverseEscapeHtml(p3), {
+            language: hljs.getLanguage(p2) ? p2 : 'plaintext',
             ignoreIllegals: true,
           }).value
         }</code></pre>`,
