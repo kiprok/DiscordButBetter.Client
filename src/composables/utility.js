@@ -64,15 +64,15 @@ export function GetMarkdownSize(length, text) {
 
 export function GetBlockQuoteMarkDown(text) {
   const blockQuote =
-    '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2 mr-3 pr-1 shadow 2xl:max-w-[90%]">';
-  const QuoteParagraph = '<p class="py-2">';
+    '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2 py-2 mr-3 pr-1 shadow ">';
+  const QuoteParagraph = '<p class="py-1">';
   const blockQuoteLines = text.split('\n');
   let blockQuoteList = [];
   let result = '';
 
   //map out each line of the blockquote and how many indents it has
   blockQuoteLines.forEach((line) => {
-    let info = /((?:&gt;)+)(.*)/.exec(line);
+    let info = /((?:&gt;){1,5})(.*)/.exec(line);
     if (info) blockQuoteList.push([info[1].match(/&gt;/g).length, info[2]]);
   });
 
