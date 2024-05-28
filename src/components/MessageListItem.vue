@@ -52,7 +52,7 @@ const parseMarkdown = (text) => {
       '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
     )
     .replace(/(?:^(?:&gt;)+.*\n?)+/gm, (match) => GetBlockQuoteMarkDown(match))
-    .replaceAll('%%CODE_BLOCK%%', () => codeBlocks.shift());
+    .replaceAll('%%CODE_BLOCK%%', () => codeBlocks.shift() || '%%CODE_BLOCK%%');
 };
 
 const finalMessage = computed(() => {
