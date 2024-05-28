@@ -68,7 +68,7 @@ export function GetBlockQuoteMarkDown(text) {
   const QuoteParagraph = '<p class="py-1">';
   const blockQuoteLines = text.split('\n');
   let blockQuoteList = [];
-  let result = '<blockquote class=" xl:w-[90%]">';
+  let result = '<blockquote class=" xl:w-[90%] my-1">';
 
   //map out each line of the blockquote and how many indents it has
   blockQuoteLines.forEach((line) => {
