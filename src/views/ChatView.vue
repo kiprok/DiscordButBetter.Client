@@ -46,6 +46,7 @@ onMounted(() => {
     if (!target) return;
     target.classList.toggle('!bg-black/50');
     target.classList.toggle('!text-white');
+    target.classList.toggle('!select-auto');
   });
 });
 

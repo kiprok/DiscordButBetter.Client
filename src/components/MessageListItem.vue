@@ -26,26 +26,33 @@ const reply = computed(() => {
 });
 
 const parseMarkdown = (text) => {
+  let codeBlocks = [];
+  text = text.replace(/(`{3,})(.*?)\n([\s\S]*?)\1/g, (match, p1, p2, p3) => {
+    codeBlocks.push(
+      `<pre class="border border-black my-1 rounded overflow-x-auto xl:max-w-[90%] my-4"><code class="hljs">${
+        hljs.highlight(reverseEscapeHtml(p3), {
+          language: hljs.getLanguage(p2) ? p2 : 'plaintext',
+          ignoreIllegals: true,
+        }).value
+      }</code></pre>`,
+    );
+    return '%%CODE_BLOCK%%';
+  });
+
   return text
     .replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>')
     .replace(/([*_])(.*?)\1/g, '<em>$2</em>')
-    .replace(/(\|\|)(.*?)\1/g, '<span class="hidden-text bg-black rounded">$2</span>')
-    .replace(/(^|\n)(#{1,6})(.+)/g, (match, p1, p2, p3) => GetMarkdownSize(p2.length, p3))
+    .replace(
+      /(\|\|)([\s\S]*?)\1/g,
+      '<div class="hidden-text bg-black rounded cursor-pointer select-none size-fit max-w-full">$2</div>',
+    )
+    .replace(/(#{1,6}\s)(.+)/g, (match, p1, p2) => GetMarkdownSize(p1.length, p2))
     .replace(
       /\[(.*?)]\((.*?)\)/g,
       '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
     )
     .replace(/(?:^(?:&gt;)+.*\n?)+/gm, (match) => GetBlockQuoteMarkDown(match))
-    .replace(
-      /(`{3,})(.*?)\n([\s\S]*?)\1/g,
-      (match, p1, p2, p3) =>
-        `<pre class="border border-black my-1 rounded overflow-x-auto 2xl:max-w-[90%] my-4"><code class="hljs">${
-          hljs.highlight(reverseEscapeHtml(p3), {
-            language: hljs.getLanguage(p2) ? p2 : 'plaintext',
-            ignoreIllegals: true,
-          }).value
-        }</code></pre>`,
-    );
+    .replaceAll('%%CODE_BLOCK%%', () => codeBlocks.shift());
 };
 
 const finalMessage = computed(() => {

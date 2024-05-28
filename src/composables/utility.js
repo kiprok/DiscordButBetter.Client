@@ -64,11 +64,11 @@ export function GetMarkdownSize(length, text) {
 
 export function GetBlockQuoteMarkDown(text) {
   const blockQuote =
-    '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2 py-2 mr-3 pr-1 shadow w-fit max-w-full">';
-  const QuoteParagraph = '<p class="py-1 mr-4">';
+    '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2 py-2 pr-1 shadow ">';
+  const QuoteParagraph = '<p class="py-1">';
   const blockQuoteLines = text.split('\n');
   let blockQuoteList = [];
-  let result = '';
+  let result = '<blockquote class=" xl:w-[90%]">';
 
   //map out each line of the blockquote and how many indents it has
   blockQuoteLines.forEach((line) => {
@@ -98,6 +98,8 @@ export function GetBlockQuoteMarkDown(text) {
     //if the difference with the lower is higher than 0, it means we need to close the blockquote tag with the difference as the number of tags
     result += differenceDown > 0 ? '</blockquote>'.repeat(Math.abs(differenceDown)) : '';
   }
+
+  result += '</blockquote>';
 
   return result;
 }
