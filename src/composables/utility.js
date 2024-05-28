@@ -66,9 +66,10 @@ export function GetBlockQuoteMarkDown(text) {
   const blockQuote =
     '<blockquote class="border-l-[10px] border-gray-600 bg-black/10 pl-2 py-2 pr-1 shadow ">';
   const QuoteParagraph = '<p class="py-1">';
+  let result = '<blockquote class=" xl:w-[90%] my-1">';
+
   const blockQuoteLines = text.split('\n');
   let blockQuoteList = [];
-  let result = '<blockquote class=" xl:w-[90%] my-1">';
 
   //map out each line of the blockquote and how many indents it has
   blockQuoteLines.forEach((line) => {
@@ -79,6 +80,7 @@ export function GetBlockQuoteMarkDown(text) {
   //build the string based on the indents
   for (let i = 0; i < blockQuoteList.length; i++) {
     //get the difference between the current line and the line above and below
+    //if it's out of bounds, we set the difference to the current indent
     let differenceUp =
       i - 1 < 0
         ? blockQuoteList[i].indentLength
