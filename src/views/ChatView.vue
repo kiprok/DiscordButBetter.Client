@@ -167,7 +167,7 @@ function SendChatMessage() {
           </span>
         </chat-area-info-bar>
         <div class="flex h-fit flex-none flex-row items-center bg-gray-600 px-6 py-2">
-          <ChatTextBox @send-chat-message="SendChatMessage" />
+          <ChatTextBox @send-chat-message="SendChatMessage" :convo-id="route.params.id" />
         </div>
       </div>
       <div

@@ -124,6 +124,11 @@ export const useConversationStore = defineStore('messageList', () => {
     );
   }
 
+  function GetLastMessageOfUser(convoId, userId) {
+    const messages = GetVisibleMessages(convoId).filter((x) => x.userId === userId);
+    return messages[messages.length - 1];
+  }
+
   function SetScrollPosition(convoId, pos) {
     if (conversations.hasOwnProperty(convoId)) conversations[convoId].scrollPosition = pos;
   }
@@ -145,6 +150,7 @@ export const useConversationStore = defineStore('messageList', () => {
     AddMessages,
     RemoveNewerMessages,
     RemoveOlderMessages,
+    GetLastMessageOfUser,
     DeleteMessage,
     SetScrollPosition,
     GetScrollPosition,

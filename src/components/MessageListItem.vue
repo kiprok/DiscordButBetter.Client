@@ -90,7 +90,7 @@ function ReplyToMessage() {
 }
 
 function EditMessage() {
-  sendMessageStore.EditMessage(props.message, reply.value);
+  sendMessageStore.EditMessage(props.message);
   let chatInput = document.querySelector('#chat-input');
   if (chatInput) {
     chatInput.focus();

@@ -2,8 +2,14 @@
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import { ref, watch } from 'vue';
 import { insertAtCursor } from '@/composables/utility.js';
+import { useUserStore } from '@/stores/user.js';
+import { useConversationStore } from '@/stores/conversation.js';
+
+const userStore = useUserStore();
+const conversationStore = useConversationStore();
 const sendMessageStore = useSendingMessageStore();
 const emit = defineEmits(['SendChatMessage']);
+const props = defineProps(['convoId']);
 
 const textBox = ref();
 
@@ -29,6 +35,14 @@ function OnKeyDown(event) {
     event.preventDefault();
     insertAtCursor('\t');
     onInput();
+  }
+
+  if (event.key === 'ArrowUp' && sendMessageStore.messageText === '') {
+    let lastMessage = conversationStore.GetLastMessage(props.convoId, userStore.myUserId);
+
+    if (lastMessage) {
+      sendMessageStore.EditMessage(lastMessage);
+    }
   }
 }
 
