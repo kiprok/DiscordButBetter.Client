@@ -73,18 +73,20 @@ export function GetBlockQuoteMarkDown(text) {
   //map out each line of the blockquote and how many indents it has
   blockQuoteLines.forEach((line) => {
     let info = /((?:&gt;){1,5})(.*)/.exec(line);
-    if (info) blockQuoteList.push([info[1].match(/&gt;/g).length, info[2]]);
+    if (info) blockQuoteList.push({ indentLength: info[1].match(/&gt;/g).length, text: info[2] });
   });
 
   //build the string based on the indents
   for (let i = 0; i < blockQuoteList.length; i++) {
     //get the difference between the current line and the line above and below
     let differenceUp =
-      i - 1 < 0 ? blockQuoteList[i][0] : blockQuoteList[i][0] - blockQuoteList[i - 1][0];
+      i - 1 < 0
+        ? blockQuoteList[i].indentLength
+        : blockQuoteList[i].indentLength - blockQuoteList[i - 1].indentLength;
     let differenceDown =
       i + 1 >= blockQuoteList.length
-        ? blockQuoteList[i][0]
-        : blockQuoteList[i][0] - blockQuoteList[i + 1][0];
+        ? blockQuoteList[i].indentLength
+        : blockQuoteList[i].indentLength - blockQuoteList[i + 1].indentLength;
 
     //result is build based on the indentation difference
     //if the difference with the upper is higher than 0, it means we need to add a blockquote tag with the difference as the number of tags
@@ -92,7 +94,7 @@ export function GetBlockQuoteMarkDown(text) {
     //if the difference with the upper is 0 we don't need to add a paragraph tag
     result += differenceUp !== 0 ? QuoteParagraph : '';
     //add the line of text
-    result += `${blockQuoteList[i][1]}\n`;
+    result += `${blockQuoteList[i].text}\n`;
     //if the difference with the lower is 0 we don't need to add a paragraph closing tag
     result += differenceDown !== 0 ? '</p>' : '';
     //if the difference with the lower is higher than 0, it means we need to close the blockquote tag with the difference as the number of tags
