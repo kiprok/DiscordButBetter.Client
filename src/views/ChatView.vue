@@ -9,6 +9,7 @@ import { useConversationStore } from '@/stores/conversation.js';
 import ChatAreaInfoBar from '@/components/ChatAreaInfoBar.vue';
 import ChatLeftSideMenuButton from '@/components/ChatLeftSideMenuButton.vue';
 import { useSearchStore } from '@/stores/search.js';
+import MessageListItem from '@/components/MessageListItem.vue';
 
 const MessageList = defineAsyncComponent(() => import('@/components/MessageList.vue'));
 
@@ -43,10 +44,14 @@ watch(
 onMounted(() => {
   messageListRef.value.addEventListener('click', (event) => {
     let target = event.target.closest('.hidden-text');
+    console.log('test');
     if (!target) return;
     target.classList.toggle('!bg-black/50');
     target.classList.toggle('!text-white');
     target.classList.toggle('!select-auto');
+    let targetText = target.querySelector('span');
+    if (!targetText) return;
+    targetText.classList.toggle('invisible');
   });
 });
 
@@ -126,7 +131,7 @@ function SendChatMessage() {
     </ChatTopBar>
     <div class="static flex grow flex-row overflow-hidden bg-purple-600">
       <div
-        class="flex grow flex-col bg-blue-600 group-[.sidebar-checked]:hidden lg:!flex"
+        class="flex flex-col bg-blue-600 w-full group-[.sidebar-checked]:hidden lg:!flex"
         ref="messageListRef">
         <div class="grow bg-gray-300">
           <message-list
@@ -176,7 +181,7 @@ function SendChatMessage() {
           lg:!block"
         :class="{
           'lg:w-[18rem]': !searchStore.GetShowingStatus(route.params.id),
-          'lg:w-[24rem]': searchStore.GetShowingStatus(route.params.id),
+          'lg:w-[26rem]': searchStore.GetShowingStatus(route.params.id),
         }">
         <div
           class="size-full text-white"
@@ -210,25 +215,11 @@ function SendChatMessage() {
                       conversationStore.TriggerJumpToMessage(route.params.id, result.messageId);
                     }
                   ">
-                  <div class="relative flex flex-row justify-between">
-                    <div class="ml-1 mr-2 mt-0 w-10 flex-none">
-                      <img
-                        :src="userStore.GetUserById(result.senderId).profilePicture"
-                        alt="profile picture"
-                        class="size-full h-10 rounded-full" />
-                    </div>
-                    <div class="flex w-12 grow flex-col">
-                      <div class="flex items-center gap-1">
-                        <h3 class="block truncate text-lg">
-                          {{ userStore.GetUserById(result.senderId).userName }}
-                        </h3>
-                        <span class="block shrink-0 text-xs">{{
-                          new Date(result.timeSend).toLocaleTimeString()
-                        }}</span>
-                      </div>
-                      <span class="w-full text-pretty break-words">{{ result.messageText }}</span>
-                    </div>
-                  </div>
+                  <message-list-item
+                    :message="result"
+                    :convoId="route.params.id"
+                    :key="result.messageId"
+                    :allowed-functions="{ allowReply: true }" />
                 </li>
               </ul>
             </div>

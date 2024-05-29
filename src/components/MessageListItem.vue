@@ -12,7 +12,7 @@ import {
 } from '@/composables/utility.js';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
-const props = defineProps(['message', 'index']);
+const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner']);
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const sendMessageStore = useSendingMessageStore();
@@ -44,9 +44,9 @@ const parseMarkdown = (text) => {
     .replace(/([*_])(.*?)\1/g, '<em>$2</em>')
     .replace(
       /(\|\|)([\s\S]*?)\1/g,
-      '<div class="hidden-text bg-black rounded cursor-pointer select-none size-fit max-w-full">$2</div>',
+      '<div class="hidden-text bg-black rounded cursor-pointer select-none size-fit max-w-full"><span class="invisible">$2</span></div>',
     )
-    .replace(/(#{1,6}\s)(.+)/g, (match, p1, p2) => GetMarkdownSize(p1.length, p2))
+    .replace(/(#{1,6}\s)(.+)/g, (match, p1, p2) => GetMarkdownSize(p1.length - 1, p2))
     .replace(
       /\[(.*?)]\((.*?)\)/g,
       '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
@@ -60,14 +60,10 @@ const finalMessage = computed(() => {
   return parseMarkdown(escapedMessage);
 });
 
-const previousAlsoOwner = computed(() => {
-  const prevMsg = conversationStore.GetVisibleMessages(props.message.convoId)[props.index - 1];
-  return (
-    !props.message.meta.edited &&
-    !reply.value &&
-    prevMsg &&
-    prevMsg.senderId === props.message.senderId
-  );
+const finalReply = computed(() => {
+  if (!reply.value) return '';
+  let escapedMessage = escapeHtml(reply.value.messageText);
+  return parseMarkdown(escapedMessage);
 });
 
 onMounted(() => {
@@ -106,22 +102,22 @@ function EditMessage() {
 </script>
 
 <template>
-  <li
-    class="group/item relative flex flex-col hover:bg-gray-400"
-    :class="{ 'mt-2': !previousAlsoOwner }">
-    <div class="flex flex-row items-end" v-if="reply">
-      <div class="ml-6 h-3 w-8 shrink-0 rounded-tl border border-b-0 border-r-0 border-black"></div>
-      <div class="mb-0.5 truncate">
-        <img
-          :src="userStore.GetUserById(reply.senderId)?.profilePicture"
-          alt="profile picture"
-          class="mr-1 inline size-4 rounded-full" />
+  <li class="group/item relative flex flex-col w-full" :class="{ 'mt-2': !previousAlsoOwner }">
+    <div class="pl-6 h-5 flex flex-row items-end truncate w-full" v-if="reply">
+      <div class="flex-none h-3 w-8 rounded-tl border border-b-0 border-r-0 border-black"></div>
+      <img
+        :src="userStore.GetUserById(reply.senderId)?.profilePicture"
+        alt="profile picture"
+        class="mr-1 size-4 flex-none rounded-full" />
+      <div
+        class="flex hover:cursor-pointer hover:text-white hover:underline"
+        @click="$emit('scroll-reply', reply.messageId)">
+        <span class="block mr-0.5 w-fit text-sm">{{
+          userStore.GetUserById(reply.senderId)?.userName
+        }}</span>
         <span
-          class="hover:cursor-pointer hover:text-white hover:underline"
-          @click="$emit('scroll-reply', reply.messageId)">
-          <span class="mr-0.5 text-sm">{{ userStore.GetUserById(reply.senderId)?.userName }}</span>
-          <span class="text-xs">{{ reply.messageText }}</span>
-        </span>
+          class="inline-block text-xs w-full whitespace-nowrap"
+          v-html="finalReply.replaceAll('\n', '')"></span>
       </div>
     </div>
     <div class="relative flex flex-row justify-between">
@@ -165,19 +161,20 @@ function EditMessage() {
         group-hover/item:opacity-100 group-hover/item:ease-in-out">
       <button
         @click="ReplyToMessage"
+        v-if="allowedFunctions.allowReply"
         class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700">
         <i class="fa-solid fa-reply"></i>
       </button>
       <button
         @click="EditMessage"
         class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700"
-        v-if="props.message.senderId === userStore.myId">
+        v-if="props.message.senderId === userStore.myId && allowedFunctions.allowEdit">
         <i class="fa-solid fa-pen-to-square"></i>
       </button>
       <button
         @click="RemoveChatMessage"
         class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700"
-        v-if="props.message.senderId === userStore.myId">
+        v-if="props.message.senderId === userStore.myId && allowedFunctions.allowDelete">
         <i class="fa-solid fa-delete-left"></i>
       </button>
     </div>

@@ -1,6 +1,6 @@
 <script setup>
 import { useUserStore } from '@/stores/user.js';
-import { defineAsyncComponent, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { computed, defineAsyncComponent, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useConversationStore } from '@/stores/conversation.js';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
@@ -186,26 +186,42 @@ function HandleNewJumpMessages() {
     waitingMessagesJump.focus = null;
   }
 }
+
+function previousAlsoOwner(message, index) {
+  const prevMsg = conversationStore.GetVisibleMessages(message.convoId)[index - 1];
+  return (
+    !message.meta.edited &&
+    !userStore.GetMessageById(message.meta.reply?.messageId) &&
+    prevMsg &&
+    prevMsg.senderId === message.senderId
+  );
+}
 </script>
 
 <template>
   <div class="flex h-full flex-col flex-nowrap">
     <div
-      class="flex h-16 grow flex-col-reverse overflow-auto"
+      class="flex h-16 grow flex-col-reverse overflow-y-auto overflow-x-hidden"
       id="list-container"
       @scroll="OnScrolling"
       ref="messageListContainer">
       <ul class="flex flex-col p-4" id="message-list" ref="messageListDom">
         <message-list-item
+          class="hover:bg-gray-400"
           :key="message.messageId"
           :data-msg-id="message.messageId"
           :data-msg-list-index="index"
           :data-msg-sender-id="message.senderId"
-          :index="index"
           v-for="(message, index) in conversationStore.GetVisibleMessages(props.convoId)"
           :message="message"
           @scroll-reply="ScrollToMessage"
-          @on-mount-change="OnMessageMountChange" />
+          @on-mount-change="OnMessageMountChange"
+          :previous-also-owner="previousAlsoOwner(message, index)"
+          :allowedFunctions="{
+            allowReply: true,
+            allowEdit: true,
+            allowDelete: true,
+          }" />
       </ul>
     </div>
   </div>
