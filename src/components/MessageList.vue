@@ -199,7 +199,7 @@ function previousAlsoOwner(message, index) {
 </script>
 
 <template>
-  <div class="flex h-full flex-col flex-nowrap">
+  <div class="flex size-full flex-col flex-nowrap">
     <div
       class="flex h-16 grow flex-col-reverse overflow-y-auto overflow-x-hidden"
       id="list-container"

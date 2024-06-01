@@ -14,9 +14,9 @@ function ToggleSideMenu() {
 <template>
   <div
     id="SideMenu"
-    class="absolute left-0 top-0 z-10 row-span-3 hidden h-screen w-screen flex-none bg-green-600 md:relative
-      md:left-auto md:top-auto md:block md:h-full md:w-72">
-    <div class="flex h-full w-full flex-col">
+    class="absolute left-0 top-0 z-10 hidden h-screen w-screen flex-none bg-green-600 md:static md:left-auto
+      md:top-auto md:block md:h-full md:w-72">
+    <div class="flex size-full flex-col">
       <div class="flex h-14 flex-none items-center bg-gray-800 p-4">
         <h2 class="text-3xl font-bold text-white">Menu</h2>
       </div>

@@ -5,11 +5,18 @@ import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import hljs from 'highlight.js';
 import {
+  ApplyBlockQuoteMarkdown,
+  ApplyCodeMarkdown,
+  ApplyHeadingMarkdown,
+  ApplyHiddenTextMarkdown,
+  ApplyItalicMarkdown,
+  ApplyLinkMarkdown,
+  ApplyStrongMarkdown,
   escapeHtml,
   GetBlockQuoteMarkDown,
   GetMarkdownSize,
   reverseEscapeHtml,
-} from '@/composables/utility.js';
+} from '@/composables/markdown.js';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner']);
@@ -25,11 +32,11 @@ const reply = computed(() => {
   return userStore.GetMessageById(props.message.meta.reply?.messageId) ?? null;
 });
 
-const parseMarkdown = (text) => {
+function parseMarkdownMessage(text) {
   let codeBlocks = [];
-  text = text.replace(/(`{3,})(.*?)\n([\s\S]*?)\1/g, (match, p1, p2, p3) => {
+  text = ApplyCodeMarkdown(text, (match, p1, p2, p3) => {
     codeBlocks.push(
-      `<pre class="border border-black my-1 rounded overflow-x-auto xl:max-w-[90%] my-4"><code class="hljs">${
+      `<pre class="border border-black rounded overflow-x-auto xl:max-w-[90%] my-4"><code class="hljs p-4">${
         hljs.highlight(reverseEscapeHtml(p3), {
           language: hljs.getLanguage(p2) ? p2 : 'plaintext',
           ignoreIllegals: true,
@@ -39,31 +46,65 @@ const parseMarkdown = (text) => {
     return '%%CODE_BLOCK%%';
   });
 
-  return text
-    .replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>')
-    .replace(/([*_])(.*?)\1/g, '<em>$2</em>')
-    .replace(
-      /(\|\|)([\s\S]*?)\1/g,
-      '<div class="hidden-text bg-black rounded cursor-pointer select-none size-fit max-w-full"><span class="invisible">$2</span></div>',
-    )
-    .replace(/(#{1,6}\s)(.+)/g, (match, p1, p2) => GetMarkdownSize(p1.length - 1, p2))
-    .replace(
-      /\[(.*?)]\((.*?)\)/g,
-      '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
-    )
-    .replace(/(?:^(?:&gt;)+.*\n?)+/gm, (match) => GetBlockQuoteMarkDown(match))
-    .replaceAll('%%CODE_BLOCK%%', () => codeBlocks.shift() || '%%CODE_BLOCK%%');
-};
+  text = ApplyStrongMarkdown(text, '<strong>$2</strong>');
+  text = ApplyItalicMarkdown(text, '<em>$2</em>');
+  text = ApplyHiddenTextMarkdown(
+    text,
+    (match, p1, p2) =>
+      `<div class="hidden-text bg-black rounded cursor-pointer select-none size-fit max-w-full"><span class="invisible">${p2.trim()}</span></div>`,
+  );
+  text = ApplyHeadingMarkdown(text, (match, p1, p2) => GetMarkdownSize(p1.length - 1, p2));
+  text = ApplyLinkMarkdown(
+    text,
+    '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
+  );
+  text = ApplyBlockQuoteMarkdown(text, (match) => GetBlockQuoteMarkDown(match));
+  text = text.replaceAll('%%CODE_BLOCK%%', () => codeBlocks.shift() || '%%CODE_BLOCK%%');
+
+  return text;
+}
+
+function parseMarkdownReply(text) {
+  let codeBlocks = [];
+  text = ApplyCodeMarkdown(text, (match, p1, p2, p3) => {
+    codeBlocks.push(
+      `<pre class="border border-blackrounded "><code class="hljs">${
+        hljs.highlight(reverseEscapeHtml(p3), {
+          language: hljs.getLanguage(p2) ? p2 : 'plaintext',
+          ignoreIllegals: true,
+        }).value
+      }</code></pre>`,
+    );
+    return '%%CODE_BLOCK%%';
+  });
+
+  text = ApplyStrongMarkdown(text, '<strong>$2</strong>');
+  text = ApplyItalicMarkdown(text, '<em>$2</em>');
+  text = ApplyHiddenTextMarkdown(
+    text,
+    (match, p1, p2) =>
+      `<div class="hidden-text bg-black rounded cursor-pointer select-none size-fit max-w-full"><span class="invisible">${p2.trim()}</span></div>`,
+  );
+  text = ApplyHeadingMarkdown(text, (match, p1, p2) => GetMarkdownSize(p1.length - 1, p2));
+  text = ApplyLinkMarkdown(
+    text,
+    '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
+  );
+  text = ApplyBlockQuoteMarkdown(text, (match) => GetBlockQuoteMarkDown(match));
+  text = text.replaceAll('%%CODE_BLOCK%%', () => codeBlocks.shift() || '%%CODE_BLOCK%%');
+
+  return text;
+}
 
 const finalMessage = computed(() => {
   let escapedMessage = escapeHtml(props.message.messageText);
-  return parseMarkdown(escapedMessage);
+  return parseMarkdownMessage(escapedMessage);
 });
 
 const finalReply = computed(() => {
   if (!reply.value) return '';
   let escapedMessage = escapeHtml(reply.value.messageText);
-  return parseMarkdown(escapedMessage);
+  return parseMarkdownReply(escapedMessage);
 });
 
 onMounted(() => {
@@ -103,21 +144,19 @@ function EditMessage() {
 
 <template>
   <li class="group/item relative flex flex-col w-full" :class="{ 'mt-2': !previousAlsoOwner }">
-    <div class="pl-6 h-5 flex flex-row items-end truncate w-full" v-if="reply">
+    <div class="pl-6 h-5 flex flex-row items-end truncate overflow-hidden w-full" v-if="reply">
       <div class="flex-none h-3 w-8 rounded-tl border border-b-0 border-r-0 border-black"></div>
       <img
         :src="userStore.GetUserById(reply.senderId)?.profilePicture"
         alt="profile picture"
         class="mr-1 size-4 flex-none rounded-full" />
       <div
-        class="flex hover:cursor-pointer hover:text-white hover:underline"
+        class="flex w-full hover:cursor-pointer hover:text-white hover:underline"
         @click="$emit('scroll-reply', reply.messageId)">
         <span class="block mr-0.5 w-fit text-sm">{{
           userStore.GetUserById(reply.senderId)?.userName
         }}</span>
-        <span
-          class="inline-block text-xs w-full whitespace-nowrap"
-          v-html="finalReply.replaceAll('\n', '')"></span>
+        <span class="block text-xs grow" v-html="finalReply.replaceAll('\n', '')"></span>
       </div>
     </div>
     <div class="relative flex flex-row justify-between">
