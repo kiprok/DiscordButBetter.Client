@@ -36,7 +36,7 @@ function parseMarkdownMessage(text) {
   let codeBlocks = [];
   text = ApplyCodeMarkdown(text, (match, p1, p2, p3) => {
     codeBlocks.push(
-      `<pre class="border border-black rounded overflow-x-auto xl:max-w-[90%] my-4"><code class="hljs p-4">${
+      `<pre class="border border-black rounded overflow-x-auto xl:max-w-[90%] my-4 bg-[#2b2b2b] text-white"><code class="hljs p-4 block">${
         hljs.highlight(reverseEscapeHtml(p3), {
           language: hljs.getLanguage(p2) ? p2 : 'plaintext',
           ignoreIllegals: true,
@@ -68,7 +68,7 @@ function parseMarkdownReply(text) {
   let codeBlocks = [];
   text = ApplyCodeMarkdown(text, (match, p1, p2, p3) => {
     codeBlocks.push(
-      `<pre class="border border-blackrounded "><code class="hljs">${
+      `<pre class="border border-black rounded inline bg-[#2b2b2b] text-white"><code class="hljs inline">${
         hljs.highlight(reverseEscapeHtml(p3), {
           language: hljs.getLanguage(p2) ? p2 : 'plaintext',
           ignoreIllegals: true,
@@ -83,14 +83,18 @@ function parseMarkdownReply(text) {
   text = ApplyHiddenTextMarkdown(
     text,
     (match, p1, p2) =>
-      `<div class="hidden-text bg-black rounded cursor-pointer select-none size-fit max-w-full"><span class="invisible">${p2.trim()}</span></div>`,
+      `<div class=" bg-black rounded cursor-pointer select-none size-fit max-w-full"><span class="invisible">${p2.trim()}</span></div>`,
   );
-  text = ApplyHeadingMarkdown(text, (match, p1, p2) => GetMarkdownSize(p1.length - 1, p2));
+  text = ApplyHeadingMarkdown(text, (match, p1, p2) => {
+    return p2;
+  });
   text = ApplyLinkMarkdown(
     text,
     '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
   );
-  text = ApplyBlockQuoteMarkdown(text, (match) => GetBlockQuoteMarkDown(match));
+  text = ApplyBlockQuoteMarkdown(text, (match) => {
+    return match.replaceAll('&gt;', '');
+  });
   text = text.replaceAll('%%CODE_BLOCK%%', () => codeBlocks.shift() || '%%CODE_BLOCK%%');
 
   return text;
@@ -151,12 +155,14 @@ function EditMessage() {
         alt="profile picture"
         class="mr-1 size-4 flex-none rounded-full" />
       <div
-        class="flex w-full hover:cursor-pointer hover:text-white hover:underline"
+        class="flex items-center content-center grow min-w-0 hover:cursor-pointer hover:text-white hover:underline"
         @click="$emit('scroll-reply', reply.messageId)">
-        <span class="block mr-0.5 w-fit text-sm">{{
+        <span class="block mr-0.5 w-fit flex-none min-w-0 text-sm">{{
           userStore.GetUserById(reply.senderId)?.userName
         }}</span>
-        <span class="block text-xs grow" v-html="finalReply.replaceAll('\n', '')"></span>
+        <span
+          class="block text-xs grow min-w-0 truncate"
+          v-html="finalReply.replaceAll('\n', ' ')"></span>
       </div>
     </div>
     <div class="relative flex flex-row justify-between">
@@ -199,19 +205,19 @@ function EditMessage() {
       class="absolute -top-5 right-0 flex h-8 items-center p-1 opacity-0 duration-300
         group-hover/item:opacity-100 group-hover/item:ease-in-out">
       <button
-        @click="ReplyToMessage"
+        @click.stop="ReplyToMessage"
         v-if="allowedFunctions.allowReply"
         class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700">
         <i class="fa-solid fa-reply"></i>
       </button>
       <button
-        @click="EditMessage"
+        @click.stop="EditMessage"
         class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700"
         v-if="props.message.senderId === userStore.myId && allowedFunctions.allowEdit">
         <i class="fa-solid fa-pen-to-square"></i>
       </button>
       <button
-        @click="RemoveChatMessage"
+        @click.stop="RemoveChatMessage"
         class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700"
         v-if="props.message.senderId === userStore.myId && allowedFunctions.allowDelete">
         <i class="fa-solid fa-delete-left"></i>

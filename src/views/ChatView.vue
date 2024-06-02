@@ -97,9 +97,7 @@ function SendChatMessage() {
 
 <template>
   <input type="checkbox" id="sidebar-check" v-model="sideBarIsShowing" class="hidden" />
-  <div
-    class="group flex size-full flex-col min-w-0"
-    :class="{ 'sidebar-checked': sideBarIsShowing }">
+  <div class="group flex grow flex-col min-w-0" :class="{ 'sidebar-checked': sideBarIsShowing }">
     <ChatTopBar class="h-14 flex-none">
       <chat-left-side-menu-button class="group-[.sidebar-checked]:hidden" />
       <label
@@ -131,9 +129,9 @@ function SendChatMessage() {
           placeholder="Search for text" />
       </form>
     </ChatTopBar>
-    <div class="static flex size-full flex-row overflow-hidden bg-purple-600">
+    <div class="static flex grow min-w-0 flex-row overflow-hidden bg-purple-600">
       <div
-        class="flex flex-col bg-blue-600 w-full group-[.sidebar-checked]:hidden lg:!flex"
+        class="flex flex-col bg-blue-600 grow min-w-0 group-[.sidebar-checked]:hidden lg:!flex"
         ref="messageListRef">
         <div class="size-full bg-gray-300">
           <message-list
