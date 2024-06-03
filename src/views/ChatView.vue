@@ -188,7 +188,10 @@ function SendChatMessage() {
           :class="{ hidden: !searchStore.GetShowingStatus(route.params.id) }">
           <div class="flex size-full flex-col">
             <div class="flex">
-              <span class="h-fit flex-none text-lg font-bold"> search results </span>
+              <span class="h-fit flex-none text-lg font-bold">
+                search results:
+                {{ searchStore.GetTotalSearchResults(route.params.id) }} found</span
+              >
               <div class="ml-auto flex-none">
                 <button
                   @click="
@@ -202,9 +205,8 @@ function SendChatMessage() {
                 </button>
               </div>
             </div>
-
             <div class="flex-grow overflow-auto">
-              <ul class="flex size-full flex-col p-2">
+              <ul class="flex grow min-w-0 flex-col p-2">
                 <li
                   v-for="result in searchStore.GetSearchResults(route.params.id)"
                   key="result.messageId"
@@ -222,6 +224,64 @@ function SendChatMessage() {
                     :allowed-functions="{ allowReply: true }" />
                 </li>
               </ul>
+            </div>
+            <div
+              class="flex-none h-12 p-1 flex flex-row items-center justify-center overflow-hidden">
+              <div
+                class="bg-blue-300 rounded-full size-8 flex items-center mr-1 justify-center flex-none hover:bg-blue-500
+                  cursor-pointer"
+                v-if="searchStore.GetFirstPageBoundary(route.params.id) > 1"
+                @click="searchStore.SetSearchPagePlace(route.params.id, 1)">
+                1
+              </div>
+              <div
+                class="size-4 flex items-center mr-1 justify-center flex-none"
+                v-if="searchStore.GetFirstPageBoundary(route.params.id) > 1">
+                &hellip;
+              </div>
+              <div
+                v-for="index in Math.min(
+                  Math.ceil(searchStore.GetTotalSearchResults(route.params.id) / 25),
+                  5,
+                )"
+                @click="
+                  searchStore.SetSearchPagePlace(
+                    route.params.id,
+                    index + searchStore.GetFirstPageBoundary(route.params.id) - 1,
+                  )
+                "
+                class="bg-blue-300 rounded-full size-8 flex items-center mr-1 justify-center flex-none hover:bg-blue-500
+                  cursor-pointer"
+                :class="{
+                  '!bg-blue-600':
+                    index + searchStore.GetFirstPageBoundary(route.params.id) - 1 ===
+                    searchStore.GetSearchDataById(route.params.id).searchPagePlace,
+                }">
+                {{ index + searchStore.GetFirstPageBoundary(route.params.id) - 1 }}
+              </div>
+              <div
+                class="size-4 flex items-center mr-1 justify-center flex-none"
+                v-if="
+                  searchStore.GetLastPageBoundary(route.params.id) <
+                  searchStore.GetLastPageNumber(route.params.id)
+                ">
+                &hellip;
+              </div>
+              <div
+                class="bg-blue-300 rounded-full size-8 flex items-center justify-center flex-none hover:bg-blue-500
+                  cursor-pointer"
+                v-if="
+                  searchStore.GetLastPageBoundary(route.params.id) <
+                  searchStore.GetLastPageNumber(route.params.id)
+                "
+                @click="
+                  searchStore.SetSearchPagePlace(
+                    route.params.id,
+                    searchStore.GetLastPageNumber(route.params.id),
+                  )
+                ">
+                {{ searchStore.GetLastPageNumber(route.params.id) }}
+              </div>
             </div>
           </div>
         </div>
