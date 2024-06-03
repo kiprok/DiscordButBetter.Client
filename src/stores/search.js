@@ -50,12 +50,13 @@ export const useSearchStore = defineStore('search', () => {
 
   function GetFirstPageBoundary(searchId) {
     let firstPage = GetSearchPagePlace(searchId) - 2 > 0 ? GetSearchPagePlace(searchId) - 2 : 1;
-    firstPage = Math.min(firstPage, GetLastPageNumber(searchId) - 4);
+    firstPage = Math.max(Math.min(firstPage, GetLastPageNumber(searchId) - 4), 1);
 
     return firstPage;
   }
 
   function GetLastPageBoundary(searchId) {
+    console.log(GetFirstPageBoundary(searchId) + 4, GetLastPageNumber(searchId));
     return GetFirstPageBoundary(searchId) + 4;
   }
 

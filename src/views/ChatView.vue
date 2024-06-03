@@ -263,7 +263,7 @@ function SendChatMessage() {
                 class="size-4 flex items-center mr-1 justify-center flex-none"
                 :class="{
                   invisible:
-                    searchStore.GetLastPageBoundary(route.params.id) ===
+                    searchStore.GetLastPageBoundary(route.params.id) >=
                     searchStore.GetLastPageNumber(route.params.id),
                 }">
                 &hellip;
@@ -273,7 +273,7 @@ function SendChatMessage() {
                   cursor-pointer select-none"
                 :class="{
                   invisible:
-                    searchStore.GetLastPageBoundary(route.params.id) ===
+                    searchStore.GetLastPageBoundary(route.params.id) >=
                     searchStore.GetLastPageNumber(route.params.id),
                 }"
                 @click="
