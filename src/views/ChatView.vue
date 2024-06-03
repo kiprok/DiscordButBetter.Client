@@ -229,14 +229,14 @@ function SendChatMessage() {
               class="flex-none h-12 p-1 flex flex-row items-center justify-center overflow-hidden">
               <div
                 class="bg-blue-300 rounded-full size-8 flex items-center mr-1 justify-center flex-none hover:bg-blue-500
-                  cursor-pointer"
-                v-if="searchStore.GetFirstPageBoundary(route.params.id) > 1"
+                  cursor-pointer select-none"
+                :class="{ invisible: searchStore.GetFirstPageBoundary(route.params.id) === 1 }"
                 @click="searchStore.SetSearchPagePlace(route.params.id, 1)">
                 1
               </div>
               <div
                 class="size-4 flex items-center mr-1 justify-center flex-none"
-                v-if="searchStore.GetFirstPageBoundary(route.params.id) > 1">
+                :class="{ invisible: searchStore.GetFirstPageBoundary(route.params.id) === 1 }">
                 &hellip;
               </div>
               <div
@@ -251,7 +251,7 @@ function SendChatMessage() {
                   )
                 "
                 class="bg-blue-300 rounded-full size-8 flex items-center mr-1 justify-center flex-none hover:bg-blue-500
-                  cursor-pointer"
+                  cursor-pointer select-none"
                 :class="{
                   '!bg-blue-600':
                     index + searchStore.GetFirstPageBoundary(route.params.id) - 1 ===
@@ -261,19 +261,21 @@ function SendChatMessage() {
               </div>
               <div
                 class="size-4 flex items-center mr-1 justify-center flex-none"
-                v-if="
-                  searchStore.GetLastPageBoundary(route.params.id) <
-                  searchStore.GetLastPageNumber(route.params.id)
-                ">
+                :class="{
+                  invisible:
+                    searchStore.GetLastPageBoundary(route.params.id) ===
+                    searchStore.GetLastPageNumber(route.params.id),
+                }">
                 &hellip;
               </div>
               <div
                 class="bg-blue-300 rounded-full size-8 flex items-center justify-center flex-none hover:bg-blue-500
-                  cursor-pointer"
-                v-if="
-                  searchStore.GetLastPageBoundary(route.params.id) <
-                  searchStore.GetLastPageNumber(route.params.id)
-                "
+                  cursor-pointer select-none"
+                :class="{
+                  invisible:
+                    searchStore.GetLastPageBoundary(route.params.id) ===
+                    searchStore.GetLastPageNumber(route.params.id),
+                }"
                 @click="
                   searchStore.SetSearchPagePlace(
                     route.params.id,
