@@ -177,8 +177,8 @@ function SendChatMessage() {
         </div>
       </div>
       <div
-        class="hidden h-full w-full flex-none overflow-hidden bg-gray-600 p-4 group-[.sidebar-checked]:block
-          lg:!block"
+        class="hidden h-full w-full pt-4 px-4 pb-[0.37rem] flex-none overflow-hidden bg-gray-600
+          group-[.sidebar-checked]:block lg:!block"
         :class="{
           'lg:w-[18rem]': !searchStore.GetShowingStatus(route.params.id),
           'lg:w-[26rem]': searchStore.GetShowingStatus(route.params.id),
@@ -226,7 +226,7 @@ function SendChatMessage() {
               </ul>
             </div>
             <div
-              class="flex-none h-12 p-1 flex flex-row items-center justify-center overflow-hidden">
+              class="flex-none h-12 p-1 mt-auto flex flex-row items-center justify-center overflow-hidden">
               <div
                 class="bg-blue-300 rounded-full size-8 flex items-center mr-1 justify-center flex-none hover:bg-blue-500
                   cursor-pointer select-none"
