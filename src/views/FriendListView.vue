@@ -40,7 +40,7 @@ async function GenFriend() {
 
 <template>
   <div class="flex w-full flex-col flex-nowrap">
-    <ChatTopBar class="flex-none">
+    <ChatTopBar>
       <chat-left-side-menu-button />
       <h1 class="block text-3xl font-bold text-white">Friends</h1>
       <button

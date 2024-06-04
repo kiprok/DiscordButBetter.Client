@@ -10,6 +10,8 @@ import ChatAreaInfoBar from '@/components/ChatAreaInfoBar.vue';
 import ChatLeftSideMenuButton from '@/components/ChatLeftSideMenuButton.vue';
 import { useSearchStore } from '@/stores/search.js';
 import MessageListItem from '@/components/MessageListItem.vue';
+import PaginationButtons from '@/components/PaginationButtons.vue';
+import ChatInfoMenu from '@/components/ChatInfoMenu.vue';
 
 const MessageList = defineAsyncComponent(() => import('@/components/MessageList.vue'));
 
@@ -44,7 +46,6 @@ watch(
 onMounted(() => {
   messageListRef.value.addEventListener('click', (event) => {
     let target = event.target.closest('.hidden-text');
-    console.log('test');
     if (!target) return;
     target.classList.toggle('!bg-black/50');
     target.classList.toggle('!text-white');
@@ -98,7 +99,7 @@ function SendChatMessage() {
 <template>
   <input type="checkbox" id="sidebar-check" v-model="sideBarIsShowing" class="hidden" />
   <div class="group flex grow flex-col min-w-0" :class="{ 'sidebar-checked': sideBarIsShowing }">
-    <ChatTopBar class="h-14 flex-none">
+    <ChatTopBar>
       <chat-left-side-menu-button class="group-[.sidebar-checked]:hidden" />
       <label
         for="sidebar-check"
@@ -176,136 +177,9 @@ function SendChatMessage() {
           <ChatTextBox @send-chat-message="SendChatMessage" :convo-id="route.params.id" />
         </div>
       </div>
-      <div
-        class="hidden h-full w-full pt-4 px-4 pb-[0.37rem] flex-none overflow-hidden bg-gray-600
-          group-[.sidebar-checked]:block lg:!block"
-        :class="{
-          'lg:w-[18rem]': !searchStore.GetShowingStatus(route.params.id),
-          'lg:w-[26rem]': searchStore.GetShowingStatus(route.params.id),
-        }">
-        <div
-          class="size-full text-white"
-          :class="{ hidden: !searchStore.GetShowingStatus(route.params.id) }">
-          <div class="flex size-full flex-col">
-            <div class="flex">
-              <span class="h-fit flex-none text-lg font-bold">
-                search results:
-                {{ searchStore.GetTotalSearchResults(route.params.id) }} found</span
-              >
-              <div class="ml-auto flex-none">
-                <button
-                  @click="
-                    () => {
-                      searchStore.GetSearchDataById(route.params.id).searchIsShowing = false;
-                      searchStore.GetSearchDataById(route.params.id).searchQuery = '';
-                    }
-                  "
-                  class="text-lg text-white hover:text-gray-300">
-                  <i class="fa-solid fa-xmark"></i>
-                </button>
-              </div>
-            </div>
-            <div class="flex-grow overflow-auto">
-              <ul class="flex grow min-w-0 flex-col p-2">
-                <li
-                  v-for="result in searchStore.GetSearchResults(route.params.id)"
-                  key="result.messageId"
-                  class="group/item relative mt-2 flex flex-col rounded-md bg-black/20 p-3 transition-colors ease-in-out
-                    hover:cursor-pointer hover:bg-black/10"
-                  @click="
-                    () => {
-                      conversationStore.TriggerJumpToMessage(route.params.id, result.messageId);
-                    }
-                  ">
-                  <message-list-item
-                    :message="result"
-                    :convoId="route.params.id"
-                    :key="result.messageId"
-                    :allowed-functions="{ allowReply: true }" />
-                </li>
-              </ul>
-            </div>
-            <div
-              class="flex-none h-12 p-1 mt-auto flex flex-row items-center justify-center overflow-hidden">
-              <div
-                class="bg-blue-300 rounded-full size-8 flex items-center mr-1 justify-center flex-none hover:bg-blue-500
-                  cursor-pointer select-none"
-                :class="{ invisible: searchStore.GetFirstPageBoundary(route.params.id) === 1 }"
-                @click="searchStore.SetSearchPagePlace(route.params.id, 1)">
-                1
-              </div>
-              <div
-                class="size-4 flex items-center mr-1 justify-center flex-none"
-                :class="{ invisible: searchStore.GetFirstPageBoundary(route.params.id) === 1 }">
-                &hellip;
-              </div>
-              <div
-                v-for="index in Math.min(
-                  Math.ceil(searchStore.GetTotalSearchResults(route.params.id) / 25),
-                  5,
-                )"
-                @click="
-                  searchStore.SetSearchPagePlace(
-                    route.params.id,
-                    index + searchStore.GetFirstPageBoundary(route.params.id) - 1,
-                  )
-                "
-                class="bg-blue-300 rounded-full size-8 flex items-center mr-1 justify-center flex-none hover:bg-blue-500
-                  cursor-pointer select-none"
-                :class="{
-                  '!bg-blue-600':
-                    index + searchStore.GetFirstPageBoundary(route.params.id) - 1 ===
-                    searchStore.GetSearchDataById(route.params.id).searchPagePlace,
-                }">
-                {{ index + searchStore.GetFirstPageBoundary(route.params.id) - 1 }}
-              </div>
-              <div
-                class="size-4 flex items-center mr-1 justify-center flex-none"
-                :class="{
-                  invisible:
-                    searchStore.GetLastPageBoundary(route.params.id) >=
-                    searchStore.GetLastPageNumber(route.params.id),
-                }">
-                &hellip;
-              </div>
-              <div
-                class="bg-blue-300 rounded-full size-8 flex items-center justify-center flex-none hover:bg-blue-500
-                  cursor-pointer select-none"
-                :class="{
-                  invisible:
-                    searchStore.GetLastPageBoundary(route.params.id) >=
-                    searchStore.GetLastPageNumber(route.params.id),
-                }"
-                @click="
-                  searchStore.SetSearchPagePlace(
-                    route.params.id,
-                    searchStore.GetLastPageNumber(route.params.id),
-                  )
-                ">
-                {{ searchStore.GetLastPageNumber(route.params.id) }}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div :class="{ hidden: searchStore.GetShowingStatus(route.params.id) }">
-          <span class="p-2 font-bold text-white">Members</span>
-          <ul class="flex flex-col overflow-auto">
-            <li
-              v-for="participant in conversationStore.GetConversationById(route.params.id)
-                ?.participants"
-              :key="participant"
-              class="rounded-lg p-2 text-xl text-white transition-colors ease-in-out hover:bg-black/30">
-              <div class="flex flex-row flex-nowrap items-center gap-2">
-                <img
-                  :src="userStore.GetUserById(participant).profilePicture"
-                  alt="pfp"
-                  class="size-10 flex-none rounded-full" />
-                <span> {{ userStore.GetUserById(participant).userName }} </span>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <chat-info-menu
+        class="flex-none hidden group-[.sidebar-checked]:block lg:!block"
+        :convoId="route.params.id" />
     </div>
   </div>
 </template>
