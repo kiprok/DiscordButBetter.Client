@@ -81,7 +81,8 @@ export const useSearchStore = defineStore('search', () => {
           ) && userStore.messages[message].convoId === searchId
         );
       })
-      .map((message) => userStore.messages[message]);
+      .map((message) => userStore.messages[message])
+      .toReversed();
 
     GetSearchDataById(searchId).searchPagePlace = 1;
     GetSearchDataById(searchId).totalSearchResults = _fullSearchData[searchId].length;
