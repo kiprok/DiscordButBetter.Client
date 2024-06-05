@@ -10,19 +10,19 @@ const emit = defineEmits(['setSearchPagePlace']);
 
 <template>
   <div class="flex-none p-1 flex flex-row items-center justify-center overflow-hidden">
-    <div
+    <button
       class="bg-blue-300 rounded-full size-8 flex items-center mr-1 justify-center flex-none hover:bg-blue-500
         cursor-pointer select-none"
       :class="{ invisible: firstPageBoundary === 1 }"
       @click="$emit('setSearchPagePlace', 1)">
       1
-    </div>
+    </button>
     <div
       class="size-4 flex items-center mr-1 justify-center flex-none"
       :class="{ invisible: firstPageBoundary === 1 }">
       &hellip;
     </div>
-    <div
+    <button
       v-for="index in Math.min(lastPageNumber, 5)"
       @click="$emit('setSearchPagePlace', index + firstPageBoundary - 1)"
       class="bg-blue-300 rounded-full size-8 flex items-center mr-1 justify-center flex-none hover:bg-blue-500
@@ -31,7 +31,7 @@ const emit = defineEmits(['setSearchPagePlace']);
         '!bg-blue-600': index + firstPageBoundary - 1 === currentPlace,
       }">
       {{ index + firstPageBoundary - 1 }}
-    </div>
+    </button>
     <div
       class="size-4 flex items-center mr-1 justify-center flex-none"
       :class="{
@@ -39,7 +39,7 @@ const emit = defineEmits(['setSearchPagePlace']);
       }">
       &hellip;
     </div>
-    <div
+    <button
       class="bg-blue-300 rounded-full size-8 flex items-center justify-center flex-none hover:bg-blue-500
         cursor-pointer select-none"
       :class="{
@@ -47,6 +47,6 @@ const emit = defineEmits(['setSearchPagePlace']);
       }"
       @click="$emit('setSearchPagePlace', lastPageNumber)">
       {{ lastPageNumber }}
-    </div>
+    </button>
   </div>
 </template>

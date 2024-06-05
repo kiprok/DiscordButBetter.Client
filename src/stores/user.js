@@ -11,10 +11,12 @@ export const useUserStore = defineStore('user', () => {
       userId: myId,
       userName: myUserName,
       profilePicture: myProfilePicture,
+      status: 0,
     },
   });
 
   const friends = reactive([]);
+  const friendRequests = reactive([]);
 
   const messages = reactive({
     /*
@@ -78,6 +80,19 @@ export const useUserStore = defineStore('user', () => {
     return friends.map((friend) => users[friend]);
   }
 
+  function GetFriendRequests() {
+    return friendRequests.map((request) => users[request]);
+  }
+
+  function AcceptFriendRequest(userId) {
+    friends.push(userId);
+    friendRequests.splice(friendRequests.indexOf(userId), 1);
+  }
+
+  function RejectFriendRequest(userId) {
+    friendRequests.splice(friendRequests.indexOf(userId), 1);
+  }
+
   function DeleteMessage(messageId) {
     delete messages[messageId];
   }
@@ -88,6 +103,7 @@ export const useUserStore = defineStore('user', () => {
       userId: id,
       userName: name,
       profilePicture: pfp,
+      status: Math.floor(Math.random() * 3),
     };
 
     return id;
@@ -103,6 +119,7 @@ export const useUserStore = defineStore('user', () => {
     myProfilePicture,
     users,
     friends,
+    friendRequests,
     messages,
     AddUser,
     AddFriend,
@@ -113,5 +130,8 @@ export const useUserStore = defineStore('user', () => {
     GetUserById,
     GetMessageById,
     GetFriendList,
+    GetFriendRequests,
+    AcceptFriendRequest,
+    RejectFriendRequest,
   };
 });
