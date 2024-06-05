@@ -24,8 +24,8 @@ const props = defineProps(['convoId']);
         <div class="flex">
           <span class="h-fit flex-none text-lg font-bold">
             search results:
-            {{ searchStore.GetTotalSearchResults(convoId) }} found</span
-          >
+            {{ searchStore.GetTotalSearchResults(convoId) }} found
+          </span>
           <div class="ml-auto flex-none">
             <button
               @click="
