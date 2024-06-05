@@ -10,34 +10,27 @@ import {
 } from '@/composables/mock/MockDataGeneration.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import ChatLeftSideMenuButton from '@/components/ChatLeftSideMenuButton.vue';
-import FriendListFriendItem from '@/components/FriendListFriendItem.vue';
-import FriendListRequestItem from '@/components/FriendListRequestItem.vue';
+import FriendSortButton from '@/components/FriendSortButton.vue';
+import FriendListUserItem from '@/components/FriendListUserItem.vue';
+import FriendListItemButton from '@/components/FriendListItemButton.vue';
+import NotificationBadge from '@/components/NotificationBadge.vue';
 
 document.title = 'Friends';
 
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
 
-const sortMethodSelected = ref(1);
+const sortMethodSelected = ref('online');
 
 const _addingFriend = ref(false);
 
 const sidePanelView = ref(false);
 
 const sortingMethods = {
-  1: {
-    type: 'friendList',
-    data: () => userStore.GetFriendList().filter((friend) => friend.status > 0),
-  },
-  2: { type: 'friendList', data: () => userStore.GetFriendList() },
-  3: {
-    type: 'friendList',
-    data: () => userStore.GetFriendList().filter((friend) => friend.status === 0),
-  },
-  4: {
-    type: 'requestList',
-    data: () => userStore.GetFriendRequests(),
-  },
+  online: () => userStore.GetFriendList().filter((friend) => friend.status > 0),
+  all: () => userStore.GetFriendList(),
+  offline: () => userStore.GetFriendList().filter((friend) => friend.status === 0),
+  pending: () => userStore.GetFriendRequests(),
 };
 
 async function GenFriend() {
@@ -81,72 +74,55 @@ async function GenFriend() {
             </span>
             <span v-else> no friends </span>
           </div>
-          <div class="min-w-0 ml-auto flex flex-row gap-1">
-            <input
-              type="radio"
-              id="sortOnline"
-              value="1"
-              class="hidden peer/online"
-              v-model="sortMethodSelected" />
-            <label
-              for="sortOnline"
-              class="text-sm flex items-center bg-blue-300 p-1 rounded-md border border-blue-900 hover:bg-blue-400
-                peer-checked/online:bg-blue-500 select-none">
-              <span class="hidden sm:block">online</span>
-              <span class="sm:hidden">on</span>
-            </label>
-            <input
-              type="radio"
-              id="sortAll"
-              value="2"
-              class="hidden peer/all"
-              v-model="sortMethodSelected" />
-            <label
-              for="sortAll"
-              class="text-sm flex items-center bg-blue-300 p-1 rounded-md border border-blue-900 hover:bg-blue-400
-                peer-checked/all:bg-blue-500 select-none">
-              all
-            </label>
-            <input
-              type="radio"
-              id="sortOffline"
-              value="3"
-              class="hidden peer/offline"
-              v-model="sortMethodSelected" />
-            <label
-              for="sortOffline"
-              class="text-sm flex items-center bg-blue-300 p-1 rounded-md border border-blue-900 hover:bg-blue-400
-                peer-checked/offline:bg-blue-500 select-none">
-              <span class="hidden sm:block">offline</span>
-              <span class="sm:hidden">off</span>
-            </label>
-            <input
-              type="radio"
-              id="sortPending"
-              value="4"
-              class="hidden peer/pending"
-              v-model="sortMethodSelected" />
-            <label
-              for="sortPending"
-              class="text-sm flex items-center bg-blue-300 p-1 rounded-md border border-blue-900 hover:bg-blue-400
-                peer-checked/pending:bg-blue-500 select-none">
-              <span class="hidden sm:block">pending</span>
-              <span class="sm:hidden">pend</span>
-            </label>
+          <div class="min-w-0 ml-auto flex flex-row">
+            <friend-sort-button radioValue="online" v-model="sortMethodSelected">
+              <span>online</span>
+            </friend-sort-button>
+            <friend-sort-button radioValue="all" v-model="sortMethodSelected">
+              <span>all</span>
+            </friend-sort-button>
+            <friend-sort-button radioValue="offline" v-model="sortMethodSelected">
+              <span>offline</span>
+            </friend-sort-button>
+            <friend-sort-button class="relative" radioValue="pending" v-model="sortMethodSelected">
+              <span>pending</span>
+              <notification-badge
+                class="-top-2 -right-2"
+                :notifications="userStore.friendRequests.length" />
+            </friend-sort-button>
           </div>
         </div>
-
         <div class="flex grow min-w-0 min-h-0 pb-4 flex-col">
           <div
-            v-for="(listItem, index) in sortingMethods[sortMethodSelected].data()"
+            v-for="(listItem, index) in sortingMethods[sortMethodSelected]()"
             :key="index"
             class="border-t-2 py-1 border-gray-400 min-w-0">
-            <friend-list-friend-item
-              v-if="sortingMethods[sortMethodSelected].type === 'friendList'"
-              :friend="listItem" />
-            <friend-list-request-item
-              v-else-if="sortingMethods[sortMethodSelected].type === 'requestList'"
-              :request="listItem" />
+            <friend-list-user-item :user="listItem">
+              <div
+                v-if="['online', 'all', 'offline'].includes(sortMethodSelected)"
+                class="ml-auto h-full flex flex-row gap-2">
+                <friend-list-item-button class="hover:text-white">
+                  <i class="fa-solid fa-comment"></i>
+                </friend-list-item-button>
+                <friend-list-item-button class="hover:text-red-500">
+                  <i class="fa-solid fa-xmark"></i>
+                </friend-list-item-button>
+              </div>
+              <div
+                v-if="sortMethodSelected === 'pending'"
+                class="ml-auto h-full flex flex-row gap-2">
+                <friend-list-item-button
+                  class="hover:text-green-500"
+                  @click="userStore.AcceptFriendRequest(listItem.userId)">
+                  <i class="fa-solid fa-check"></i>
+                </friend-list-item-button>
+                <friend-list-item-button
+                  class="hover:text-red-500"
+                  @click="userStore.RejectFriendRequest(listItem.userId)">
+                  <i class="fa-solid fa-xmark"></i>
+                </friend-list-item-button>
+              </div>
+            </friend-list-user-item>
           </div>
         </div>
       </div>
