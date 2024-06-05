@@ -67,12 +67,14 @@ async function GenFriend() {
       <div
         class="size-full overflow-auto bg-gray-300 px-4 sm:px-8 pt-8 lg:block"
         :class="{ hidden: sidePanelView }">
-        <div class="flex flex-row min-w-0 mb-1">
+        <div class="flex flex-row min-w-0 mb-1 capitalize">
           <div class="min-w-0">
-            <span v-if="userStore.friends.length > 0">
-              {{ userStore.friends.length }} friends
+            <span v-if="sortingMethods[sortMethodSelected]().length > 0">
+              {{ sortingMethods[sortMethodSelected]().length }}
             </span>
-            <span v-else> no friends </span>
+            <span v-else>no </span>
+            <span v-if="sortMethodSelected !== 'all'">&nbsp;{{ sortMethodSelected }}</span>
+            <span v-if="sortMethodSelected !== 'pending'">&nbsp;friends</span>
           </div>
           <div class="min-w-0 ml-auto flex flex-row">
             <friend-sort-button radioValue="online" v-model="sortMethodSelected">
