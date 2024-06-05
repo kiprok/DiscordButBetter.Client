@@ -87,7 +87,7 @@ async function GenFriend() {
             <friend-sort-button class="relative" radioValue="pending" v-model="sortMethodSelected">
               <span>pending</span>
               <notification-badge
-                class="-top-2 -right-2"
+                class="-top-2 -right-2 absolute text-[10px] size-4"
                 :notifications="userStore.friendRequests.length" />
             </friend-sort-button>
           </div>
