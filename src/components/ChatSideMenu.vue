@@ -1,6 +1,10 @@
 <script setup>
 import { useUserStore } from '@/stores/user.js';
 import { useConversationStore } from '@/stores/conversation.js';
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute();
+const router = useRouter();
 
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
@@ -8,6 +12,13 @@ const conversationStore = useConversationStore();
 function ToggleSideMenu() {
   let sideMenu = document.querySelector('#SideMenu');
   sideMenu.classList.toggle('hidden');
+}
+
+async function CloseConversation(convoId) {
+  conversationStore.RemoveVisibleConversation(convoId);
+  if (route.params.id === convoId) {
+    await router.push({ name: 'friendList' });
+  }
 }
 </script>
 
@@ -25,14 +36,19 @@ function ToggleSideMenu() {
           Friends
         </router-link>
         <router-link
-          v-for="(convo, index) in conversationStore.GetALLConversations()"
+          v-for="(convo, index) in conversationStore.GetVisibleConversations()"
           :key="index"
           class="router-link"
           :to="{ name: 'chat', params: { id: convo.convoId } }"
           @click="ToggleSideMenu">
-          <div class="flex flex-row flex-nowrap items-center gap-2">
+          <div class="group min-w-0 size-full flex flex-row flex-nowrap items-center gap-2">
             <img :src="convo.convoPicture" alt="pfp" class="size-10 flex-none rounded-full" />
-            <span>{{ convo.convoName }}</span>
+            <span class="truncate">{{ convo.convoName }}</span>
+            <button
+              class="flex-none size-fit ml-auto hover:text-gray-400 sm:hidden group-hover:block"
+              @click.stop.prevent="CloseConversation(convo.convoId)">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
         </router-link>
       </div>
@@ -48,10 +64,10 @@ function ToggleSideMenu() {
 
 <style scoped>
 .router-link {
-  @apply rounded-lg px-4 py-2 text-xl text-white transition-colors ease-in-out hover:bg-gray-600/30;
+  @apply rounded-lg px-4 py-2 text-xl text-white transition-colors ease-in-out hover:bg-black/30;
 }
 
 .router-link-exact-active {
-  @apply bg-gray-300/30;
+  @apply !bg-black/40;
 }
 </style>

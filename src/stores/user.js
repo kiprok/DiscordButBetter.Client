@@ -93,6 +93,10 @@ export const useUserStore = defineStore('user', () => {
     friendRequests.splice(friendRequests.indexOf(userId), 1);
   }
 
+  function RemoveFriend(userId) {
+    friends.splice(friends.indexOf(userId), 1);
+  }
+
   function DeleteMessage(messageId) {
     delete messages[messageId];
   }
@@ -123,6 +127,7 @@ export const useUserStore = defineStore('user', () => {
     messages,
     AddUser,
     AddFriend,
+    RemoveFriend,
     SendMessage,
     DeleteMessage,
     GetOlderMessages,

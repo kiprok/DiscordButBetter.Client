@@ -14,11 +14,13 @@ import FriendSortButton from '@/components/FriendSortButton.vue';
 import FriendListUserItem from '@/components/FriendListUserItem.vue';
 import FriendListItemButton from '@/components/FriendListItemButton.vue';
 import NotificationBadge from '@/components/NotificationBadge.vue';
+import { useRouter } from 'vue-router';
 
 document.title = 'Friends';
 
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
+const router = useRouter();
 
 const sortMethodSelected = ref('online');
 
@@ -33,20 +35,42 @@ const sortingMethods = {
   pending: () => userStore.GetFriendRequests(),
 };
 
+async function OpenConversation(userId) {
+  let conversation = conversationStore
+    .GetVisibleConversations()
+    .find((convo) => convo.participants.includes(userId) && convo.convoType === 0);
+
+  if (conversation) {
+    router.push({ name: 'chat', params: { id: conversation.convoId } });
+  } else {
+    let conversationId = Object.keys(conversationStore.GetALLConversations()).find(
+      (convoId) =>
+        conversationStore.GetConversationById(convoId).participants.includes(userId) &&
+        conversationStore.GetConversationById(convoId).convoType === 0,
+    );
+    if (conversationId) {
+      conversationStore.AddVisibleConversation(conversationId);
+      await router.push({ name: 'chat', params: { id: conversationId } });
+    } else {
+      let user = userStore.GetUserById(userId);
+      let newConvo = await GenerateConversation(
+        user.userName,
+        user.profilePicture,
+        userStore.myId,
+        userId,
+      );
+      conversationStore.conversations[newConvo.convoId] = newConvo;
+      await GenerateConversationMessages(newConvo.convoId, userId, 1000);
+      conversationStore.AddVisibleConversation(newConvo.convoId);
+      await router.push({ name: 'chat', params: { id: newConvo.convoId } });
+    }
+  }
+}
+
 async function GenFriend() {
   _addingFriend.value = true;
   let userId = await GenerateUser();
   userStore.friendRequests.push(userId);
-  //userStore.AddFriend(userId);
-  //let user = userStore.GetUserById(userId);
-  // let newConvo = await GenerateConversation(
-  //   user.userName,
-  //   user.profilePicture,
-  //   userStore.myId,
-  //   userId,
-  // );
-  //conversationStore.conversations[newConvo.convoId] = newConvo;
-  //await GenerateConversationMessages(newConvo.convoId, userId, 1000);
 
   _addingFriend.value = false;
 }
@@ -103,10 +127,14 @@ async function GenFriend() {
               <div
                 v-if="['online', 'all', 'offline'].includes(sortMethodSelected)"
                 class="ml-auto h-full flex flex-row gap-2">
-                <friend-list-item-button class="hover:text-white">
+                <friend-list-item-button
+                  @click="OpenConversation(listItem.userId)"
+                  class="hover:text-white">
                   <i class="fa-solid fa-comment"></i>
                 </friend-list-item-button>
-                <friend-list-item-button class="hover:text-red-500">
+                <friend-list-item-button
+                  @click="userStore.RemoveFriend(listItem.userId)"
+                  class="hover:text-red-500">
                   <i class="fa-solid fa-xmark"></i>
                 </friend-list-item-button>
               </div>

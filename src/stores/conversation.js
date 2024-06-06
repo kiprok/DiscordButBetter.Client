@@ -18,6 +18,8 @@ export const useConversationStore = defineStore('messageList', () => {
     // },
   });
 
+  const visibleConversations = reactive([]);
+
   const jumpToPlaceCallback = ref(null);
 
   function RegisterJumpCallback(callback) {
@@ -63,6 +65,19 @@ export const useConversationStore = defineStore('messageList', () => {
 
   function GetALLConversations() {
     return conversations;
+  }
+
+  function GetVisibleConversations() {
+    return visibleConversations.map((x) => conversations[x]);
+  }
+
+  function AddVisibleConversation(convoId) {
+    if (visibleConversations.indexOf(convoId) === -1) visibleConversations.push(convoId);
+  }
+
+  function RemoveVisibleConversation(convoId) {
+    const index = visibleConversations.indexOf(convoId);
+    if (index > -1) visibleConversations.splice(index, 1);
   }
 
   function GetConversationById(id) {
@@ -142,6 +157,9 @@ export const useConversationStore = defineStore('messageList', () => {
     conversations,
     GetConversationById,
     GetALLConversations,
+    GetVisibleConversations,
+    AddVisibleConversation,
+    RemoveVisibleConversation,
     GetVisibleMessages,
     ClearVisibleMessages,
     GetFirstMessage,
