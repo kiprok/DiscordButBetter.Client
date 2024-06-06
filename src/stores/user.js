@@ -11,7 +11,7 @@ export const useUserStore = defineStore('user', () => {
       userId: myId,
       userName: myUserName,
       profilePicture: myProfilePicture,
-      status: 0,
+      status: 1,
     },
   });
 
@@ -107,7 +107,7 @@ export const useUserStore = defineStore('user', () => {
       userId: id,
       userName: name,
       profilePicture: pfp,
-      status: Math.floor(Math.random() * 3),
+      status: Math.floor(Math.random() * 4),
     };
 
     return id;
