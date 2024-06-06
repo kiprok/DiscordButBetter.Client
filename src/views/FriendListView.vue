@@ -72,9 +72,9 @@ async function GenFriend() {
             <span v-if="sortingMethods[sortMethodSelected]().length > 0">
               {{ sortingMethods[sortMethodSelected]().length }}
             </span>
-            <span v-else>no </span>
+            <span v-else>no</span>
             <span v-if="sortMethodSelected !== 'all'">&nbsp;{{ sortMethodSelected }}</span>
-            <span v-if="sortMethodSelected !== 'pending'">&nbsp;friends</span>
+            <span v-if="sortMethodSelected === 'all'">&nbsp;friends</span>
           </div>
           <div class="min-w-0 ml-auto flex flex-row">
             <friend-sort-button radioValue="online" v-model="sortMethodSelected">
