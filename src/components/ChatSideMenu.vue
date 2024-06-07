@@ -46,10 +46,10 @@ async function CloseConversation(convoId) {
         <router-link
           v-for="(convo, index) in conversationStore.GetVisibleConversations()"
           :key="index"
-          class="router-link"
+          class="router-link group"
           :to="{ name: 'chat', params: { id: convo.convoId } }"
           @click="ToggleSideMenu">
-          <div class="group min-w-0 size-full flex flex-row flex-nowrap items-center gap-2">
+          <div class="min-w-0 size-full flex flex-row flex-nowrap items-center gap-2">
             <img
               :src="convo.convoPicture"
               v-if="convo.convoType === 1"
