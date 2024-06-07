@@ -145,7 +145,7 @@ async function GenFriend() {
               </friend-sort-button>
             </div>
           </div>
-          <div class="relative grow min-w-0 min-h-0 pb-4 flex-col">
+          <div class="flex grow min-w-0 min-h-0 pb-4 flex-col">
             <transition-group name="friend-list">
               <div
                 v-for="(listItem, index) in sortingMethods[sortMethodSelected]()"
@@ -201,16 +201,12 @@ async function GenFriend() {
 .friend-list-move,
 .friend-list-enter-active,
 .friend-list-leave-active {
-  transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+  transition: all 0.5s ease;
 }
 
 .friend-list-enter-from,
 .friend-list-leave-to {
   opacity: 0;
-  transform: translate(30px, 0);
-}
-
-.friend-list-leave-active {
-  position: absolute;
+  transform: translate(-30px, 0);
 }
 </style>
