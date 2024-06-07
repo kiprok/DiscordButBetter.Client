@@ -205,7 +205,7 @@ function previousAlsoOwner(message, index) {
       id="list-container"
       @scroll="OnScrolling"
       ref="messageListContainer">
-      <ul class="flex flex-col p-4" id="message-list" ref="messageListDom">
+      <ul class="p-4 flex flex-col" id="message-list" ref="messageListDom">
         <message-list-item
           class="hover:bg-gray-400"
           :key="message.messageId"
@@ -226,3 +226,21 @@ function previousAlsoOwner(message, index) {
     </div>
   </div>
 </template>
+
+<style scoped>
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: scaleY(0.01) translate(30px, 0);
+}
+
+.list-leave-active {
+  position: absolute;
+}
+</style>
