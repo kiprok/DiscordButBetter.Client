@@ -66,12 +66,13 @@ function onInput() {
   <div class="size-full">
     <form class="flex size-full items-center" @submit.prevent="SendChatMessage">
       <div
-        class="relative h-fit max-h-44 md:max-h-96 min-h-8 w-24 grow content-center overflow-y-scroll rounded-l-lg
-          bg-white"
+        class="relative h-fit max-h-44 md:max-h-96 min-h-8 w-24 grow content-center overflow-y-scroll
+          overflow-x-hidden rounded-l-lg bg-white"
         @click="textBox.focus">
         <div
           v-if="sendMessageStore.messageText.trim() === ''"
-          class="absolute z-10 top-1/2 -translate-y-1/2 left-2 select-none text-black/40 truncate pointer-events-none">
+          class="absolute w-full min-w-0 z-10 top-1/2 -translate-y-1/2 left-2 select-none text-black/40 truncate
+            pointer-events-none">
           Message @{{ conversationStore.GetConversationById(props.convoId).convoName }}
         </div>
         <div
