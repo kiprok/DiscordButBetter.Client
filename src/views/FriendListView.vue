@@ -2,7 +2,7 @@
 import ChatTopBar from '@/components/ChatTopBar.vue';
 import { useUserStore } from '@/stores/user.js';
 import SimpleButton from '@/components/SimpleButton.vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import {
   GenerateUser,
   GenerateConversation,
@@ -22,7 +22,13 @@ const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const router = useRouter();
 
-const sortMethodSelected = ref('online');
+const radioSortMethodSelected = ref('online');
+const searchText = ref('');
+
+const sortMethodSelected = computed(() => {
+  if (searchText.value !== '') return 'search';
+  return radioSortMethodSelected.value;
+});
 
 const _addingFriend = ref(false);
 
@@ -33,6 +39,18 @@ const sortingMethods = {
   all: () => userStore.GetFriendList(),
   offline: () => userStore.GetFriendList().filter((friend) => friend.status === 0),
   pending: () => userStore.GetFriendRequests(),
+  search: () =>
+    userStore
+      .GetFriendList()
+      .filter((friend) => friend.userName.toLowerCase().includes(searchText.value.toLowerCase())),
+};
+
+const sortMethodAliases = {
+  online: 'Online',
+  all: 'Friends',
+  offline: 'Offline',
+  pending: 'Pending',
+  search: 'Found',
 };
 
 async function OpenConversation(userId) {
@@ -89,70 +107,80 @@ async function GenFriend() {
     </ChatTopBar>
     <div class="flex grow min-h-0 min-w-0">
       <div
-        class="size-full overflow-auto bg-gray-300 px-4 sm:px-8 pt-8 lg:block"
+        class="grow min-w-0 overflow-y-scroll bg-gray-300 px-4 sm:px-8 pt-8 lg:block"
         :class="{ hidden: sidePanelView }">
-        <div class="flex flex-row min-w-0 mb-1 capitalize">
-          <div class="min-w-0">
-            <span v-if="sortingMethods[sortMethodSelected]().length > 0">
+        <div class="size-full flex flex-col">
+          <div class="w-full h-14 flex-none">
+            <input
+              type="text"
+              name="friendSearch"
+              id="friendSearch"
+              class="w-full outline outline-2 pl-1"
+              v-model="searchText"
+              placeholder="Search Friends" />
+          </div>
+          <div class="flex flex-row min-w-0 mb-1">
+            <span class="min-w-0">
               {{ sortingMethods[sortMethodSelected]().length }}
+              {{ sortMethodAliases[sortMethodSelected] }}
             </span>
-            <span v-else>no</span>
-            <span v-if="sortMethodSelected !== 'all'">&nbsp;{{ sortMethodSelected }}</span>
-            <span v-if="sortMethodSelected === 'all'">&nbsp;friends</span>
+            <div class="min-w-0 ml-auto flex flex-row capitalize">
+              <friend-sort-button radioValue="online" v-model="radioSortMethodSelected">
+                <span>online</span>
+              </friend-sort-button>
+              <friend-sort-button radioValue="all" v-model="radioSortMethodSelected">
+                <span>all</span>
+              </friend-sort-button>
+              <friend-sort-button radioValue="offline" v-model="radioSortMethodSelected">
+                <span>offline</span>
+              </friend-sort-button>
+              <friend-sort-button
+                class="relative"
+                radioValue="pending"
+                v-model="radioSortMethodSelected">
+                <span>pending</span>
+                <notification-badge
+                  class="-top-2 -right-2 absolute text-[10px] size-4"
+                  :notifications="userStore.friendRequests.length" />
+              </friend-sort-button>
+            </div>
           </div>
-          <div class="min-w-0 ml-auto flex flex-row">
-            <friend-sort-button radioValue="online" v-model="sortMethodSelected">
-              <span>online</span>
-            </friend-sort-button>
-            <friend-sort-button radioValue="all" v-model="sortMethodSelected">
-              <span>all</span>
-            </friend-sort-button>
-            <friend-sort-button radioValue="offline" v-model="sortMethodSelected">
-              <span>offline</span>
-            </friend-sort-button>
-            <friend-sort-button class="relative" radioValue="pending" v-model="sortMethodSelected">
-              <span>pending</span>
-              <notification-badge
-                class="-top-2 -right-2 absolute text-[10px] size-4"
-                :notifications="userStore.friendRequests.length" />
-            </friend-sort-button>
-          </div>
-        </div>
-        <div class="flex grow min-w-0 min-h-0 pb-4 flex-col">
-          <div
-            v-for="(listItem, index) in sortingMethods[sortMethodSelected]()"
-            :key="index"
-            class="border-t-2 py-1 border-gray-400 min-w-0">
-            <friend-list-user-item :user="listItem">
-              <div
-                v-if="['online', 'all', 'offline'].includes(sortMethodSelected)"
-                class="ml-auto h-full flex flex-row gap-2">
-                <friend-list-item-button
-                  @click="OpenConversation(listItem.userId)"
-                  class="hover:text-white">
-                  <i class="fa-solid fa-comment"></i>
-                </friend-list-item-button>
-                <friend-list-item-button
-                  @click="userStore.RemoveFriend(listItem.userId)"
-                  class="hover:text-red-500">
-                  <i class="fa-solid fa-xmark"></i>
-                </friend-list-item-button>
-              </div>
-              <div
-                v-if="sortMethodSelected === 'pending'"
-                class="ml-auto h-full flex flex-row gap-2">
-                <friend-list-item-button
-                  class="hover:text-green-500"
-                  @click="userStore.AcceptFriendRequest(listItem.userId)">
-                  <i class="fa-solid fa-check"></i>
-                </friend-list-item-button>
-                <friend-list-item-button
-                  class="hover:text-red-500"
-                  @click="userStore.RejectFriendRequest(listItem.userId)">
-                  <i class="fa-solid fa-xmark"></i>
-                </friend-list-item-button>
-              </div>
-            </friend-list-user-item>
+          <div class="flex grow min-w-0 min-h-0 pb-4 flex-col">
+            <div
+              v-for="(listItem, index) in sortingMethods[sortMethodSelected]()"
+              :key="index"
+              class="border-t-2 py-1 border-gray-400 min-w-0">
+              <friend-list-user-item :user="listItem">
+                <div
+                  v-if="['online', 'all', 'offline', 'search'].includes(sortMethodSelected)"
+                  class="ml-auto h-full flex flex-row gap-2">
+                  <friend-list-item-button
+                    @click="OpenConversation(listItem.userId)"
+                    class="hover:text-white">
+                    <i class="fa-solid fa-comment"></i>
+                  </friend-list-item-button>
+                  <friend-list-item-button
+                    @click="userStore.RemoveFriend(listItem.userId)"
+                    class="hover:text-red-500">
+                    <i class="fa-solid fa-xmark"></i>
+                  </friend-list-item-button>
+                </div>
+                <div
+                  v-if="sortMethodSelected === 'pending'"
+                  class="ml-auto h-full flex flex-row gap-2">
+                  <friend-list-item-button
+                    class="hover:text-green-500"
+                    @click="userStore.AcceptFriendRequest(listItem.userId)">
+                    <i class="fa-solid fa-check"></i>
+                  </friend-list-item-button>
+                  <friend-list-item-button
+                    class="hover:text-red-500"
+                    @click="userStore.RejectFriendRequest(listItem.userId)">
+                    <i class="fa-solid fa-xmark"></i>
+                  </friend-list-item-button>
+                </div>
+              </friend-list-user-item>
+            </div>
           </div>
         </div>
       </div>
