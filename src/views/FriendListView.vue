@@ -199,22 +199,12 @@ async function GenFriend() {
 
 <style scoped>
 .friend-list-move,
-.friend-list-enter-active,
-.friend-list-leave-active {
+.friend-list-enter-active {
   transition: all 0.5s ease;
 }
 
 .friend-list-enter-from {
   opacity: 0;
   transform: translate(-5rem, 0);
-}
-
-.friend-list-leave-to {
-  opacity: 0;
-  transform: scale(0.5);
-}
-
-.friend-list-leave-active {
-  position: absolute;
 }
 </style>
