@@ -118,11 +118,9 @@ function LoadNewerMessages(startPointId) {
 function OnScrolling(event) {
   const { scrollTop, offsetHeight, scrollHeight } = event.target;
   if (scrollTop === 0) {
-    console.log('bottom');
     const lastMessage = conversationStore.GetLastMessage(props.convoId);
     LoadNewerMessages(lastMessage.messageId);
   } else if (scrollHeight - (-scrollTop + offsetHeight) <= 2) {
-    console.log('top');
     const firstMessage = conversationStore.GetFirstMessage(props.convoId);
     LoadOlderMessages(firstMessage.messageId);
   }
@@ -130,7 +128,6 @@ function OnScrolling(event) {
 }
 
 function OnMessageMountChange(message, eventType) {
-  console.log(eventType);
   if (IsLoadingCompleted(waitingMessagesAbove, message)) {
     HandleNewAboveMessages();
     return;
@@ -144,7 +141,6 @@ function OnMessageMountChange(message, eventType) {
 
   if (messageListContainer.value) {
     if (message.messageId === sendingMessageStore.sendingMessage) {
-      console.log('scrolling to bottom');
       messageListContainer.value.scroll({
         top: 0,
         behavior: 'smooth',
