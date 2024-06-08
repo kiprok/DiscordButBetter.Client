@@ -32,7 +32,7 @@ export const useConversationStore = defineStore('messageList', () => {
 
   function TriggerJumpToBottom(convoId) {
     if (!jumpToPlaceCallback.value) return;
-    const olderMessage = userStore.GetOlderMessages(convoId, null, 25);
+    const olderMessage = userStore.GetOlderMessages(convoId, null, 50);
     ClearVisibleMessages(convoId);
     AddMessages(convoId, olderMessage);
 
@@ -121,14 +121,14 @@ export const useConversationStore = defineStore('messageList', () => {
   }
 
   function RemoveNewerMessages(convoId, amount) {
-    conversations[convoId].visibleMessages.splice(
+    return conversations[convoId].visibleMessages.splice(
       conversations[convoId].visibleMessages.length - amount,
       amount,
     );
   }
 
   function RemoveOlderMessages(convoId, amount) {
-    conversations[convoId].visibleMessages.splice(0, amount);
+    return conversations[convoId].visibleMessages.splice(0, amount);
   }
 
   function DeleteMessage(convoId, messageId) {

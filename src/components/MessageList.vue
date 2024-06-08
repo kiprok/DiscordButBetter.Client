@@ -87,6 +87,11 @@ function LoadOlderMessages(startPointId) {
 
   conversationStore.AddMessages(props.convoId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
+
+  if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
+    waitingMessagesAbove.push(...conversationStore.RemoveNewerMessages(props.convoId, 25));
+    conversationStore.GetConversationById(props.convoId).viewingOlderMessages = true;
+  }
 }
 
 function LoadNewerMessages(startPointId) {
@@ -104,6 +109,10 @@ function LoadNewerMessages(startPointId) {
 
   conversationStore.AddMessages(props.convoId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
+
+  if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
+    waitingMessagesBelow.push(...conversationStore.RemoveOlderMessages(props.convoId, 25));
+  }
 }
 
 function OnScrolling(event) {
@@ -123,7 +132,7 @@ function OnScrolling(event) {
 function OnMessageMountChange(message, eventType) {
   console.log(eventType);
   if (IsLoadingCompleted(waitingMessagesAbove, message)) {
-    HandleNewAboveMesssages();
+    HandleNewAboveMessages();
     return;
   } else if (IsLoadingCompleted(waitingMessagesBelow, message)) {
     HandleNewBelowMessages();
@@ -135,20 +144,22 @@ function OnMessageMountChange(message, eventType) {
 
   if (messageListContainer.value) {
     if (message.messageId === sendingMessageStore.sendingMessage) {
+      console.log('scrolling to bottom');
       messageListContainer.value.scroll({
         top: 0,
         behavior: 'smooth',
       });
     }
+    sendingMessageStore.sendingMessage = null;
   }
 }
 
-function HandleNewAboveMesssages() {
+function HandleNewAboveMessages() {
   if (!chatIsLoading.value) {
-    if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
-      conversationStore.RemoveNewerMessages(props.convoId, 25);
-      conversationStore.GetConversationById(props.convoId).viewingOlderMessages = true;
-    }
+    // if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
+    //   conversationStore.RemoveNewerMessages(props.convoId, 25);
+    //   conversationStore.GetConversationById(props.convoId).viewingOlderMessages = true;
+    // }
   } else {
     ScrollToSavedLocation();
     chatIsLoading.value = false;
@@ -156,13 +167,14 @@ function HandleNewAboveMesssages() {
 }
 
 function HandleNewBelowMessages() {
+  if (!messageListContainer) return;
   let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
   if (!chatIsLoading.value) {
     messageListContainer.value.scrollTop += dif;
 
-    if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
-      conversationStore.RemoveOlderMessages(props.convoId, 25);
-    }
+    // if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
+    //   conversationStore.RemoveOlderMessages(props.convoId, 25);
+    // }
   } else {
     ScrollToSavedLocation();
     chatIsLoading.value = false;
@@ -170,6 +182,7 @@ function HandleNewBelowMessages() {
 }
 
 function HandleNewJumpMessages() {
+  if (!messageListContainer) return;
   if (!waitingMessagesJump.focus) {
     messageListContainer.value.scrollTop = 0;
 
@@ -205,24 +218,37 @@ function previousAlsoOwner(message, index) {
       id="list-container"
       @scroll="OnScrolling"
       ref="messageListContainer">
-      <ul class="p-4 flex flex-col" id="message-list" ref="messageListDom">
-        <message-list-item
-          class="hover:bg-gray-400"
-          :key="message.messageId"
-          :data-msg-id="message.messageId"
-          :data-msg-list-index="index"
-          :data-msg-sender-id="message.senderId"
-          v-for="(message, index) in conversationStore.GetVisibleMessages(props.convoId)"
-          :message="message"
-          @scroll-reply="ScrollToMessage"
-          @on-mount-change="OnMessageMountChange"
-          :previous-also-owner="previousAlsoOwner(message, index)"
-          :allowedFunctions="{
-            allowReply: true,
-            allowEdit: true,
-            allowDelete: true,
-          }" />
+      <ul class="p-4" id="message-list" ref="messageListDom">
+        <transition-group name="message-list">
+          <message-list-item
+            class="hover:bg-gray-400"
+            :key="message.messageId"
+            :data-msg-id="message.messageId"
+            :data-msg-list-index="index"
+            :data-msg-sender-id="message.senderId"
+            v-for="(message, index) in conversationStore.GetVisibleMessages(props.convoId)"
+            :message="message"
+            @scroll-reply="ScrollToMessage"
+            @on-mount-change="OnMessageMountChange"
+            :previous-also-owner="previousAlsoOwner(message, index)"
+            :allowedFunctions="{
+              allowReply: true,
+              allowEdit: true,
+              allowDelete: true,
+            }" />
+        </transition-group>
       </ul>
     </div>
   </div>
 </template>
+
+<style scoped>
+.message-list-enter-active {
+  transition: all 0.5s ease;
+}
+
+.message-list-enter-from {
+  opacity: 0;
+  transform: translateX(5rem);
+}
+</style>
