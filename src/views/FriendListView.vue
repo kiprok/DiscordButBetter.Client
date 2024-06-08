@@ -207,6 +207,6 @@ async function GenFriend() {
 .friend-list-enter-from,
 .friend-list-leave-to {
   opacity: 0;
-  transform: translate(-30px, 0);
+  transform: translate(-5rem, 0);
 }
 </style>
