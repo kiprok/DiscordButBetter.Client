@@ -73,7 +73,7 @@ function onInput() {
           v-if="sendMessageStore.messageText.trim() === ''"
           class="absolute w-full min-w-0 z-10 top-1/2 -translate-y-1/2 left-2 select-none text-black/40 truncate
             pointer-events-none">
-          Message @{{ conversationStore.GetConversationById(props.convoId).convoName }}
+          Message @{{ conversationStore.GetConversationById(props.convoId)?.convoName }}
         </div>
         <div
           contenteditable="true"

@@ -3,8 +3,6 @@ import { reactive, ref } from 'vue';
 import { useUserStore } from '@/stores/user.js';
 
 export const useConversationStore = defineStore('messageList', () => {
-  const userStore = useUserStore();
-
   const conversations = reactive({
     // id: {
     //   convoId: "",
@@ -31,6 +29,7 @@ export const useConversationStore = defineStore('messageList', () => {
   }
 
   function TriggerJumpToBottom(convoId) {
+    const userStore = useUserStore();
     if (!jumpToPlaceCallback.value) return;
     const olderMessage = userStore.GetOlderMessages(convoId, null, 50);
     ClearVisibleMessages(convoId);
@@ -40,6 +39,7 @@ export const useConversationStore = defineStore('messageList', () => {
   }
 
   function TriggerJumpToMessage(convoId, messageId) {
+    const userStore = useUserStore();
     if (!jumpToPlaceCallback.value) return;
 
     let centerMessage;
