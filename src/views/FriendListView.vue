@@ -122,7 +122,8 @@ async function GenRandomMessage() {
       conversationStore.AddVisibleConversation(conversation.convoId);
     }
 
-    conversationStore.AddMessage(conversation.convoId, userStore.messages[newMessageId]);
+    if (!conversationStore.GetConversationById(conversation.convoId).viewingOlderMessages)
+      conversationStore.AddMessage(conversation.convoId, userStore.messages[newMessageId]);
     conversationStore.UpdateLastMessageTime(conversation.convoId, Date.now());
     conversation.newUnseenMessages.push(newMessageId);
   }
