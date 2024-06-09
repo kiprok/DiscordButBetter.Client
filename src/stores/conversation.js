@@ -13,6 +13,9 @@ export const useConversationStore = defineStore('messageList', () => {
     //   participants: [],
     //   scrollPosition: 0,
     //   viewingOlderMessages: false,
+    //   lastMessageTime: 0,
+    //   lastSeenMessage: "",
+    //   newUnseenMessages: [],
     // },
   });
 
@@ -153,6 +156,15 @@ export const useConversationStore = defineStore('messageList', () => {
     else return 0;
   }
 
+  function UpdateLastMessageTime(convoId, time) {
+    conversations[convoId].lastMessageTime = time;
+  }
+
+  function RemoveNewUnseenMessage(convoId, messageId) {
+    const index = conversations[convoId].newUnseenMessages.indexOf(messageId);
+    if (index > -1) conversations[convoId].newUnseenMessages.splice(index, 1);
+  }
+
   return {
     conversations,
     GetConversationById,
@@ -176,5 +188,7 @@ export const useConversationStore = defineStore('messageList', () => {
     UnRegisterJumpCallback,
     TriggerJumpToMessage,
     TriggerJumpToBottom,
+    UpdateLastMessageTime,
+    RemoveNewUnseenMessage,
   };
 });

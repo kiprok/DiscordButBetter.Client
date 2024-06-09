@@ -23,6 +23,9 @@ export async function GenerateConversation(convoName, convoPicture, userId1, use
     participants: [userId1, userId2],
     scrollPosition: 0,
     viewingOlderMessages: false,
+    lastMessageTime: 0,
+    lastSeenMessage: '',
+    newUnseenMessages: [],
   };
 }
 

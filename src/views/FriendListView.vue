@@ -31,6 +31,7 @@ const sortMethodSelected = computed(() => {
 });
 
 const _addingFriend = ref(false);
+const _sendingRandomMessage = ref(false);
 
 const sidePanelView = ref(false);
 
@@ -79,6 +80,7 @@ async function OpenConversation(userId) {
       );
       conversationStore.conversations[newConvo.convoId] = newConvo;
       await GenerateConversationMessages(newConvo.convoId, userId, 1000);
+      conversationStore.UpdateLastMessageTime(newConvo.convoId, Date.now());
       conversationStore.AddVisibleConversation(newConvo.convoId);
       await router.push({ name: 'chat', params: { id: newConvo.convoId } });
     }
@@ -91,6 +93,40 @@ async function GenFriend() {
   userStore.friendRequests.push(userId);
 
   _addingFriend.value = false;
+}
+
+async function GenRandomMessage() {
+  _sendingRandomMessage.value = true;
+  let conversation = Object.keys(conversationStore.GetALLConversations()).map((convoId) =>
+    conversationStore.GetConversationById(convoId),
+  )[Math.floor(Math.random() * Object.keys(conversationStore.GetALLConversations()).length)];
+  if (!conversation) {
+    _sendingRandomMessage.value = false;
+    return;
+  }
+  let userid =
+    conversation.participants[Math.floor(Math.random() * conversation.participants.length)];
+
+  if (conversation) {
+    let newMessageId = crypto.randomUUID();
+    userStore.messages[newMessageId] = {
+      messageId: newMessageId,
+      senderId: userid,
+      convoId: conversation.convoId,
+      messageText: `A new Random Message`,
+      timeSend: Date.now(),
+      meta: {},
+    };
+
+    if (!conversationStore.GetVisibleConversations().includes(conversation.convoId)) {
+      conversationStore.AddVisibleConversation(conversation.convoId);
+    }
+
+    conversationStore.AddMessage(conversation.convoId, userStore.messages[newMessageId]);
+    conversationStore.UpdateLastMessageTime(conversation.convoId, Date.now());
+    conversation.newUnseenMessages.push(newMessageId);
+  }
+  _sendingRandomMessage.value = false;
 }
 </script>
 
@@ -193,6 +229,9 @@ async function GenFriend() {
         :class="{ hidden: !sidePanelView, flex: sidePanelView }">
         <div>
           <simple-button :disabled="_addingFriend" @click="GenFriend">add friend</simple-button>
+          <simple-button :disabled="_sendingRandomMessage" @click="GenRandomMessage"
+            >send a random message</simple-button
+          >
         </div>
       </div>
     </div>

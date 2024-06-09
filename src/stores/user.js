@@ -70,6 +70,13 @@ export const useUserStore = defineStore('user', () => {
       .map((key) => messages[key]);
   }
 
+  function GetConversationMessages(convoId) {
+    return Object.keys(messages)
+      .filter((key) => convoId === messages[key].convoId)
+      .toSorted((a, b) => messages[a].timeSend - messages[b].timeSend)
+      .map((key) => messages[key]);
+  }
+
   function GetUserById(id) {
     return users[id];
   }
@@ -87,11 +94,13 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function AcceptFriendRequest(userId) {
+    if (friends.includes(userId)) return;
     friends.push(userId);
     friendRequests.splice(friendRequests.indexOf(userId), 1);
   }
 
   function RejectFriendRequest(userId) {
+    if (!friends.includes(userId)) return;
     friendRequests.splice(friendRequests.indexOf(userId), 1);
   }
 
@@ -136,6 +145,7 @@ export const useUserStore = defineStore('user', () => {
     DeleteMessage,
     GetOlderMessages,
     GetNewerMessages,
+    GetConversationMessages,
     GetUserById,
     GetMessageById,
     GetFriendList,

@@ -128,6 +128,15 @@ function OnScrolling(event) {
 }
 
 function OnMessageMountChange(message, eventType) {
+  if (
+    eventType === 1 &&
+    conversationStore
+      .GetConversationById(props.convoId)
+      .newUnseenMessages.includes(message.messageId)
+  ) {
+    conversationStore.RemoveNewUnseenMessage(props.convoId, message.messageId);
+  }
+
   if (IsLoadingCompleted(waitingMessagesAbove, message)) {
     HandleNewAboveMessages();
     return;
@@ -163,7 +172,7 @@ function HandleNewAboveMessages() {
 }
 
 function HandleNewBelowMessages() {
-  if (!messageListContainer) return;
+  if (!messageListContainer.value) return;
   let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
   if (!chatIsLoading.value) {
     messageListContainer.value.scrollTop += dif;
@@ -178,7 +187,7 @@ function HandleNewBelowMessages() {
 }
 
 function HandleNewJumpMessages() {
-  if (!messageListContainer) return;
+  if (!messageListContainer.value) return;
   if (!waitingMessagesJump.focus) {
     messageListContainer.value.scrollTop = 0;
 

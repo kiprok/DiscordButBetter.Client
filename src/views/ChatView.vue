@@ -90,6 +90,9 @@ function SendChatMessage() {
     conversationStore.AddMessage(route.params.id, msg);
   else sendMessageStore.sendingMessage = null;
 
+  if (conversationStore.GetConversationById(route.params.id).lastMessageTime < msg.timeSend)
+    conversationStore.UpdateLastMessageTime(route.params.id, msg.timeSend);
+
   sendMessageStore.messageText = '';
   sendMessageStore.messageEditing = null;
   sendMessageStore.replyTo = null;
