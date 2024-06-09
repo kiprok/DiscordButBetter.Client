@@ -110,7 +110,7 @@ function SendChatMessage() {
         <i class="fa-solid fa-chevron-left"></i>
       </label>
 
-      <h1 class="text-2xl font-bold text-white group-[.sidebar-checked]:hidden lg:!block">
+      <h1 class="text-2xl font-bold text-white truncate group-[.sidebar-checked]:hidden lg:!block">
         {{ conversationStore.GetConversationById(route.params.id)?.convoName }}
       </h1>
       <label
