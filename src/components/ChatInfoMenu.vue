@@ -109,8 +109,7 @@ const props = defineProps(['convoId']);
             "
             class="size-16 ml-4 absolute -bottom-4 left-0 rounded-full border-4 border-gray-700" />
         </div>
-        <div
-          class="overflow-y-auto outline outline-4 mt-6 mx-2 outline-gray-700 p-2 text-white rounded-lg bg-gray-800">
+        <div class="overflow-y-auto mt-6 mx-2 p-2 text-white rounded-lg bg-gray-800">
           <h2 class="font-bold text-lg">
             {{
               userStore.GetUserById(
