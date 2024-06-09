@@ -121,7 +121,8 @@ function SendChatMessage() {
       <form
         @submit.prevent="
           () => {
-            searchStore.GetSearchDataById(route.params.id).searchIsShowing = true;
+            searchStore.GetSearchDataById(route.params.id).searchIsShowing =
+              searchStore.GetSearchDataById(route.params.id).searchQuery !== '';
             searchStore.SearchMessages(route.params.id);
           }
         "
