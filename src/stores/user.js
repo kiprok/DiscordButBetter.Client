@@ -12,6 +12,8 @@ export const useUserStore = defineStore('user', () => {
       userName: myUserName,
       profilePicture: myProfilePicture,
       status: 1,
+      statusMessage: 'I am a cool person',
+      biography: 'I am a cool person who does cool things.\nAnd i im going to do more cool things.',
     },
   });
 
@@ -108,6 +110,8 @@ export const useUserStore = defineStore('user', () => {
       userName: name,
       profilePicture: pfp,
       status: Math.floor(Math.random() * 4),
+      statusMessage: `i am ${name}`,
+      biography: `I am ${name}\nAnd my id is ${id}`,
     };
 
     return id;
