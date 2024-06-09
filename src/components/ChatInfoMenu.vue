@@ -5,12 +5,23 @@ import { useSearchStore } from '@/stores/search.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import { useUserStore } from '@/stores/user.js';
 import UserProfilePicture from '@/components/UserProfilePicture.vue';
+import { ref, watch } from 'vue';
 
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const searchStore = useSearchStore();
 
 const props = defineProps(['convoId']);
+
+const searchPageAnimationDirection = ref('search-results-left');
+
+watch(
+  () => searchStore.GetSearchPagePlace(props.convoId),
+  (newPlace, oldPlace) => {
+    if (newPlace > oldPlace) searchPageAnimationDirection.value = 'search-results-left';
+    else searchPageAnimationDirection.value = 'search-results-right';
+  },
+);
 </script>
 
 <template>
@@ -43,24 +54,28 @@ const props = defineProps(['convoId']);
           </div>
         </div>
         <div class="flex-grow overflow-auto">
-          <ul class="flex grow min-w-0 flex-col p-2">
-            <li
-              v-for="result in searchStore.GetSearchResults(convoId)"
-              key="result.messageId"
-              class="group/item relative mt-2 flex flex-col rounded-md bg-black/20 p-3 transition-colors ease-in-out
-                hover:cursor-pointer hover:bg-black/10"
-              @click="
-                () => {
-                  conversationStore.TriggerJumpToMessage(convoId, result.messageId);
-                }
-              ">
-              <message-list-item
-                :message="result"
-                :convoId="convoId"
-                :key="result.messageId"
-                :allowed-functions="{ allowReply: true }" />
-            </li>
-          </ul>
+          <transition :name="searchPageAnimationDirection" mode="out-in">
+            <ul
+              :key="searchStore.GetSearchPagePlace(convoId)"
+              class="flex grow min-w-0 flex-col p-2">
+              <li
+                v-for="result in searchStore.GetSearchResults(convoId)"
+                key="result.messageId"
+                class="group/item relative mt-2 flex flex-col rounded-md bg-black/20 p-3 transition-colors ease-in-out
+                  hover:cursor-pointer hover:bg-black/10"
+                @click="
+                  () => {
+                    conversationStore.TriggerJumpToMessage(convoId, result.messageId);
+                  }
+                ">
+                <message-list-item
+                  :message="result"
+                  :convoId="convoId"
+                  :key="result.messageId"
+                  :allowed-functions="{ allowReply: true }" />
+              </li>
+            </ul>
+          </transition>
         </div>
         <pagination-buttons
           class="h-12 mt-auto"
@@ -142,3 +157,24 @@ const props = defineProps(['convoId']);
     </div>
   </div>
 </template>
+
+<style scoped>
+.search-results-left-enter-active,
+.search-results-right-enter-active,
+.search-results-right-leave-active,
+.search-results-left-leave-active {
+  transition: all 0.3s ease;
+}
+
+.search-results-right-leave-to,
+.search-results-left-enter {
+  opacity: 0;
+  transform: translate(5rem, 0);
+}
+
+.search-results-right-enter,
+.search-results-left-leave-to {
+  opacity: 0;
+  transform: translate(-5rem, 0);
+}
+</style>
