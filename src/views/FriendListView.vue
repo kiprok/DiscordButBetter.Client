@@ -145,45 +145,47 @@ async function GenFriend() {
               </friend-sort-button>
             </div>
           </div>
-          <div class="relative grow min-w-0 pb-4">
-            <transition-group name="friend-list">
-              <div
-                v-for="(listItem, index) in sortingMethods[sortMethodSelected]()"
-                :key="listItem.userId"
-                class="border-t-2 py-1 border-gray-400 min-w-0 w-full">
-                <friend-list-user-item :user="listItem">
-                  <div
-                    v-if="['online', 'all', 'offline', 'search'].includes(sortMethodSelected)"
-                    class="ml-auto h-full flex flex-row gap-2">
-                    <friend-list-item-button
-                      @click="OpenConversation(listItem.userId)"
-                      class="hover:text-white">
-                      <i class="fa-solid fa-comment"></i>
-                    </friend-list-item-button>
-                    <friend-list-item-button
-                      @click="userStore.RemoveFriend(listItem.userId)"
-                      class="hover:text-red-500">
-                      <i class="fa-solid fa-xmark"></i>
-                    </friend-list-item-button>
-                  </div>
-                  <div
-                    v-if="sortMethodSelected === 'pending'"
-                    class="ml-auto h-full flex flex-row gap-2">
-                    <friend-list-item-button
-                      class="hover:text-green-500"
-                      @click="userStore.AcceptFriendRequest(listItem.userId)">
-                      <i class="fa-solid fa-check"></i>
-                    </friend-list-item-button>
-                    <friend-list-item-button
-                      class="hover:text-red-500"
-                      @click="userStore.RejectFriendRequest(listItem.userId)">
-                      <i class="fa-solid fa-xmark"></i>
-                    </friend-list-item-button>
-                  </div>
-                </friend-list-user-item>
-              </div>
-            </transition-group>
-          </div>
+          <transition name="container" mode="out-in">
+            <div :key="sortMethodSelected" class="relative grow w-full min-w-0 pb-4">
+              <transition-group name="list">
+                <div
+                  v-for="(listItem, index) in sortingMethods[sortMethodSelected]()"
+                  :key="listItem.userId"
+                  class="border-t-2 py-1 border-gray-400 min-w-0 w-full">
+                  <friend-list-user-item :user="listItem">
+                    <div
+                      v-if="['online', 'all', 'offline', 'search'].includes(sortMethodSelected)"
+                      class="ml-auto h-full flex flex-row gap-2">
+                      <friend-list-item-button
+                        @click="OpenConversation(listItem.userId)"
+                        class="hover:text-white">
+                        <i class="fa-solid fa-comment"></i>
+                      </friend-list-item-button>
+                      <friend-list-item-button
+                        @click="userStore.RemoveFriend(listItem.userId)"
+                        class="hover:text-red-500">
+                        <i class="fa-solid fa-xmark"></i>
+                      </friend-list-item-button>
+                    </div>
+                    <div
+                      v-if="sortMethodSelected === 'pending'"
+                      class="ml-auto h-full flex flex-row gap-2">
+                      <friend-list-item-button
+                        class="hover:text-green-500"
+                        @click="userStore.AcceptFriendRequest(listItem.userId)">
+                        <i class="fa-solid fa-check"></i>
+                      </friend-list-item-button>
+                      <friend-list-item-button
+                        class="hover:text-red-500"
+                        @click="userStore.RejectFriendRequest(listItem.userId)">
+                        <i class="fa-solid fa-xmark"></i>
+                      </friend-list-item-button>
+                    </div>
+                  </friend-list-user-item>
+                </div>
+              </transition-group>
+            </div>
+          </transition>
         </div>
       </div>
       <div
@@ -198,23 +200,36 @@ async function GenFriend() {
 </template>
 
 <style scoped>
-.friend-list-move,
-.friend-list-enter-active,
-.friend-list-leave-active {
+.list-move,
+.list-enter-active {
   transition: all 0.5s ease;
 }
-
-.friend-list-enter-from {
+.list-enter-from {
   opacity: 0;
   transform: translate(-5rem, 0);
 }
 
-.friend-list-leave-to {
+.list-leave-to {
   opacity: 0;
-  transform: scale(0.5);
 }
 
-.friend-list-leave-active {
+.list-leave-active {
+  transition: all 0.3s ease;
   position: absolute;
+}
+
+.container-leave-active,
+.container-enter-active {
+  transition: all 0.25s ease-in-out;
+}
+
+.container-enter-from {
+  opacity: 0;
+  transform: translate(2rem, 0);
+}
+
+.container-leave-to {
+  opacity: 0;
+  transform: translate(-2rem, 0);
 }
 </style>
