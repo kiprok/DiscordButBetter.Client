@@ -15,6 +15,7 @@ import FriendListUserItem from '@/components/FriendListUserItem.vue';
 import FriendListItemButton from '@/components/FriendListItemButton.vue';
 import NotificationBadge from '@/components/NotificationBadge.vue';
 import { useRouter } from 'vue-router';
+import AddFriendModal from '@/components/modals/AddFriendModal.vue';
 
 document.title = 'Friends';
 
@@ -24,6 +25,7 @@ const router = useRouter();
 
 const radioSortMethodSelected = ref('online');
 const searchText = ref('');
+const showAddFriendModal = ref(false);
 
 const sortMethodSelected = computed(() => {
   if (searchText.value !== '') return 'search';
@@ -103,7 +105,7 @@ async function GenFriend() {
   for (let i = 0; i < 10; i++) {
     let userId = await GenerateUser();
     userStore.friendRequests.push(userId);
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
   _addingFriend.value = false;
 }
@@ -149,6 +151,12 @@ async function GenRandomMessage() {
     <ChatTopBar>
       <chat-left-side-menu-button />
       <h1 class="block text-3xl font-bold text-white">Friends</h1>
+      <button
+        @click="showAddFriendModal = true"
+        class="block text-lg px-1 text-white bg-green-600 hover:bg-green-700">
+        Add Friend
+      </button>
+      <AddFriendModal v-model="showAddFriendModal" />
       <button
         @click="sidePanelView = !sidePanelView"
         class="ml-auto block text-lg text-white hover:text-gray-200 lg:hidden">

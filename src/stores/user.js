@@ -77,6 +77,16 @@ export const useUserStore = defineStore('user', () => {
       .map((key) => messages[key]);
   }
 
+  function SearchUsers(query) {
+    if (query === '' || query === undefined || query === null) return [];
+    return Object.values(users).filter(
+      (user) =>
+        user.userName.toLowerCase().includes(query.toLowerCase()) &&
+        !friends.includes(user.userId) &&
+        user.userId !== myId,
+    );
+  }
+
   function GetUserById(id) {
     return users[id];
   }
@@ -138,6 +148,7 @@ export const useUserStore = defineStore('user', () => {
     friends,
     friendRequests,
     messages,
+    SearchUsers,
     AddUser,
     AddFriend,
     RemoveFriend,
