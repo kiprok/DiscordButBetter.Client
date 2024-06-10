@@ -5,23 +5,13 @@ import { useSearchStore } from '@/stores/search.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import { useUserStore } from '@/stores/user.js';
 import UserProfilePicture from '@/components/UserProfilePicture.vue';
-import { ref, watch } from 'vue';
+import PaginationAnimation from '@/components/animations/PaginationAnimation.vue';
 
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const searchStore = useSearchStore();
 
 const props = defineProps(['convoId']);
-
-const searchPageAnimationDirection = ref('search-results-left');
-
-watch(
-  () => searchStore.GetSearchPagePlace(props.convoId),
-  (newPlace, oldPlace) => {
-    if (newPlace > oldPlace) searchPageAnimationDirection.value = 'search-results-left';
-    else searchPageAnimationDirection.value = 'search-results-right';
-  },
-);
 </script>
 
 <template>
@@ -54,7 +44,7 @@ watch(
           </div>
         </div>
         <div class="flex-grow overflow-auto">
-          <transition :name="searchPageAnimationDirection" mode="out-in">
+          <pagination-animation :page="searchStore.GetSearchPagePlace(props.convoId)">
             <ul
               :key="searchStore.GetSearchPagePlace(convoId)"
               class="flex grow min-w-0 flex-col p-2">
@@ -75,7 +65,7 @@ watch(
                   :allowed-functions="{ allowReply: true }" />
               </li>
             </ul>
-          </transition>
+          </pagination-animation>
         </div>
         <pagination-buttons
           class="h-12 mt-auto"
@@ -157,24 +147,3 @@ watch(
     </div>
   </div>
 </template>
-
-<style scoped>
-.search-results-left-enter-active,
-.search-results-right-enter-active,
-.search-results-right-leave-active,
-.search-results-left-leave-active {
-  transition: all 0.3s ease;
-}
-
-.search-results-right-leave-to,
-.search-results-left-enter {
-  opacity: 0;
-  transform: translate(5rem, 0);
-}
-
-.search-results-right-enter,
-.search-results-left-leave-to {
-  opacity: 0;
-  transform: translate(-5rem, 0);
-}
-</style>

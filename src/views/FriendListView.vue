@@ -16,6 +16,8 @@ import FriendListItemButton from '@/components/FriendListItemButton.vue';
 import NotificationBadge from '@/components/NotificationBadge.vue';
 import { useRouter } from 'vue-router';
 import AddFriendModal from '@/components/modals/AddFriendModal.vue';
+import DefaultListAnimation from '@/components/animations/DefaultListAnimation.vue';
+import PaginationAnimation from '@/components/animations/PaginationAnimation.vue';
 
 document.title = 'Friends';
 
@@ -55,16 +57,6 @@ const sortMethodAliases = {
   pending: 'Pending',
   search: 'Found',
 };
-
-const listAnimationName = ref('container-left');
-
-watch(
-  () => Object.keys(sortingMethods).indexOf(sortMethodSelected.value),
-  (newVal, oldVal) => {
-    if (newVal > oldVal) listAnimationName.value = 'container-left';
-    else listAnimationName.value = 'container-right';
-  },
-);
 
 async function OpenConversation(userId) {
   let conversation = conversationStore
@@ -203,9 +195,9 @@ async function GenRandomMessage() {
               </friend-sort-button>
             </div>
           </div>
-          <transition :name="listAnimationName" mode="out-in">
+          <pagination-animation :page="Object.keys(sortingMethods).indexOf(sortMethodSelected)">
             <div :key="sortMethodSelected" class="relative grow w-full min-w-0 pb-4">
-              <transition-group name="list">
+              <default-list-animation>
                 <div
                   v-for="(listItem, index) in sortingMethods[sortMethodSelected]()"
                   :key="listItem.userId"
@@ -241,9 +233,9 @@ async function GenRandomMessage() {
                     </div>
                   </friend-list-user-item>
                 </div>
-              </transition-group>
+              </default-list-animation>
             </div>
-          </transition>
+          </pagination-animation>
         </div>
       </div>
       <div
@@ -260,41 +252,4 @@ async function GenRandomMessage() {
   </div>
 </template>
 
-<style scoped>
-.list-move,
-.list-enter-active {
-  transition: all 0.5s ease;
-}
-.list-enter-from {
-  opacity: 0;
-  transform: translate(-5rem, 0);
-}
-
-.list-leave-to {
-  opacity: 0;
-}
-
-.list-leave-active {
-  transition: all 0.3s ease;
-  position: absolute;
-}
-
-.container-right-enter-active,
-.container-right-leave-active,
-.container-left-leave-active,
-.container-left-enter-active {
-  transition: all 0.25s ease-in-out;
-}
-
-.container-right-leave-to,
-.container-left-enter-from {
-  opacity: 0;
-  transform: translate(2rem, 0);
-}
-
-.container-right-enter-from,
-.container-left-leave-to {
-  opacity: 0;
-  transform: translate(-2rem, 0);
-}
-</style>
+<style scoped></style>
