@@ -145,8 +145,12 @@ async function GenRandomMessage() {
       <h1 class="block text-3xl font-bold text-white">Friends</h1>
       <button
         @click="showAddFriendModal = true"
-        class="block text-lg px-1 text-white bg-green-600 hover:bg-green-700">
-        Add Friend
+        class="flex text-lg px-1 text-white bg-green-600 hover:bg-green-700 items-center gap-1">
+        <i class="fa-solid fa-user-large"></i>
+        <span class="hidden sm:inline-block">Add Friend</span>
+        <span class="sm:hidden">
+          <i class="fa-solid fa-plus"></i>
+        </span>
       </button>
       <AddFriendModal v-model="showAddFriendModal" />
       <button
