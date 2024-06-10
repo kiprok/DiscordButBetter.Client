@@ -2,7 +2,7 @@
 import ChatTopBar from '@/components/ChatTopBar.vue';
 import { useUserStore } from '@/stores/user.js';
 import SimpleButton from '@/components/SimpleButton.vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import {
   GenerateUser,
   GenerateConversation,
@@ -54,6 +54,16 @@ const sortMethodAliases = {
   search: 'Found',
 };
 
+const listAnimationName = ref('container-left');
+
+watch(
+  () => Object.keys(sortingMethods).indexOf(sortMethodSelected.value),
+  (newVal, oldVal) => {
+    if (newVal > oldVal) listAnimationName.value = 'container-left';
+    else listAnimationName.value = 'container-right';
+  },
+);
+
 async function OpenConversation(userId) {
   let conversation = conversationStore
     .GetVisibleConversations()
@@ -89,9 +99,12 @@ async function OpenConversation(userId) {
 
 async function GenFriend() {
   _addingFriend.value = true;
-  let userId = await GenerateUser();
-  userStore.friendRequests.push(userId);
 
+  for (let i = 0; i < 10; i++) {
+    let userId = await GenerateUser();
+    userStore.friendRequests.push(userId);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
   _addingFriend.value = false;
 }
 
@@ -182,7 +195,7 @@ async function GenRandomMessage() {
               </friend-sort-button>
             </div>
           </div>
-          <transition name="container" mode="out-in">
+          <transition :name="listAnimationName" mode="out-in">
             <div :key="sortMethodSelected" class="relative grow w-full min-w-0 pb-4">
               <transition-group name="list">
                 <div
@@ -229,7 +242,7 @@ async function GenRandomMessage() {
         class="w-full flex-none bg-gray-600 lg:flex lg:w-[22rem]"
         :class="{ hidden: !sidePanelView, flex: sidePanelView }">
         <div>
-          <simple-button :disabled="_addingFriend" @click="GenFriend">add friend</simple-button>
+          <simple-button :disabled="_addingFriend" @click="GenFriend">add users</simple-button>
           <simple-button :disabled="_sendingRandomMessage" @click="GenRandomMessage"
             >send a random message</simple-button
           >
@@ -258,17 +271,21 @@ async function GenRandomMessage() {
   position: absolute;
 }
 
-.container-leave-active,
-.container-enter-active {
+.container-right-enter-active,
+.container-right-leave-active,
+.container-left-leave-active,
+.container-left-enter-active {
   transition: all 0.25s ease-in-out;
 }
 
-.container-enter-from {
+.container-right-leave-to,
+.container-left-enter-from {
   opacity: 0;
   transform: translate(2rem, 0);
 }
 
-.container-leave-to {
+.container-right-enter-from,
+.container-left-leave-to {
   opacity: 0;
   transform: translate(-2rem, 0);
 }
