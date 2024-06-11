@@ -140,6 +140,10 @@ export const useUserStore = defineStore('user', () => {
     friends.push(userId);
   }
 
+  function SendFriendRequest(userId) {
+    friends.push(userId);
+  }
+
   return {
     myUserName,
     myId,
@@ -163,5 +167,6 @@ export const useUserStore = defineStore('user', () => {
     GetFriendRequests,
     AcceptFriendRequest,
     RejectFriendRequest,
+    SendFriendRequest,
   };
 });

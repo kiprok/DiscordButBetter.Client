@@ -34,7 +34,8 @@ const sortMethodSelected = computed(() => {
   return radioSortMethodSelected.value;
 });
 
-const _addingFriend = ref(false);
+const _addingUsers = ref(false);
+const _addingFriends = ref(false);
 const _sendingRandomMessage = ref(false);
 
 const sidePanelView = ref(false);
@@ -91,15 +92,26 @@ async function OpenConversation(userId) {
   }
 }
 
-async function GenFriend() {
-  _addingFriend.value = true;
+async function GenUsers() {
+  _addingUsers.value = true;
 
-  for (let i = 0; i < 10; i++) {
-    let userId = await GenerateUser();
+  for (let i = 0; i < 50; i++) {
+    await GenerateUser();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  _addingUsers.value = false;
+}
+
+async function GenFriend() {
+  _addingFriends.value = true;
+  let userId = Object.values(userStore.users)[
+    Math.floor(Math.random() * Object.keys(userStore.users).length)
+  ]?.userId;
+  if (userId) {
     userStore.friendRequests.push(userId);
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  _addingFriend.value = false;
+  _addingFriends.value = false;
 }
 
 async function GenRandomMessage() {
@@ -246,10 +258,11 @@ async function GenRandomMessage() {
         class="w-full flex-none bg-gray-600 lg:flex lg:w-[22rem]"
         :class="{ hidden: !sidePanelView, flex: sidePanelView }">
         <div>
-          <simple-button :disabled="_addingFriend" @click="GenFriend">add users</simple-button>
-          <simple-button :disabled="_sendingRandomMessage" @click="GenRandomMessage"
-            >send a random message</simple-button
-          >
+          <simple-button :disabled="_addingUsers" @click="GenUsers">add users</simple-button>
+          <simple-button :disabled="_sendingRandomMessage" @click="GenRandomMessage">
+            send a random message
+          </simple-button>
+          <simple-button :disabled="_addingFriends" @click="GenFriend">add friend</simple-button>
         </div>
       </div>
     </div>

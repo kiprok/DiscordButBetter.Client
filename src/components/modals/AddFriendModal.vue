@@ -55,17 +55,19 @@ watch(show, (value) => {
                 class="w-full">
                 <FriendListUserItem :user>
                   <div
-                    class="ml-auto"
+                    class="ml-auto text-black"
                     v-if="
                       !userStore
                         .GetFriendRequests()
                         .find((otherUser) => otherUser.userId === user.userId)
                     ">
-                    <friend-list-item-button>
+                    <friend-list-item-button
+                      class="hover:text-green-500"
+                      @click="userStore.SendFriendRequest(user.userId)">
                       <i class="fa-solid fa-plus" />
                     </friend-list-item-button>
                   </div>
-                  <div v-else class="ml-auto h-full flex flex-row gap-2">
+                  <div v-else class="ml-auto h-full flex flex-row gap-2 text-black">
                     <friend-list-item-button
                       class="hover:text-green-500"
                       @click="userStore.AcceptFriendRequest(user.userId)">
