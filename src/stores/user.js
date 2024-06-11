@@ -2,19 +2,19 @@ import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
 
 export const useUserStore = defineStore('user', () => {
-  const myId = ref('');
+  const myUserName = ref('kiprok');
+  const myId = crypto.randomUUID();
+  const myProfilePicture = ref('https://i.imgur.com/Y86bvSa.jpeg');
 
   const users = reactive({
-    /*
-            "": {
-                userId: "",
-                userName: "",
-                profilePicture: "",
-                status: 0,
-                statusMessage: "",
-                biography: ""
-            }
-             */
+    [myId]: {
+      userId: myId,
+      userName: myUserName,
+      profilePicture: myProfilePicture,
+      status: 1,
+      statusMessage: 'I am a cool person',
+      biography: 'I am a cool person who does cool things.\nAnd i im going to do more cool things.',
+    },
   });
 
   const friends = reactive([]);
@@ -145,7 +145,9 @@ export const useUserStore = defineStore('user', () => {
   }
 
   return {
+    myUserName,
     myId,
+    myProfilePicture,
     users,
     friends,
     friendRequests,
