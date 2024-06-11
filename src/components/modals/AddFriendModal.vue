@@ -49,11 +49,34 @@ watch(show, (value) => {
           <div class="flex-none border-b-2 border-gray-700 my-4" />
           <ul class="relative grow min-h-0 min-w-0 overflow-y-scroll">
             <default-list-animation>
-              <li v-for="user in userStore.SearchUsers(searchQuery)" class="w-full">
+              <li
+                v-for="user in userStore.SearchUsers(searchQuery)"
+                :key="user.userId"
+                class="w-full">
                 <FriendListUserItem :user>
-                  <friend-list-item-button class="ml-auto">
-                    <i class="fa-solid fa-plus" />
-                  </friend-list-item-button>
+                  <div
+                    class="ml-auto"
+                    v-if="
+                      !userStore
+                        .GetFriendRequests()
+                        .find((otherUser) => otherUser.userId === user.userId)
+                    ">
+                    <friend-list-item-button>
+                      <i class="fa-solid fa-plus" />
+                    </friend-list-item-button>
+                  </div>
+                  <div v-else class="ml-auto h-full flex flex-row gap-2">
+                    <friend-list-item-button
+                      class="hover:text-green-500"
+                      @click="userStore.AcceptFriendRequest(user.userId)">
+                      <i class="fa-solid fa-check"></i>
+                    </friend-list-item-button>
+                    <friend-list-item-button
+                      class="hover:text-red-500"
+                      @click="userStore.RejectFriendRequest(user.userId)">
+                      <i class="fa-solid fa-xmark"></i>
+                    </friend-list-item-button>
+                  </div>
                 </FriendListUserItem>
               </li>
             </default-list-animation>

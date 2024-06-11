@@ -43,7 +43,7 @@ const props = defineProps(['convoId']);
             </button>
           </div>
         </div>
-        <div class="flex-grow overflow-auto">
+        <div class="flex-grow overflow-y-scroll overflow-x-hidden">
           <pagination-animation :page="searchStore.GetSearchPagePlace(props.convoId)">
             <ul
               :key="searchStore.GetSearchPagePlace(convoId)"
