@@ -17,6 +17,7 @@ import {
   GetMarkdownSize,
   reverseEscapeHtml,
 } from '@/composables/markdown.js';
+import ContextModal from '@/components/modals/ContextModal.vue';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner']);
@@ -25,8 +26,10 @@ const conversationStore = useConversationStore();
 const sendMessageStore = useSendingMessageStore();
 
 const refTextMessage = ref();
+const showContextMenu = ref(false);
 
 const timeSend = new Date(props.message.timeSend);
+const timeTouchHold = ref(-1);
 
 const reply = computed(() => {
   return userStore.GetMessageById(props.message.meta.reply?.messageId) ?? null;
@@ -127,6 +130,8 @@ onUnmounted(() => {
 function RemoveChatMessage() {
   userStore.DeleteMessage(props.message.messageId);
   conversationStore.DeleteMessage(props.message.convoId, props.message.messageId);
+
+  showContextMenu.value = false;
 }
 
 function ReplyToMessage() {
@@ -135,6 +140,8 @@ function ReplyToMessage() {
   if (chatInput) {
     chatInput.focus();
   }
+
+  showContextMenu.value = false;
 }
 
 function EditMessage() {
@@ -143,11 +150,66 @@ function EditMessage() {
   if (chatInput) {
     chatInput.focus();
   }
+
+  showContextMenu.value = false;
+}
+
+function onPointerDown() {
+  if (window.screen.width > 640) return;
+  timeTouchHold.value = Date.now();
+}
+
+function onPointerUp() {
+  if (window.screen.width > 640) return;
+  if (timeTouchHold.value !== -1 && Date.now() - timeTouchHold.value > 500) {
+    showContextMenu.value = true;
+    timeTouchHold.value = -1;
+  } else {
+    console.log('not long enough');
+    timeTouchHold.value = -1;
+  }
+}
+
+function onPointerMove() {
+  if (window.screen.width > 640 || timeTouchHold.value === -1) return;
+  timeTouchHold.value = -1;
 }
 </script>
 
 <template>
-  <li class="group/item relative flex flex-col w-full" :class="{ 'mt-2': !previousAlsoOwner }">
+  <li
+    class="group/item relative flex flex-col w-full"
+    :class="{ 'mt-2': !previousAlsoOwner }"
+    @pointerdown="onPointerDown"
+    @pointerup="onPointerUp"
+    @pointermove="onPointerMove">
+    <span class="absolute top-0 left-0 size-full overflow-hidden pointer-events-none">
+      <span
+        class="absolute top-0 left-0 w-0 h-full bg-black/40 duration-100"
+        :class="{
+          '!w-full transition-all ease-linear delay-200 !duration-300': timeTouchHold !== -1,
+        }" />
+    </span>
+    <context-modal v-model="showContextMenu" header="Options">
+      <button
+        @click="ReplyToMessage"
+        v-if="allowedFunctions.allowReply"
+        class="w-full py-4 text-xl text-white hover:bg-gray-700">
+        Reply
+      </button>
+      <button
+        @click="EditMessage"
+        class="w-full py-4 text-xl text-white hover:bg-gray-700"
+        v-if="props.message.senderId === userStore.myId && allowedFunctions.allowEdit">
+        Edit
+      </button>
+      <button
+        @click="RemoveChatMessage"
+        class="w-full py-4 text-xl text-white hover:bg-gray-700"
+        v-if="props.message.senderId === userStore.myId && allowedFunctions.allowDelete">
+        Delete
+      </button>
+    </context-modal>
     <div class="pl-6 h-5 flex flex-row items-end truncate overflow-hidden w-full" v-if="reply">
       <div class="flex-none h-3 w-8 rounded-tl border border-b-0 border-r-0 border-black"></div>
       <img
@@ -202,8 +264,8 @@ function EditMessage() {
       </div>
     </div>
     <div
-      class="absolute -top-5 right-0 flex h-8 items-center p-1 opacity-0 duration-300
-        group-hover/item:opacity-100 group-hover/item:ease-in-out">
+      class="absolute -top-5 right-0 sm:flex h-8 items-center p-1 hidden opacity-0 duration-300
+        sm:group-hover/item:opacity-100 sm:group-hover/item:ease-in-out">
       <button
         @click.stop="ReplyToMessage"
         v-if="allowedFunctions.allowReply"
