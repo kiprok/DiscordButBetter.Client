@@ -15,13 +15,13 @@ const routes = [
   },
   {
     path: '/chat/:id',
-    component: ChatView,
+    component: () => import('@/views/ChatView.vue'),
     name: 'chat',
   },
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes,
 });
 

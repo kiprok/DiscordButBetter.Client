@@ -180,14 +180,15 @@ function onPointerMove() {
   <li
     class="group/item relative flex flex-col w-full"
     :class="{ 'mt-2': !previousAlsoOwner }"
-    @pointerdown="onPointerDown"
-    @pointerup="onPointerUp"
+    @pointerdown.prevent="onPointerDown"
+    @pointerup.prevent="onPointerUp"
+    @contextmenu.prevent
     @pointermove="onPointerMove">
     <span class="absolute top-0 left-0 size-full overflow-hidden pointer-events-none">
       <span
-        class="absolute top-0 left-0 w-0 h-full bg-black/40 duration-100"
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-0 bg-black/40 duration-100"
         :class="{
-          '!w-full transition-all ease-linear delay-200 !duration-300': timeTouchHold !== -1,
+          '!size-full transition-all ease-linear delay-200 !duration-300': timeTouchHold !== -1,
         }" />
     </span>
     <context-modal v-model="showContextMenu" header="Options">

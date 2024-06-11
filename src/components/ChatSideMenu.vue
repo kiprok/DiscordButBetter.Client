@@ -90,7 +90,9 @@ async function CloseConversation(convoId) {
           <user-profile-picture
             :user="userStore.GetUserById(userStore.myId)"
             class="size-10 flex-none" />
-          <span class="text-xl text-white">{{ userStore.myUserName }}</span>
+          <span class="text-xl text-white">{{
+            userStore.GetUserById(userStore.myId)?.userName
+          }}</span>
         </div>
       </div>
     </div>

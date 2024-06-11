@@ -25,6 +25,8 @@ const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const router = useRouter();
 
+userStore.myId = userStore.AddUser('kiprok', 'https://i.imgur.com/Y86bvSa.jpeg');
+
 const radioSortMethodSelected = ref('online');
 const searchText = ref('');
 const showAddFriendModal = ref(false);
@@ -107,9 +109,18 @@ async function GenFriend() {
   let userId = Object.values(userStore.users)[
     Math.floor(Math.random() * Object.keys(userStore.users).length)
   ]?.userId;
-  if (userId) {
+
+  if (
+    userId &&
+    userId !== userStore.myId &&
+    !userStore.GetFriendList().find((user) => user.userId === userId) &&
+    !userStore.GetFriendRequests().find((user) => user.userId === userId)
+  ) {
     userStore.friendRequests.push(userId);
     await new Promise((resolve) => setTimeout(resolve, 100));
+  } else {
+    userId = await GenerateUser();
+    userStore.AddFriend(userId);
   }
   _addingFriends.value = false;
 }
