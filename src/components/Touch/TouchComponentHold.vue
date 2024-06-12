@@ -17,7 +17,6 @@ function onPointerUp() {
     emit('held');
     timeTouchHold.value = -1;
   } else {
-    console.log('not long enough');
     timeTouchHold.value = -1;
   }
 }
