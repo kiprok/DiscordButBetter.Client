@@ -16,7 +16,6 @@ function onPointerDown(event) {
 function onPointerUp(event) {
   if (event.pointerType !== 'touch') return;
   if (timeTouchHold.value !== -1 && Date.now() - timeTouchHold.value > 500) {
-    emit('held');
     timeTouchHold.value = -1;
   } else {
     timeTouchHold.value = -1;
@@ -27,6 +26,22 @@ function onPointerMove(event) {
   if (event.pointerType !== 'touch' || timeTouchHold.value === -1) return;
   timeTouchHold.value = -1;
 }
+
+function onContextMenu(event) {
+  if (isTouch.value) {
+    event.preventDefault();
+    emit('held');
+    if (window.getSelection) {
+      if (window.getSelection().empty) {
+        window.getSelection().empty();
+      } else if (window.getSelection().removeAllRanges) {
+        window.getSelection().removeAllRanges();
+      }
+    } else if (document.selection) {
+      document.selection.empty();
+    }
+  }
+}
 </script>
 
 <template>
@@ -34,7 +49,8 @@ function onPointerMove(event) {
     :is="tag"
     @pointerdown="onPointerDown"
     @pointerup="onPointerUp"
-    @pointermove="onPointerMove"
+    @pointerleave="onPointerMove"
+    @contextmenu="onContextMenu"
     class="relative">
     <span class="absolute top-0 left-0 size-full overflow-hidden pointer-events-none">
       <span

@@ -31,7 +31,7 @@ watch(show, (value) => {
     <transition name="show-modal">
       <div
         v-if="show"
-        class="w-screen h-screen bg-black/70 flex items-center justify-center overflow-hidden"
+        class="w-screen h-dvh bg-black/70 flex items-center justify-center overflow-hidden"
         @click="show = false">
         <div
           class="center relative text-white bg-gray-600 flex flex-col rounded-lg px-4 py-8 w-[40rem] min-h-0 min-w-0

@@ -27,7 +27,7 @@ async function CloseConversation(convoId) {
 <template>
   <div
     id="SideMenu"
-    class="absolute left-0 top-0 z-10 hidden h-screen w-screen flex-none bg-green-600 md:static md:left-auto
+    class="absolute left-0 top-0 z-10 hidden h-dvh w-screen flex-none bg-green-600 md:static md:left-auto
       md:top-auto md:block md:h-full md:w-72">
     <div class="flex size-full flex-col">
       <div class="flex h-14 flex-none items-center bg-gray-800 p-4">
