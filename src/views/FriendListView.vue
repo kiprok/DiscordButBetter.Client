@@ -118,6 +118,10 @@ async function GenFriend() {
     await new Promise((resolve) => setTimeout(resolve, 100));
   } else {
     userId = await GenerateUser();
+    console.log(userStore.users[userStore.myId]);
+    console.log({
+      ...userStore.users[userStore.myId],
+    });
     userStore.AddFriend(userId);
   }
   _addingFriends.value = false;

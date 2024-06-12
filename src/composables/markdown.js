@@ -1,3 +1,5 @@
+import hljs from 'highlight.js';
+
 export function reverseEscapeHtml(original) {
   const map = {
     '&amp;': '&',
@@ -106,4 +108,72 @@ export function GetBlockQuoteMarkDown(text) {
   result += '</blockquote>';
 
   return result;
+}
+
+export function parseMarkdownMessage(text) {
+  let codeBlocks = [];
+  text = ApplyCodeMarkdown(text, (match, p1, p2, p3) => {
+    codeBlocks.push(
+      `<pre class="border border-black rounded overflow-x-auto xl:max-w-[90%] my-4 bg-[#2b2b2b] text-white"><code class="hljs p-4 block">${
+        hljs.highlight(reverseEscapeHtml(p3), {
+          language: hljs.getLanguage(p2) ? p2 : 'plaintext',
+          ignoreIllegals: true,
+        }).value
+      }</code></pre>`,
+    );
+    return '%%CODE_BLOCK%%';
+  });
+
+  text = ApplyStrongMarkdown(text, '<strong>$2</strong>');
+  text = ApplyItalicMarkdown(text, '<em>$2</em>');
+  text = ApplyHiddenTextMarkdown(
+    text,
+    (match, p1, p2) =>
+      `<div class="hidden-text bg-black rounded cursor-pointer select-none size-fit max-w-full"><span class="invisible">${p2.trim()}</span></div>`,
+  );
+  text = ApplyHeadingMarkdown(text, (match, p1, p2) => GetMarkdownSize(p1.length - 1, p2));
+  text = ApplyLinkMarkdown(
+    text,
+    '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
+  );
+  text = ApplyBlockQuoteMarkdown(text, (match) => GetBlockQuoteMarkDown(match));
+  text = text.replaceAll('%%CODE_BLOCK%%', () => codeBlocks.shift() || '%%CODE_BLOCK%%');
+
+  return text;
+}
+
+export function parseMarkdownReply(text) {
+  let codeBlocks = [];
+  text = ApplyCodeMarkdown(text, (match, p1, p2, p3) => {
+    codeBlocks.push(
+      `<pre class="border border-black rounded inline bg-[#2b2b2b] text-white"><code class="hljs inline">${
+        hljs.highlight(reverseEscapeHtml(p3), {
+          language: hljs.getLanguage(p2) ? p2 : 'plaintext',
+          ignoreIllegals: true,
+        }).value
+      }</code></pre>`,
+    );
+    return '%%CODE_BLOCK%%';
+  });
+
+  text = ApplyStrongMarkdown(text, '<strong>$2</strong>');
+  text = ApplyItalicMarkdown(text, '<em>$2</em>');
+  text = ApplyHiddenTextMarkdown(
+    text,
+    (match, p1, p2) =>
+      `<div class=" bg-black rounded cursor-pointer select-none size-fit max-w-full"><span class="invisible">${p2.trim()}</span></div>`,
+  );
+  text = ApplyHeadingMarkdown(text, (match, p1, p2) => {
+    return p2;
+  });
+  text = ApplyLinkMarkdown(
+    text,
+    '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
+  );
+  text = ApplyBlockQuoteMarkdown(text, (match) => {
+    return match.replaceAll('&gt;', '');
+  });
+  text = text.replaceAll('%%CODE_BLOCK%%', () => codeBlocks.shift() || '%%CODE_BLOCK%%');
+
+  return text;
 }

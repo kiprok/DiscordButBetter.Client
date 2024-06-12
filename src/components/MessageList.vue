@@ -227,6 +227,7 @@ function previousAlsoOwner(message, index) {
         <transition-group name="message-list">
           <message-list-item
             class="hover:bg-gray-400"
+            tag="li"
             :key="message.messageId"
             :data-msg-id="message.messageId"
             :data-msg-list-index="index"

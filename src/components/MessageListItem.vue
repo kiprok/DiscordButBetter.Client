@@ -3,24 +3,12 @@ import { useUserStore } from '@/stores/user.js';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import { useConversationStore } from '@/stores/conversation.js';
-import hljs from 'highlight.js';
-import {
-  ApplyBlockQuoteMarkdown,
-  ApplyCodeMarkdown,
-  ApplyHeadingMarkdown,
-  ApplyHiddenTextMarkdown,
-  ApplyItalicMarkdown,
-  ApplyLinkMarkdown,
-  ApplyStrongMarkdown,
-  escapeHtml,
-  GetBlockQuoteMarkDown,
-  GetMarkdownSize,
-  reverseEscapeHtml,
-} from '@/composables/markdown.js';
+import { escapeHtml, parseMarkdownMessage, parseMarkdownReply } from '@/composables/markdown.js';
 import ContextModal from '@/components/modals/ContextModal.vue';
+import TouchComponentHold from '@/components/Touch/TouchComponentHold.vue';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
-const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner']);
+const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner', 'tag']);
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const sendMessageStore = useSendingMessageStore();
@@ -29,79 +17,10 @@ const refTextMessage = ref();
 const showContextMenu = ref(false);
 
 const timeSend = new Date(props.message.timeSend);
-const timeTouchHold = ref(-1);
 
 const reply = computed(() => {
   return userStore.GetMessageById(props.message.meta.reply?.messageId) ?? null;
 });
-
-function parseMarkdownMessage(text) {
-  let codeBlocks = [];
-  text = ApplyCodeMarkdown(text, (match, p1, p2, p3) => {
-    codeBlocks.push(
-      `<pre class="border border-black rounded overflow-x-auto xl:max-w-[90%] my-4 bg-[#2b2b2b] text-white"><code class="hljs p-4 block">${
-        hljs.highlight(reverseEscapeHtml(p3), {
-          language: hljs.getLanguage(p2) ? p2 : 'plaintext',
-          ignoreIllegals: true,
-        }).value
-      }</code></pre>`,
-    );
-    return '%%CODE_BLOCK%%';
-  });
-
-  text = ApplyStrongMarkdown(text, '<strong>$2</strong>');
-  text = ApplyItalicMarkdown(text, '<em>$2</em>');
-  text = ApplyHiddenTextMarkdown(
-    text,
-    (match, p1, p2) =>
-      `<div class="hidden-text bg-black rounded cursor-pointer select-none size-fit max-w-full"><span class="invisible">${p2.trim()}</span></div>`,
-  );
-  text = ApplyHeadingMarkdown(text, (match, p1, p2) => GetMarkdownSize(p1.length - 1, p2));
-  text = ApplyLinkMarkdown(
-    text,
-    '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
-  );
-  text = ApplyBlockQuoteMarkdown(text, (match) => GetBlockQuoteMarkDown(match));
-  text = text.replaceAll('%%CODE_BLOCK%%', () => codeBlocks.shift() || '%%CODE_BLOCK%%');
-
-  return text;
-}
-
-function parseMarkdownReply(text) {
-  let codeBlocks = [];
-  text = ApplyCodeMarkdown(text, (match, p1, p2, p3) => {
-    codeBlocks.push(
-      `<pre class="border border-black rounded inline bg-[#2b2b2b] text-white"><code class="hljs inline">${
-        hljs.highlight(reverseEscapeHtml(p3), {
-          language: hljs.getLanguage(p2) ? p2 : 'plaintext',
-          ignoreIllegals: true,
-        }).value
-      }</code></pre>`,
-    );
-    return '%%CODE_BLOCK%%';
-  });
-
-  text = ApplyStrongMarkdown(text, '<strong>$2</strong>');
-  text = ApplyItalicMarkdown(text, '<em>$2</em>');
-  text = ApplyHiddenTextMarkdown(
-    text,
-    (match, p1, p2) =>
-      `<div class=" bg-black rounded cursor-pointer select-none size-fit max-w-full"><span class="invisible">${p2.trim()}</span></div>`,
-  );
-  text = ApplyHeadingMarkdown(text, (match, p1, p2) => {
-    return p2;
-  });
-  text = ApplyLinkMarkdown(
-    text,
-    '<a href="$2" class="text-blue-800 hover:cursor-pointer hover:text-white hover:underline">$1</a>',
-  );
-  text = ApplyBlockQuoteMarkdown(text, (match) => {
-    return match.replaceAll('&gt;', '');
-  });
-  text = text.replaceAll('%%CODE_BLOCK%%', () => codeBlocks.shift() || '%%CODE_BLOCK%%');
-
-  return text;
-}
 
 const finalMessage = computed(() => {
   let escapedMessage = escapeHtml(props.message.messageText);
@@ -117,11 +36,6 @@ const finalReply = computed(() => {
 onMounted(() => {
   emits('OnMountChange', props.message, 1);
 });
-
-watch(
-  () => props.message.messageText,
-  () => {},
-);
 
 onUnmounted(() => {
   emits('OnMountChange', props.message, -1);
@@ -153,44 +67,14 @@ function EditMessage() {
 
   showContextMenu.value = false;
 }
-
-function onPointerDown() {
-  if (window.screen.width > 640) return;
-  timeTouchHold.value = Date.now();
-}
-
-function onPointerUp() {
-  if (window.screen.width > 640) return;
-  if (timeTouchHold.value !== -1 && Date.now() - timeTouchHold.value > 500) {
-    showContextMenu.value = true;
-    timeTouchHold.value = -1;
-  } else {
-    console.log('not long enough');
-    timeTouchHold.value = -1;
-  }
-}
-
-function onPointerMove() {
-  if (window.screen.width > 640 || timeTouchHold.value === -1) return;
-  timeTouchHold.value = -1;
-}
 </script>
 
 <template>
-  <li
-    class="group/item relative flex flex-col w-full"
-    :class="{ 'mt-2': !previousAlsoOwner }"
-    @pointerdown.prevent="onPointerDown"
-    @pointerup.prevent="onPointerUp"
-    @contextmenu.prevent
-    @pointermove="onPointerMove">
-    <span class="absolute top-0 left-0 size-full overflow-hidden pointer-events-none">
-      <span
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-0 bg-black/40 duration-100"
-        :class="{
-          '!size-full transition-all ease-linear delay-200 !duration-300': timeTouchHold !== -1,
-        }" />
-    </span>
+  <touch-component-hold
+    @held="showContextMenu = true"
+    :tag="tag ? tag : 'div'"
+    class="group/item flex flex-col w-full"
+    :class="{ 'mt-2': !previousAlsoOwner }">
     <context-modal v-model="showContextMenu" header="Options">
       <button
         @click="ReplyToMessage"
@@ -286,5 +170,5 @@ function onPointerMove() {
         <i class="fa-solid fa-delete-left"></i>
       </button>
     </div>
-  </li>
+  </touch-component-hold>
 </template>
