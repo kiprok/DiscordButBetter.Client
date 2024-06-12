@@ -74,7 +74,8 @@ function EditMessage() {
     @held="showContextMenu = true"
     :tag="tag ? tag : 'div'"
     class="group/item flex flex-col w-full"
-    :class="{ 'mt-2': !previousAlsoOwner }">
+    :class="{ 'mt-2': !previousAlsoOwner }"
+    v-slot="{ timeHold, isTouch }">
     <context-modal v-model="showContextMenu" header="Options">
       <button
         @click="ReplyToMessage"
@@ -149,8 +150,11 @@ function EditMessage() {
       </div>
     </div>
     <div
-      class="absolute -top-5 right-0 sm:flex h-8 items-center p-1 hidden opacity-0 duration-300
-        sm:group-hover/item:opacity-100 sm:group-hover/item:ease-in-out">
+      class="absolute -top-5 right-0 h-8 items-center p-1 opacity-0 duration-300"
+      :class="{
+        'flex group-hover/item:opacity-100 group-hover/item:ease-in-out': !isTouch,
+        hidden: isTouch,
+      }">
       <button
         @click.stop="ReplyToMessage"
         v-if="allowedFunctions.allowReply"
