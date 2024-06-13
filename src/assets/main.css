@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
+html, body{
   overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 pre code.hljs {

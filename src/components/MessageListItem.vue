@@ -5,7 +5,7 @@ import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import { escapeHtml, parseMarkdownMessage, parseMarkdownReply } from '@/composables/markdown.js';
 import ContextModal from '@/components/modals/ContextModal.vue';
-import TouchComponentHold from '@/components/Touch/TouchComponentHold.vue';
+import TouchComponentHold from '@/components/touch/TouchComponentHold.vue';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner', 'tag']);

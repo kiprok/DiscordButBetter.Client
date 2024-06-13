@@ -137,10 +137,12 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function AddFriend(userId) {
+    if (friends.includes(userId)) return;
     friends.push(userId);
   }
 
   function SendFriendRequest(userId) {
+    if (friends.includes(userId)) return;
     friends.push(userId);
   }
 

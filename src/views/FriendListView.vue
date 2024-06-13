@@ -180,10 +180,8 @@ async function GenRandomMessage() {
         <i class="fa-solid fa-circle-info"></i>
       </button>
     </ChatTopBar>
-    <div class="flex grow min-h-0 min-w-0">
-      <div
-        class="grow min-w-0 overflow-y-scroll bg-gray-300 px-4 sm:px-8 pt-8 lg:block"
-        :class="{ hidden: sidePanelView }">
+    <div class="relative flex grow min-h-0 min-w-0">
+      <div class="grow min-w-0 overflow-y-scroll bg-gray-300 px-4 sm:px-8 pt-8 lg:block">
         <div class="size-full flex flex-col">
           <div class="w-full h-14 flex-none">
             <input
@@ -264,8 +262,9 @@ async function GenRandomMessage() {
         </div>
       </div>
       <div
-        class="w-full flex-none bg-gray-600 lg:flex lg:w-[22rem]"
-        :class="{ hidden: !sidePanelView, flex: sidePanelView }">
+        class="w-full h-full absolute transition-transform ease-in-out lg:static lg:transition-none
+          lg:translate-x-0 lg:flex-none bg-gray-600 lg:flex lg:w-[22rem]"
+        :class="{ 'translate-x-full': !sidePanelView }">
         <div>
           <simple-button :disabled="_addingUsers" @click="GenUsers">add users</simple-button>
           <simple-button :disabled="_sendingRandomMessage" @click="GenRandomMessage">

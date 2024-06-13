@@ -11,7 +11,7 @@ import ChatLeftSideMenuButton from '@/components/ChatLeftSideMenuButton.vue';
 import { useSearchStore } from '@/stores/search.js';
 import MessageListItem from '@/components/MessageListItem.vue';
 import PaginationButtons from '@/components/PaginationButtons.vue';
-import ChatInfoMenu from '@/components/ChatInfoMenu.vue';
+import ChatInfoMenu from '@/components/sideMenus/ChatInfoMenu.vue';
 
 const MessageList = defineAsyncComponent(() => import('@/components/MessageList.vue'));
 
@@ -134,10 +134,8 @@ function SendChatMessage() {
           placeholder="Search for text" />
       </form>
     </chat-top-bar>
-    <div class="static flex grow min-w-0 flex-row overflow-hidden bg-purple-600">
-      <div
-        class="flex flex-col bg-blue-600 grow min-w-0 group-[.sidebar-checked]:hidden lg:!flex"
-        ref="messageListRef">
+    <div class="relative flex grow min-w-0 flex-row overflow-hidden bg-purple-600">
+      <div class="flex flex-col bg-blue-600 grow min-w-0 lg:!flex" ref="messageListRef">
         <div class="size-full bg-gray-300">
           <message-list
             :convoId="conversationStore.GetConversationById(route.params.id)?.convoId"
@@ -182,7 +180,8 @@ function SendChatMessage() {
         </div>
       </div>
       <chat-info-menu
-        class="flex-none hidden group-[.sidebar-checked]:block lg:!block"
+        class="flex-none absolute z-10 top-0 translate-x-full transition-transform h-full ease-in-out
+          group-[.sidebar-checked]:translate-x-0 lg:translate-x-0 lg:transition-none lg:static"
         :convoId="route.params.id" />
     </div>
   </div>

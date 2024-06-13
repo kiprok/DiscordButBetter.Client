@@ -3,13 +3,14 @@ import { useUserStore } from '@/stores/user.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import { computed } from 'vue';
 import NotificationBadge from '@/components/NotificationBadge.vue';
+import { useChatLeftSideMenuStore } from '@/stores/chatLeftSideMenu.js';
 
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
+const chatLeftSideMenuStore = useChatLeftSideMenuStore();
 
 function ToggleSideMenu() {
-  let sideMenu = document.querySelector('#SideMenu');
-  sideMenu.classList.toggle('hidden');
+  chatLeftSideMenuStore.toggleLeftSideMenu();
 }
 
 const totalNotifications = computed(() => {
