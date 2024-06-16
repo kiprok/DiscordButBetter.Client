@@ -59,7 +59,7 @@ function onContextMenu(event) {
           '!size-full transition-all ease-linear delay-200 !duration-300': timeTouchHold !== -1,
         }" />
     </span>
-    <slot :timeHold="timeTouchHold" :isTouch="isTouch" />
+    <slot />
   </component>
 </template>
 
