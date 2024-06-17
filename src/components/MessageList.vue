@@ -219,7 +219,7 @@ function previousAlsoOwner(message, index) {
 <template>
   <div class="flex size-full flex-col flex-nowrap">
     <div
-      class="flex h-16 grow flex-col-reverse overflow-y-auto overflow-x-hidden"
+      class="flex h-16 grow flex-col-reverse overflow-y-auto overflow-x-hidden touch:select-none"
       id="list-container"
       @scroll="OnScrolling"
       ref="messageListContainer">

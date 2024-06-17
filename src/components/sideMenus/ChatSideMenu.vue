@@ -28,7 +28,7 @@ async function CloseConversation(convoId) {
 <template>
   <div
     id="SideMenu"
-    class="absolute left-0 transition-[transform] ease-in-out top-0 z-20 h-dvh w-screen flex-none bg-green-600
+    class="absolute left-0 transition-[transform] ease-out top-0 z-20 h-dvh w-screen flex-none bg-green-600
       md:static md:left-auto md:top-auto md:block md:translate-x-0 md:h-full md:transition-none md:w-72"
     :class="{ '-translate-x-full': chatLeftSideMenuStore.leftSideMenuIsOpen }">
     <div class="flex size-full flex-col">

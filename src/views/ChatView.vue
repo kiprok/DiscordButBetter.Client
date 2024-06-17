@@ -180,7 +180,7 @@ function SendChatMessage() {
         </div>
       </div>
       <chat-info-menu
-        class="flex-none absolute z-10 top-0 translate-x-full transition-transform h-full ease-in-out
+        class="flex-none absolute z-10 top-0 translate-x-full transition-transform h-full ease-out
           group-[.sidebar-checked]:translate-x-0 lg:translate-x-0 lg:transition-none lg:static"
         :convoId="route.params.id" />
     </div>

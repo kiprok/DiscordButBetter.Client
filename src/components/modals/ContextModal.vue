@@ -17,8 +17,8 @@ const props = defineProps({
         class="w-screen h-dvh bg-black/70 flex flex-col items-center justify-end overflow-hidden"
         @click="show = false">
         <div
-          class="center relative text-white bg-gray-600 flex flex-col rounded-t-lg px-4 py-8 w-full min-h-0 min-w-0
-            h-fit max-h-full"
+          class="center relative text-white bg-gray-600 flex flex-col rounded-t-lg px-4 py-8 w-full max-w-96 min-h-0
+            min-w-0 h-fit max-h-full"
           @click.stop>
           <h2 class="text-3xl">{{ header }}</h2>
           <div class="border-b-2 border-gray-700 my-4" />

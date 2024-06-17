@@ -16,7 +16,7 @@ const props = defineProps(['convoId']);
 
 <template>
   <div
-    class="overflow-hidden w-full bg-gray-600 transition-[width] ease-in-out duration-200"
+    class="overflow-hidden w-full bg-gray-600 transition-[width] ease-out duration-200"
     :class="{
       'lg:w-[18rem]': !searchStore.GetShowingStatus(convoId),
       'lg:w-[26rem]': searchStore.GetShowingStatus(convoId),

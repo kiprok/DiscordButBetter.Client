@@ -262,8 +262,8 @@ async function GenRandomMessage() {
         </div>
       </div>
       <div
-        class="w-full h-full absolute transition-transform ease-in-out lg:static lg:transition-none
-          lg:translate-x-0 lg:flex-none bg-gray-600 lg:flex lg:w-[22rem]"
+        class="w-full h-full absolute transition-transform ease-out lg:static lg:transition-none lg:translate-x-0
+          lg:flex-none bg-gray-600 lg:flex lg:w-[22rem]"
         :class="{ 'translate-x-full': !sidePanelView }">
         <div>
           <simple-button :disabled="_addingUsers" @click="GenUsers">add users</simple-button>
