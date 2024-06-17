@@ -1,5 +1,6 @@
 <script setup>
 import ChatSideMenu from '@/components/sideMenus/ChatSideMenu.vue';
+import ContextModal from '@/components/modals/ContextModal.vue';
 </script>
 
 <template>
@@ -7,4 +8,5 @@ import ChatSideMenu from '@/components/sideMenus/ChatSideMenu.vue';
     <ChatSideMenu />
     <router-view />
   </div>
+  <context-modal />
 </template>

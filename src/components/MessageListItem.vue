@@ -5,17 +5,21 @@ import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import { escapeHtml, parseMarkdownMessage, parseMarkdownReply } from '@/composables/markdown.js';
 import ContextModal from '@/components/modals/ContextModal.vue';
+import ChatMessageItemContent from '@/components/modals/contextMenuContents/ChatMessageItemContent.vue';
 import TouchComponentHold from '@/components/touch/TouchComponentHold.vue';
+import {
+  EditChatMessage,
+  RemoveChatMessage,
+  ReplyToChatMessage,
+} from '@/composables/commands/chatMessageCommands.js';
+import { useContextMenuStore } from '@/stores/contextModal.js';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner', 'tag']);
 const userStore = useUserStore();
-const conversationStore = useConversationStore();
-const sendMessageStore = useSendingMessageStore();
+const contextMenuStore = useContextMenuStore();
 
 const refTextMessage = ref();
-const showContextMenu = ref(false);
-
 const timeSend = new Date(props.message.timeSend);
 
 const reply = computed(() => {
@@ -41,60 +45,21 @@ onUnmounted(() => {
   emits('OnMountChange', props.message, -1);
 });
 
-function RemoveChatMessage() {
-  userStore.DeleteMessage(props.message.messageId);
-  conversationStore.DeleteMessage(props.message.convoId, props.message.messageId);
-
-  showContextMenu.value = false;
-}
-
-function ReplyToMessage() {
-  sendMessageStore.replyTo = userStore.GetMessageById(props.message.messageId);
-  let chatInput = document.querySelector('#chat-input');
-  if (chatInput) {
-    chatInput.focus();
-  }
-
-  showContextMenu.value = false;
-}
-
-function EditMessage() {
-  sendMessageStore.EditMessage(props.message);
-  let chatInput = document.querySelector('#chat-input');
-  if (chatInput) {
-    chatInput.focus();
-  }
-
-  showContextMenu.value = false;
+function OpenContextMenu() {
+  contextMenuStore.OpenContextMenu(ChatMessageItemContent, {
+    message: props.message,
+    allowedFunctions: props.allowedFunctions,
+    convoId: props.message.convoId,
+  });
 }
 </script>
 
 <template>
   <touch-component-hold
-    @held="showContextMenu = true"
+    @held="OpenContextMenu"
     :tag="tag ? tag : 'div'"
     class="group/item flex flex-col w-full"
     :class="{ 'mt-2': !previousAlsoOwner }">
-    <context-modal v-model="showContextMenu" header="Options">
-      <button
-        @click="ReplyToMessage"
-        v-if="allowedFunctions.allowReply"
-        class="w-full py-4 text-xl text-white hover:bg-gray-700">
-        Reply
-      </button>
-      <button
-        @click="EditMessage"
-        class="w-full py-4 text-xl text-white hover:bg-gray-700"
-        v-if="props.message.senderId === userStore.myId && allowedFunctions.allowEdit">
-        Edit
-      </button>
-      <button
-        @click="RemoveChatMessage"
-        class="w-full py-4 text-xl text-white hover:bg-gray-700"
-        v-if="props.message.senderId === userStore.myId && allowedFunctions.allowDelete">
-        Delete
-      </button>
-    </context-modal>
     <div class="pl-6 h-5 flex flex-row items-end truncate overflow-hidden w-full" v-if="reply">
       <div class="flex-none h-3 w-8 rounded-tl border border-b-0 border-r-0 border-black"></div>
       <img
@@ -152,19 +117,19 @@ function EditMessage() {
       class="absolute -top-5 right-0 h-8 items-center p-1 opacity-0 duration-300 flex
         mouse:group-hover/item:opacity-100 touch:hidden group-hover/item:ease-in-out">
       <button
-        @click.stop="ReplyToMessage"
+        @click.stop="ReplyToChatMessage(props.message)"
         v-if="allowedFunctions.allowReply"
         class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700">
         <i class="fa-solid fa-reply"></i>
       </button>
       <button
-        @click.stop="EditMessage"
+        @click.stop="EditChatMessage(props.message)"
         class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700"
         v-if="props.message.senderId === userStore.myId && allowedFunctions.allowEdit">
         <i class="fa-solid fa-pen-to-square"></i>
       </button>
       <button
-        @click.stop="RemoveChatMessage"
+        @click.stop="RemoveChatMessage(props.message.convoId, props.message.messageId)"
         class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700"
         v-if="props.message.senderId === userStore.myId && allowedFunctions.allowDelete">
         <i class="fa-solid fa-delete-left"></i>

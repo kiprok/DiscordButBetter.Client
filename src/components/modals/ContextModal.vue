@@ -1,28 +1,21 @@
 <script setup>
-const show = defineModel({
-  type: Boolean,
-  default: false,
-});
-
-const props = defineProps({
-  header: String,
-});
+import { useContextMenuStore } from '@/stores/contextModal.js';
+const contextMenuStore = useContextMenuStore();
 </script>
 
 <template>
   <teleport to="#modal">
     <transition name="show-modal">
       <div
-        v-if="show"
+        v-if="contextMenuStore.ShowContextMenu"
         class="w-screen h-dvh bg-black/70 flex flex-col items-center justify-end overflow-hidden"
-        @click="show = false">
+        @click="contextMenuStore.ShowContextMenu = false">
         <div
           class="center relative text-white bg-gray-600 flex flex-col rounded-t-lg px-4 py-8 w-full max-w-96 min-h-0
             min-w-0 h-fit max-h-full"
           @click.stop>
-          <h2 class="text-3xl">{{ header }}</h2>
           <div class="border-b-2 border-gray-700 my-4" />
-          <slot></slot>
+          <component :is="contextMenuStore.contextMenuType ?? 'div'" />
         </div>
       </div>
     </transition>

@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 
-const props = defineProps(['tag']);
+const props = defineProps(['tag', 'backClasses']);
 const emit = defineEmits(['held']);
 
 const timeTouchHold = ref(-1);
@@ -15,11 +15,7 @@ function onPointerDown(event) {
 
 function onPointerUp(event) {
   if (event.pointerType !== 'touch') return;
-  if (timeTouchHold.value !== -1 && Date.now() - timeTouchHold.value > 500) {
-    timeTouchHold.value = -1;
-  } else {
-    timeTouchHold.value = -1;
-  }
+  timeTouchHold.value = -1;
 }
 
 function onPointerMove(event) {
@@ -31,15 +27,6 @@ function onContextMenu(event) {
   if (isTouch.value) {
     event.preventDefault();
     emit('held');
-    if (window.getSelection) {
-      if (window.getSelection().empty) {
-        window.getSelection().empty();
-      } else if (window.getSelection().removeAllRanges) {
-        window.getSelection().removeAllRanges();
-      }
-    } else if (document.selection) {
-      document.selection.empty();
-    }
   }
 }
 </script>
@@ -57,6 +44,7 @@ function onContextMenu(event) {
         class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-0 bg-black/30 duration-100"
         :class="{
           '!size-full transition-all ease-linear delay-200 !duration-300': timeTouchHold !== -1,
+          ...backClasses,
         }" />
     </span>
     <slot />

@@ -5,6 +5,8 @@ import { useRoute, useRouter } from 'vue-router';
 import NotificationBadge from '@/components/NotificationBadge.vue';
 import UserProfilePicture from '@/components/UserProfilePicture.vue';
 import { useChatLeftSideMenuStore } from '@/stores/chatLeftSideMenu.js';
+import TouchComponentHold from '@/components/touch/TouchComponentHold.vue';
+import ContextModal from '@/components/modals/ContextModal.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -37,7 +39,7 @@ async function CloseConversation(convoId) {
       </div>
       <div class="flex grow flex-col overflow-auto bg-gray-500 px-2">
         <router-link
-          class="router-link flex items-center"
+          class="router-link flex items-center p-4"
           @click="ToggleSideMenu"
           :to="{ name: 'friendList' }">
           <span>Friends</span>
@@ -58,7 +60,10 @@ async function CloseConversation(convoId) {
             class="router-link group"
             :to="{ name: 'chat', params: { id: convo.convoId } }"
             @click="ToggleSideMenu">
-            <div class="min-w-0 size-full flex flex-row flex-nowrap items-center gap-2">
+            <touch-component-hold
+              class="p-2 min-w-0 size-full flex flex-row flex-nowrap items-center gap-2"
+              tag="div"
+              :back-classes="{ 'rounded-lg': true }">
               <img
                 :src="convo.convoPicture"
                 v-if="convo.convoType === 1"
@@ -78,12 +83,12 @@ async function CloseConversation(convoId) {
                     conversationStore.GetConversationById(convo.convoId).newUnseenMessages.length
                   " />
                 <button
-                  class="size-fit flex-none hover:text-gray-400 sm:hidden group-hover:block"
+                  class="size-fit flex-none hover:text-gray-400 sm:hidden touch:hidden mouse:group-hover:block"
                   @click.stop.prevent="CloseConversation(convo.convoId)">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
-            </div>
+            </touch-component-hold>
           </router-link>
         </transition-group>
       </div>
@@ -103,7 +108,7 @@ async function CloseConversation(convoId) {
 
 <style scoped>
 .router-link {
-  @apply rounded-lg px-4 py-2 text-xl text-white transition-colors ease-in-out hover:bg-black/30;
+  @apply rounded-lg text-xl text-white transition-colors ease-in-out hover:bg-black/30;
 }
 
 .router-link-exact-active {
