@@ -7,6 +7,8 @@ import UserProfilePicture from '@/components/UserProfilePicture.vue';
 import { useChatLeftSideMenuStore } from '@/stores/chatLeftSideMenu.js';
 import TouchComponentHold from '@/components/touch/TouchComponentHold.vue';
 import ContextModal from '@/components/modals/ContextModal.vue';
+import { useContextMenuStore } from '@/stores/contextModal.js';
+import ConversationItemContent from '@/components/modals/contextMenuContents/ConversationItemContent.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -14,6 +16,7 @@ const router = useRouter();
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const chatLeftSideMenuStore = useChatLeftSideMenuStore();
+const contextMenuStore = useContextMenuStore();
 
 function ToggleSideMenu() {
   chatLeftSideMenuStore.toggleLeftSideMenu();
@@ -63,7 +66,14 @@ async function CloseConversation(convoId) {
             <touch-component-hold
               class="p-2 min-w-0 size-full flex flex-row flex-nowrap items-center gap-2"
               tag="div"
-              :back-classes="{ 'rounded-lg': true }">
+              :back-classes="{ 'rounded-lg': true }"
+              @held="
+                () => {
+                  contextMenuStore.OpenContextMenu(ConversationItemContent, {
+                    convoId: convo.convoId,
+                  });
+                }
+              ">
               <img
                 :src="convo.convoPicture"
                 v-if="convo.convoType === 1"
