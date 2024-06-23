@@ -1,17 +1,19 @@
 <script setup>
-import { useContextMenuStore } from '@/stores/contextModal.js';
+import { useModalStore } from '@/stores/modalStore.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import { ReplyToChatMessage } from '@/composables/commands/chatMessageCommands.js';
 import { useRoute, useRouter } from 'vue-router';
 
+const props = defineProps(['modalName', 'modalArguments']);
+
 const router = useRouter();
 const route = useRoute();
-const contextMenuStore = useContextMenuStore();
+const modalStore = useModalStore();
 const conversationStore = useConversationStore();
 
 async function CloseConversation() {
-  conversationStore.RemoveVisibleConversation(contextMenuStore.contextMenuArguments.convoId);
-  if (route.params.id === contextMenuStore.contextMenuArguments.convoId) {
+  conversationStore.RemoveVisibleConversation(props.modalArguments.convoId);
+  if (route.params.id === props.modalArguments.convoId) {
     await router.push({ name: 'friendList' });
   }
 }
@@ -22,7 +24,7 @@ async function CloseConversation() {
     @click="
       () => {
         CloseConversation();
-        contextMenuStore.ShowContextMenu = false;
+        modalStore.CloseModal(modalName);
       }
     "
     class="w-full py-4 text-xl text-white hover:bg-gray-700">

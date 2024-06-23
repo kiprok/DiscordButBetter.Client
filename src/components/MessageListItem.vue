@@ -12,12 +12,12 @@ import {
   RemoveChatMessage,
   ReplyToChatMessage,
 } from '@/composables/commands/chatMessageCommands.js';
-import { useContextMenuStore } from '@/stores/contextModal.js';
+import { useModalStore } from '@/stores/modalStore.js';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner', 'tag']);
 const userStore = useUserStore();
-const contextMenuStore = useContextMenuStore();
+const modalStore = useModalStore();
 
 const refTextMessage = ref();
 const timeSend = new Date(props.message.timeSend);
@@ -46,7 +46,7 @@ onUnmounted(() => {
 });
 
 function OpenContextMenu() {
-  contextMenuStore.OpenContextMenu(ChatMessageItemContent, {
+  modalStore.OpenModal('contextMenu', ChatMessageItemContent, {
     message: props.message,
     allowedFunctions: props.allowedFunctions,
     convoId: props.message.convoId,

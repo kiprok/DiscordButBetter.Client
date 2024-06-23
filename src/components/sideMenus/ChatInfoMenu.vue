@@ -4,8 +4,9 @@ import MessageListItem from '@/components/MessageListItem.vue';
 import { useSearchStore } from '@/stores/search.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import { useUserStore } from '@/stores/user.js';
-import UserProfilePicture from '@/components/UserProfilePicture.vue';
+import UserProfilePicture from '@/components/user/UserProfilePicture.vue';
 import PaginationAnimation from '@/components/animations/PaginationAnimation.vue';
+import UserProfile from '@/components/user/UserProfile.vue';
 
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
@@ -101,48 +102,18 @@ const props = defineProps(['convoId']);
         </ul>
       </div>
       <div
-        class="size-full flex flex-col"
+        class="size-full"
         v-else-if="conversationStore.GetConversationById(convoId).convoType === 0">
-        <div class="relative flex-none w-full min-h-28 bg-blue-200">
-          <user-profile-picture
-            :user="
-              userStore.GetUserById(
-                conversationStore
-                  .GetConversationById(convoId)
-                  ?.participants.find((x) => x !== userStore.myId),
-              )
-            "
-            class="size-16 ml-4 absolute -bottom-4 left-0 rounded-full border-4 border-gray-700" />
-        </div>
-        <div class="overflow-y-auto mt-6 mx-2 p-2 text-white rounded-lg bg-gray-800">
-          <h2 class="font-bold text-lg">
-            {{
-              userStore.GetUserById(
-                conversationStore
-                  .GetConversationById(convoId)
-                  ?.participants.find((x) => x !== userStore.myId),
-              )?.userName
-            }}
-          </h2>
-          <span class="text-xs">{{
+        <user-profile
+          :conversation="conversationStore.GetConversationById(convoId)"
+          :user="
             userStore.GetUserById(
               conversationStore
                 .GetConversationById(convoId)
                 ?.participants.find((x) => x !== userStore.myId),
-            )?.statusMessage
-          }}</span>
-          <div class="w-full h-0.5 bg-gray-700 my-2" />
-          <h3 class="font-bold text-sm uppercase">about me</h3>
-          <span class="whitespace-pre-wrap text-sm">
-            {{
-              userStore.GetUserById(
-                conversationStore
-                  .GetConversationById(convoId)
-                  ?.participants.find((x) => x !== userStore.myId),
-              )?.biography
-            }}
-          </span>
-        </div>
+            )
+          "
+          class="size-full" />
       </div>
     </div>
   </div>

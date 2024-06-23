@@ -1,5 +1,5 @@
 <script setup>
-import { useContextMenuStore } from '@/stores/contextModal.js';
+import { useModalStore } from '@/stores/modalStore.js';
 import {
   RemoveChatMessage,
   EditChatMessage,
@@ -7,50 +7,53 @@ import {
 } from '@/composables/commands/chatMessageCommands.js';
 import { useUserStore } from '@/stores/user.js';
 
-const contextMenuStore = useContextMenuStore();
+const modalStore = useModalStore();
 const userStore = useUserStore();
+
+const props = defineProps(['modalName', 'modalArguments']);
+
+console.log(props.modalArguments);
+console.log(props.modalArguments.allowedFunctions);
+console.log(props.modalName);
 </script>
 
 <template>
   <button
     @click="
       () => {
-        ReplyToChatMessage(contextMenuStore.contextMenuArguments.message);
-        contextMenuStore.ShowContextMenu = false;
+        ReplyToChatMessage(modalArguments.message);
+        modalStore.CloseModal(modalName);
       }
     "
-    v-if="contextMenuStore.contextMenuArguments.allowedFunctions.allowReply"
+    v-if="modalArguments.allowedFunctions.allowReply"
     class="w-full py-4 text-xl text-white hover:bg-gray-700">
     Reply
   </button>
   <button
     @click="
       () => {
-        EditChatMessage(contextMenuStore.contextMenuArguments.message);
-        contextMenuStore.ShowContextMenu = false;
+        EditChatMessage(modalArguments.message);
+        modalStore.CloseModal(modalName);
       }
     "
     class="w-full py-4 text-xl text-white hover:bg-gray-700"
     v-if="
-      contextMenuStore.contextMenuArguments.message.senderId === userStore.myId &&
-      contextMenuStore.contextMenuArguments.allowedFunctions.allowEdit
+      modalArguments.message.senderId === userStore.myId &&
+      modalArguments.allowedFunctions.allowEdit
     ">
     Edit
   </button>
   <button
     @click="
       () => {
-        RemoveChatMessage(
-          contextMenuStore.contextMenuArguments.convoId,
-          contextMenuStore.contextMenuArguments.message.messageId,
-        );
-        contextMenuStore.ShowContextMenu = false;
+        RemoveChatMessage(modalArguments.convoId, modalArguments.message.messageId);
+        modalStore.CloseModal(modalName);
       }
     "
     class="w-full py-4 text-xl text-white hover:bg-gray-700"
     v-if="
-      contextMenuStore.contextMenuArguments.message.senderId === userStore.myId &&
-      contextMenuStore.contextMenuArguments.allowedFunctions.allowDelete
+      modalArguments.message.senderId === userStore.myId &&
+      modalArguments.allowedFunctions.allowDelete
     ">
     Delete
   </button>

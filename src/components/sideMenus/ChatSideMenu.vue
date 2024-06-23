@@ -3,12 +3,13 @@ import { useUserStore } from '@/stores/user.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import { useRoute, useRouter } from 'vue-router';
 import NotificationBadge from '@/components/NotificationBadge.vue';
-import UserProfilePicture from '@/components/UserProfilePicture.vue';
+import UserProfilePicture from '@/components/user/UserProfilePicture.vue';
 import { useChatLeftSideMenuStore } from '@/stores/chatLeftSideMenu.js';
 import TouchComponentHold from '@/components/touch/TouchComponentHold.vue';
 import ContextModal from '@/components/modals/ContextModal.vue';
-import { useContextMenuStore } from '@/stores/contextModal.js';
+import { useModalStore } from '@/stores/modalStore.js';
 import ConversationItemContent from '@/components/modals/contextMenuContents/ConversationItemContent.vue';
+import UserItemFullDetail from '@/components/user/UserItemFullDetail.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -16,7 +17,7 @@ const router = useRouter();
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const chatLeftSideMenuStore = useChatLeftSideMenuStore();
-const contextMenuStore = useContextMenuStore();
+const modalStore = useModalStore();
 
 function ToggleSideMenu() {
   chatLeftSideMenuStore.toggleLeftSideMenu();
@@ -69,23 +70,21 @@ async function CloseConversation(convoId) {
               :back-classes="{ 'rounded-lg': true }"
               @held="
                 () => {
-                  contextMenuStore.OpenContextMenu(ConversationItemContent, {
+                  modalStore.OpenModal('contextMenu', ConversationItemContent, {
                     convoId: convo.convoId,
                   });
                 }
               ">
-              <img
-                :src="convo.convoPicture"
-                v-if="convo.convoType === 1"
-                alt="pfp"
-                class="size-10 flex-none rounded-full" />
-              <user-profile-picture
+              <div class="flex" v-if="convo.convoType === 1">
+                <img :src="convo.convoPicture" alt="pfp" class="size-10 flex-none rounded-full" />
+                <span class="truncate">{{ convo.convoName }}</span>
+              </div>
+              <user-item-full-detail
                 v-else
                 :user="
                   userStore.GetUserById(convo.participants.find((user) => user !== userStore.myId))
                 "
-                class="size-10 flex-none" />
-              <span class="truncate">{{ convo.convoName }}</span>
+                class="flex" />
               <div class="ml-auto flex-none flex items-center gap-2 size-fit">
                 <notification-badge
                   class="flex-none size-5 text-sm"
@@ -102,15 +101,13 @@ async function CloseConversation(convoId) {
           </router-link>
         </transition-group>
       </div>
-      <div class="mt-auto h-14 w-full flex-none bg-gray-800">
-        <div class="flex h-full w-full flex-row flex-nowrap items-center gap-2">
-          <user-profile-picture
-            :user="userStore.GetUserById(userStore.myId)"
-            class="size-10 flex-none" />
-          <span class="text-xl text-white">{{
-            userStore.GetUserById(userStore.myId)?.userName
-          }}</span>
-        </div>
+      <div class="mt-auto h-14 w-full flex items-center flex-none bg-gray-800">
+        <user-item-full-detail
+          :user="userStore.GetUserById(userStore.myId)"
+          class="text-white hover:bg-white/30 hover:cursor-pointer rounded-lg p-1 select-none" />
+        <button class="ml-auto text-2xl p-2 text-white hover:text-gray-300 flex-none">
+          <i class="fa-solid fa-cog" />
+        </button>
       </div>
     </div>
   </div>
