@@ -2,6 +2,7 @@
 import ChatSideMenu from '@/components/sideMenus/ChatSideMenu.vue';
 import ContextModal from '@/components/modals/ContextModal.vue';
 import AddFriendModal from '@/components/modals/AddFriendModal.vue';
+import UserProfileModal from '@/components/modals/UserProfileModal.vue';
 </script>
 
 <template>
@@ -11,4 +12,5 @@ import AddFriendModal from '@/components/modals/AddFriendModal.vue';
   </div>
   <context-modal />
   <add-friend-modal />
+  <user-profile-modal />
 </template>

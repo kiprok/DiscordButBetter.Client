@@ -7,7 +7,7 @@ export const useModalStore = defineStore('modal', () => {
   function RegisterModal(name) {
     modals[name] = {
       modalIsShowing: ref(false),
-      modalArguments: ref(null),
+      modalArguments: shallowRef(null),
     };
   }
 

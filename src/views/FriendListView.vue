@@ -225,17 +225,20 @@ async function GenRandomMessage() {
                   v-for="(listItem, index) in sortingMethods[sortMethodSelected]()"
                   :key="listItem.userId"
                   class="border-t-2 py-1 border-gray-400 min-w-0 w-full">
-                  <friend-list-user-item :user="listItem">
+                  <friend-list-user-item
+                    :user="listItem"
+                    @click="modalStore.OpenModal('userProfile', { user: listItem })"
+                    class="hover:cursor-pointer">
                     <div
                       v-if="['online', 'all', 'offline', 'search'].includes(sortMethodSelected)"
                       class="ml-auto h-full flex flex-row gap-2">
                       <friend-list-item-button
-                        @click="OpenConversation(listItem.userId)"
+                        @click.stop="OpenConversation(listItem.userId)"
                         class="hover:text-white">
                         <i class="fa-solid fa-comment"></i>
                       </friend-list-item-button>
                       <friend-list-item-button
-                        @click="userStore.RemoveFriend(listItem.userId)"
+                        @click.stop="userStore.RemoveFriend(listItem.userId)"
                         class="hover:text-red-500">
                         <i class="fa-solid fa-xmark"></i>
                       </friend-list-item-button>
@@ -245,12 +248,12 @@ async function GenRandomMessage() {
                       class="ml-auto h-full flex flex-row gap-2">
                       <friend-list-item-button
                         class="hover:text-green-500"
-                        @click="userStore.AcceptFriendRequest(listItem.userId)">
+                        @click.stop="userStore.AcceptFriendRequest(listItem.userId)">
                         <i class="fa-solid fa-check"></i>
                       </friend-list-item-button>
                       <friend-list-item-button
                         class="hover:text-red-500"
-                        @click="userStore.RejectFriendRequest(listItem.userId)">
+                        @click.stop="userStore.RejectFriendRequest(listItem.userId)">
                         <i class="fa-solid fa-xmark"></i>
                       </friend-list-item-button>
                     </div>

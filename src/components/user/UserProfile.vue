@@ -1,7 +1,7 @@
 <script setup>
 import UserProfilePicture from '@/components/user/UserProfilePicture.vue';
 
-const props = defineProps(['conversation', 'user']);
+const props = defineProps(['user']);
 </script>
 
 <template>

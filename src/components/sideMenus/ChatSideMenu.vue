@@ -105,7 +105,10 @@ async function CloseConversation(convoId) {
       <div class="mt-auto h-14 w-full flex items-center flex-none bg-gray-800">
         <user-item-full-detail
           :user="userStore.GetUserById(userStore.myId)"
-          class="text-white hover:bg-white/30 hover:cursor-pointer rounded-lg p-1 select-none" />
+          class="text-white hover:bg-white/30 hover:cursor-pointer rounded-lg p-1 select-none"
+          @click="
+            modalStore.OpenModal('userProfile', { user: userStore.GetUserById(userStore.myId) })
+          " />
         <button class="ml-auto text-2xl p-2 text-white hover:text-gray-300 flex-none">
           <i class="fa-solid fa-cog" />
         </button>

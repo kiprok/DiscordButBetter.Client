@@ -24,9 +24,6 @@ function onPointerMove(event) {
 }
 
 function onContextMenu(event) {
-  console.log(event.type);
-  console.log(event instanceof PointerEvent);
-  console.log(event);
   if (isTouch.value) {
     event.preventDefault();
     emit('held');

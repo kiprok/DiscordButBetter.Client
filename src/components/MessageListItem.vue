@@ -83,8 +83,13 @@ function OpenContextMenu() {
         <img
           :src="userStore.GetUserById(props.message.senderId).profilePicture"
           alt="profile picture"
-          class="size-full h-10 rounded-full"
-          v-if="!previousAlsoOwner" />
+          class="size-full h-10 rounded-full hover:cursor-pointer"
+          v-if="!previousAlsoOwner"
+          @click="
+            modalStore.OpenModal('userProfile', {
+              user: userStore.GetUserById(props.message.senderId),
+            })
+          " />
         <div v-if="previousAlsoOwner" class="flex h-6 items-center justify-center">
           <span class="invisible text-xs group-hover/item:visible">
             {{
