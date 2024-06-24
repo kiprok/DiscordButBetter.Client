@@ -70,7 +70,8 @@ async function CloseConversation(convoId) {
               :back-classes="{ 'rounded-lg': true }"
               @held="
                 () => {
-                  modalStore.OpenModal('contextMenu', ConversationItemContent, {
+                  modalStore.OpenModal('contextMenu', {
+                    componentType: ConversationItemContent,
                     convoId: convo.convoId,
                   });
                 }

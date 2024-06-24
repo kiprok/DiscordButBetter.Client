@@ -46,7 +46,8 @@ onUnmounted(() => {
 });
 
 function OpenContextMenu() {
-  modalStore.OpenModal('contextMenu', ChatMessageItemContent, {
+  modalStore.OpenModal('contextMenu', {
+    componentType: ChatMessageItemContent,
     message: props.message,
     allowedFunctions: props.allowedFunctions,
     convoId: props.message.convoId,

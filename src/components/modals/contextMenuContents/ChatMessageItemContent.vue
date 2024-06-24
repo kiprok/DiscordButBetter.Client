@@ -11,10 +11,6 @@ const modalStore = useModalStore();
 const userStore = useUserStore();
 
 const props = defineProps(['modalName', 'modalArguments']);
-
-console.log(props.modalArguments);
-console.log(props.modalArguments.allowedFunctions);
-console.log(props.modalName);
 </script>
 
 <template>

@@ -20,7 +20,7 @@ modalStore.RegisterModal(modalName);
           @click.stop>
           <div class="border-b-2 border-gray-700 my-4" />
           <component
-            :is="modalStore.GetModalType(modalName) ?? 'div'"
+            :is="modalStore.GetModalArguments(modalName).componentType ?? 'div'"
             :modal-Name="modalName"
             :modal-arguments="modalStore.GetModalArguments(modalName)" />
         </div>

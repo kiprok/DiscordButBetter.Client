@@ -4,40 +4,45 @@ import FriendListUserItem from '@/components/FriendListUserItem.vue';
 import { useUserStore } from '@/stores/user.js';
 import FriendListItemButton from '@/components/FriendListItemButton.vue';
 import DefaultListAnimation from '@/components/animations/DefaultListAnimation.vue';
+import { useModalStore } from '@/stores/modalStore.js';
 
 const userStore = useUserStore();
-
-const show = defineModel({
-  type: Boolean,
-  default: false,
-});
+const modalStore = useModalStore();
 
 const inputBox = ref();
 const searchQuery = ref('');
 
-watch(show, (value) => {
-  nextTick(() => {
-    searchQuery.value = '';
+const modalName = 'addFriend';
 
-    if (value) {
-      inputBox.value.focus();
-    }
-  });
-});
+modalStore.RegisterModal(modalName);
+
+watch(
+  () => modalStore.GetModalShowStatus(modalName),
+  () => {
+    nextTick(() => {
+      searchQuery.value = '';
+      if (modalStore.GetModalShowStatus(modalName)) {
+        inputBox.value.focus();
+      }
+    });
+  },
+);
 </script>
 
 <template>
   <teleport to="#modal">
     <transition name="show-modal">
       <div
-        v-if="show"
+        v-if="modalStore.GetModalShowStatus(modalName)"
         class="w-screen h-dvh bg-black/70 flex items-center justify-center overflow-hidden"
-        @click="show = false">
+        @click="modalStore.CloseModal(modalName)">
         <div
           class="center relative text-white bg-gray-600 flex flex-col rounded-lg px-4 py-8 w-[40rem] min-h-0 min-w-0
             h-96 max-h-full md:mx-4"
           @click.stop>
-          <button @click="show = false" class="absolute top-0 right-2 hover:text-gray-500">
+          <button
+            @click="modalStore.CloseModal(modalName)"
+            class="absolute top-0 right-2 hover:text-gray-500">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
           <input

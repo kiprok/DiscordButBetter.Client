@@ -1,6 +1,7 @@
 <script setup>
 import ChatSideMenu from '@/components/sideMenus/ChatSideMenu.vue';
 import ContextModal from '@/components/modals/ContextModal.vue';
+import AddFriendModal from '@/components/modals/AddFriendModal.vue';
 </script>
 
 <template>
@@ -9,4 +10,5 @@ import ContextModal from '@/components/modals/ContextModal.vue';
     <router-view />
   </div>
   <context-modal />
+  <add-friend-modal />
 </template>

@@ -2,7 +2,7 @@
 import ChatTopBar from '@/components/ChatTopBar.vue';
 import { useUserStore } from '@/stores/user.js';
 import SimpleButton from '@/components/SimpleButton.vue';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import {
   GenerateUser,
   GenerateConversation,
@@ -15,19 +15,20 @@ import FriendListUserItem from '@/components/FriendListUserItem.vue';
 import FriendListItemButton from '@/components/FriendListItemButton.vue';
 import NotificationBadge from '@/components/NotificationBadge.vue';
 import { useRouter } from 'vue-router';
-import AddFriendModal from '@/components/modals/AddFriendModal.vue';
 import DefaultListAnimation from '@/components/animations/DefaultListAnimation.vue';
 import PaginationAnimation from '@/components/animations/PaginationAnimation.vue';
+import { useModalStore } from '@/stores/modalStore.js';
 
 document.title = 'Friends';
 
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
+const modalStore = useModalStore();
+
 const router = useRouter();
 
 const radioSortMethodSelected = ref('online');
 const searchText = ref('');
-const showAddFriendModal = ref(false);
 
 const sortMethodSelected = computed(() => {
   if (searchText.value !== '') return 'search';
@@ -165,7 +166,7 @@ async function GenRandomMessage() {
       <chat-left-side-menu-button />
       <h1 class="block text-3xl font-bold text-white">Friends</h1>
       <button
-        @click="showAddFriendModal = true"
+        @click="modalStore.OpenModal('addFriend')"
         class="flex text-lg px-1 text-white bg-green-600 hover:bg-green-700 items-center gap-1">
         <i class="fa-solid fa-user-large"></i>
         <span class="hidden sm:inline-block">Add Friend</span>
@@ -173,7 +174,6 @@ async function GenRandomMessage() {
           <i class="fa-solid fa-plus"></i>
         </span>
       </button>
-      <AddFriendModal v-model="showAddFriendModal" />
       <button
         @click="sidePanelView = !sidePanelView"
         class="ml-auto block text-lg text-white hover:text-gray-200 lg:hidden">
