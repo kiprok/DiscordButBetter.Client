@@ -10,9 +10,25 @@ import UserProfile from '@/components/user/UserProfile.vue';
 const userStore = useUserStore();
 const modalStore = useModalStore();
 
+const containerRef = ref();
+
 const modalName = 'userProfile';
 
 modalStore.RegisterModal(modalName);
+
+watch(
+  () => modalStore.GetModalShowStatus(modalName),
+  (value) => {
+    nextTick(() => {
+      let boundingRect = modalStore.GetModalArguments(modalName)?.anchor?.getBoundingClientRect();
+      if (boundingRect) {
+        containerRef.value.style.position = 'fixed';
+        containerRef.value.style.bottom = `${Math.ceil(screen.height - boundingRect.top)}px`;
+        containerRef.value.style.left = `${boundingRect.left}px`;
+      }
+    });
+  },
+);
 </script>
 
 <template>
@@ -23,8 +39,9 @@ modalStore.RegisterModal(modalName);
         class="w-screen h-dvh bg-black/70 flex items-center justify-center overflow-hidden"
         @click="modalStore.CloseModal(modalName)">
         <div
-          class="max-h-full min-w-0 max-w-full md:mx-4 bg-gray-600 w-96 pb-4 rounded-lg overflow-hidden"
-          @click.stop>
+          class="max-h-full min-w-0 max-w-full bg-gray-600 w-96 pb-4 rounded-lg overflow-hidden"
+          @click.stop
+          ref="containerRef">
           <user-profile :user="modalStore.GetModalArguments(modalName).user" />
         </div>
       </div>

@@ -10,6 +10,7 @@ import ContextModal from '@/components/modals/ContextModal.vue';
 import { useModalStore } from '@/stores/modalStore.js';
 import ConversationItemContent from '@/components/modals/contextMenuContents/ConversationItemContent.vue';
 import UserItemFullDetail from '@/components/user/UserItemFullDetail.vue';
+import { ref } from 'vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -18,6 +19,8 @@ const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const chatLeftSideMenuStore = useChatLeftSideMenuStore();
 const modalStore = useModalStore();
+
+const userAnchorRef = ref();
 
 function ToggleSideMenu() {
   chatLeftSideMenuStore.toggleLeftSideMenu();
@@ -102,12 +105,16 @@ async function CloseConversation(convoId) {
           </router-link>
         </transition-group>
       </div>
-      <div class="mt-auto h-14 w-full flex items-center flex-none bg-gray-800">
+      <div class="mt-auto h-14 w-full flex items-center flex-none bg-gray-800" ref="userAnchorRef">
         <user-item-full-detail
           :user="userStore.GetUserById(userStore.myId)"
           class="text-white hover:bg-white/30 hover:cursor-pointer rounded-lg p-1 select-none"
           @click="
-            modalStore.OpenModal('userProfile', { user: userStore.GetUserById(userStore.myId) })
+            (event) =>
+              modalStore.OpenModal('userProfile', {
+                user: userStore.GetUserById(userStore.myId),
+                anchor: userAnchorRef,
+              })
           " />
         <button class="ml-auto text-2xl p-2 text-white hover:text-gray-300 flex-none">
           <i class="fa-solid fa-cog" />
