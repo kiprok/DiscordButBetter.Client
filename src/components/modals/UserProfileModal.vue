@@ -10,11 +10,13 @@ import UserProfile from '@/components/user/UserProfile.vue';
 const userStore = useUserStore();
 const modalStore = useModalStore();
 
+const contentRef = ref();
 const containerRef = ref();
 
 const modalName = 'userProfile';
 
 modalStore.RegisterModal(modalName);
+//TODO fix max height for user profile modal
 
 watch(
   () => modalStore.GetModalShowStatus(modalName),
@@ -23,8 +25,9 @@ watch(
       let boundingRect = modalStore.GetModalArguments(modalName)?.anchor?.getBoundingClientRect();
       if (boundingRect) {
         containerRef.value.style.position = 'fixed';
-        containerRef.value.style.bottom = `${Math.ceil(screen.height - boundingRect.top)}px`;
+        containerRef.value.style.bottom = `0px`;
         containerRef.value.style.left = `${boundingRect.left}px`;
+        contentRef.value.style.marginBottom = `${screen.height - boundingRect.top}px`;
       }
     });
   },
@@ -36,13 +39,15 @@ watch(
     <transition name="show-modal">
       <div
         v-if="modalStore.GetModalShowStatus(modalName)"
-        class="w-screen h-dvh bg-black/70 flex items-center justify-center overflow-hidden"
+        class="w-screen h-dvh bg-black/70 flex items-center justify-center"
         @click="modalStore.CloseModal(modalName)">
-        <div
-          class="max-h-full min-w-0 max-w-full bg-gray-600 w-96 pb-4 rounded-lg overflow-hidden"
-          @click.stop
-          ref="containerRef">
-          <user-profile :user="modalStore.GetModalArguments(modalName).user" />
+        <div ref="containerRef" class="max-h-full max-w-full">
+          <div
+            class="max-h-full max-w-full h-full bg-gray-600 w-96 pb-4 rounded-lg overflow-hidden"
+            @click.stop
+            ref="contentRef">
+            <user-profile :user="modalStore.GetModalArguments(modalName).user" />
+          </div>
         </div>
       </div>
     </transition>

@@ -5,13 +5,13 @@ const props = defineProps(['user']);
 </script>
 
 <template>
-  <div>
-    <div class="relative flex-none w-full min-h-28 bg-blue-200">
+  <div class="flex flex-col size-full">
+    <div class="relative flex-none min-h-28 bg-blue-200">
       <user-profile-picture
         :user="user"
         class="size-16 ml-4 absolute -bottom-4 left-0 rounded-full border-4 border-gray-700" />
     </div>
-    <div class="overflow-y-auto mt-6 mx-2 p-2 text-white rounded-lg bg-gray-800">
+    <div class="mt-6 mx-2 p-2 min-h-0 grow overflow-y-auto text-white rounded-lg bg-gray-800">
       <h2 class="font-bold text-lg">
         {{ user?.userName }}
       </h2>
