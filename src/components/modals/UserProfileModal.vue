@@ -11,27 +11,67 @@ const userStore = useUserStore();
 const modalStore = useModalStore();
 
 const contentRef = ref();
-const containerRef = ref();
+let mediaQuery = null;
 
 const modalName = 'userProfile';
 
 modalStore.RegisterModal(modalName);
-//TODO fix max height for user profile modal
-
 watch(
   () => modalStore.GetModalShowStatus(modalName),
   (value) => {
-    nextTick(() => {
-      let boundingRect = modalStore.GetModalArguments(modalName)?.anchor?.getBoundingClientRect();
-      if (boundingRect) {
-        containerRef.value.style.position = 'fixed';
-        containerRef.value.style.bottom = `0px`;
-        containerRef.value.style.left = `${boundingRect.left}px`;
-        contentRef.value.style.marginBottom = `${screen.height - boundingRect.top}px`;
+    if (value) {
+      nextTick(() => {
+        let boundingRect = modalStore.GetModalArguments(modalName)?.anchor?.getBoundingClientRect();
+        if (boundingRect) {
+          mediaQuery = window.matchMedia(
+            `(max-height: ${contentRef.value.offsetHeight + screen.height - boundingRect.top}px)`,
+          );
+          mediaQuery.addEventListener('change', MediaEventCallback);
+
+          if (mediaQuery.matches) {
+            SetProfileToSmall();
+          } else {
+            SetProfileToNormal();
+          }
+        }
+      });
+    } else {
+      if (mediaQuery) {
+        mediaQuery.removeEventListener('change', MediaEventCallback);
+        mediaQuery = null;
       }
-    });
+    }
   },
 );
+
+function MediaEventCallback(event) {
+  if (event.matches) {
+    SetProfileToSmall();
+  } else {
+    SetProfileToNormal();
+  }
+}
+
+function SetProfileToNormal() {
+  let boundingRect = modalStore.GetModalArguments(modalName)?.anchor?.getBoundingClientRect();
+  if (!boundingRect) return;
+
+  contentRef.value.style.position = 'absolute';
+  contentRef.value.style.bottom = `${screen.height - boundingRect.top}px`;
+  contentRef.value.style.left = `${boundingRect.left}px`;
+  contentRef.value.style.height = '';
+  contentRef.value.style.overflowY = '';
+}
+
+function SetProfileToSmall() {
+  let boundingRect = modalStore.GetModalArguments(modalName)?.anchor?.getBoundingClientRect();
+  if (!boundingRect) return;
+  contentRef.value.style.position = 'absolute';
+  contentRef.value.style.bottom = '0';
+  contentRef.value.style.left = `${boundingRect.left}px`;
+  contentRef.value.style.height = '100dvh';
+  contentRef.value.style.overflowY = 'auto';
+}
 </script>
 
 <template>
@@ -39,15 +79,14 @@ watch(
     <transition name="show-modal">
       <div
         v-if="modalStore.GetModalShowStatus(modalName)"
-        class="w-screen h-dvh bg-black/70 flex items-center justify-center"
+        class="relative w-screen h-dvh overflow-y-auto flex items-center justify-center"
+        :class="{ 'bg-black/70': !modalStore.GetModalArguments(modalName)?.anchor }"
         @click="modalStore.CloseModal(modalName)">
-        <div ref="containerRef" class="max-h-full max-w-full">
-          <div
-            class="max-h-full max-w-full h-full bg-gray-600 w-96 pb-4 rounded-lg overflow-hidden"
-            @click.stop
-            ref="contentRef">
-            <user-profile :user="modalStore.GetModalArguments(modalName).user" />
-          </div>
+        <div
+          class="max-w-full h-fit overflow-hidden bg-gray-600 w-96 pb-4 rounded-lg"
+          @click.stop
+          ref="contentRef">
+          <user-profile :user="modalStore.GetModalArguments(modalName).user" />
         </div>
       </div>
     </transition>
