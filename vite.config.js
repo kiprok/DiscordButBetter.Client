@@ -21,5 +21,13 @@ export default defineConfig({
   server: {
     host: true,
     https: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
   },
 });
