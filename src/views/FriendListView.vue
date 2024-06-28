@@ -104,6 +104,9 @@ async function GenUsers() {
 }
 
 async function GenFriend() {
+  const responseTest = await fetch('api/weatherforecast');
+  console.log(await responseTest.json());
+
   _addingFriends.value = true;
   let userId = Object.values(userStore.users)[
     Math.floor(Math.random() * Object.keys(userStore.users).length)
