@@ -104,7 +104,14 @@ async function GenUsers() {
 }
 
 async function GenFriend() {
-  const responseTest = await fetch('api/weatherforecast');
+  let responseTest = await fetch('api/users', {
+    method: 'PUT',
+  });
+  console.log(await responseTest.json());
+
+  responseTest = await fetch('api/users', {
+    method: 'GET',
+  });
   console.log(await responseTest.json());
 
   _addingFriends.value = true;
