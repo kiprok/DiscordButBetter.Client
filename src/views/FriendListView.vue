@@ -106,16 +106,6 @@ async function GenUsers() {
 async function GenFriend() {
   _addingFriends.value = true;
 
-  let responseTest = await fetch('api/users', {
-    method: 'POST',
-  });
-  console.log(await responseTest.json());
-
-  responseTest = await fetch('api/users', {
-    method: 'GET',
-  });
-  console.log(await responseTest.json());
-
   let userId = Object.values(userStore.users)[
     Math.floor(Math.random() * Object.keys(userStore.users).length)
   ]?.userId;
