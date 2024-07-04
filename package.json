@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@microsoft/signalr": "^8.0.0",
+    "@microsoft/signalr-protocol-msgpack": "^8.0.0",
     "@vitejs/plugin-basic-ssl": "^1.1.0",
     "highlight.js": "^11.9.0",
     "pinia": "^2.1.7",
