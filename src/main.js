@@ -4,19 +4,41 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
-import FriendListView from '@/views/FriendListView.vue';
-import ChatView from '@/views/ChatView.vue';
-
 const routes = [
   {
     path: '/',
-    component: FriendListView,
-    name: 'friendList',
+    component: import('@/views/LandingPageView.vue'),
+    name: 'landingPage',
   },
   {
-    path: '/chat/:id',
-    component: () => import('@/views/ChatView.vue'),
-    name: 'chat',
+    path: '/login',
+    component: import('@/views/LoginView.vue'),
+    name: 'login',
+  },
+  {
+    path: '/register',
+    component: import('@/views/RegisterView.vue'),
+    name: 'register',
+  },
+  {
+    path: '/app',
+    component: import('@/views/App/ChatAppView.vue'),
+    children: [
+      {
+        path: '',
+        redirect: { name: 'friendList' },
+      },
+      {
+        path: 'chat/:id',
+        component: import('@/views/App/SubViews/ChatView.vue'),
+        name: 'chat',
+      },
+      {
+        path: 'friendList',
+        component: import('@/views/App/SubViews/FriendListView.vue'),
+        name: 'friendList',
+      },
+    ],
   },
 ];
 
