@@ -116,7 +116,9 @@ async function CloseConversation(convoId) {
                 anchor: userAnchorRef,
               })
           " />
-        <button class="ml-auto text-2xl p-2 text-white hover:text-gray-300 flex-none">
+        <button
+          class="ml-auto text-2xl p-2 text-white hover:text-gray-300 flex-none"
+          @click="router.push({ name: 'landingPage' })">
           <i class="fa-solid fa-cog" />
         </button>
       </div>

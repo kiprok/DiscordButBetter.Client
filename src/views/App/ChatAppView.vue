@@ -1,7 +1,5 @@
 <script setup>
 import ChatSideMenu from '@/components/sideMenus/ChatSideMenu.vue';
-import * as signalR from '@microsoft/signalr';
-import { MessagePackHubProtocol } from '@microsoft/signalr-protocol-msgpack';
 
 //
 // const connection = new signalR.HubConnectionBuilder()

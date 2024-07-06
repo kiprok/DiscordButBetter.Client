@@ -1,5 +1,7 @@
 <script setup>
-import ChatSideMenu from '@/components/sideMenus/ChatSideMenu.vue';
+import { useServerStore } from '@/stores/server.js';
+
+const serverStore = useServerStore();
 </script>
 
 <template>
@@ -17,16 +19,32 @@ import ChatSideMenu from '@/components/sideMenus/ChatSideMenu.vue';
     <div
       class="sm:ml-auto mt-4 sm:mt-0 sm:mr-2 hidden peer-checked:flex peer-checked:flex-col sm:!flex-row sm:flex
         sm:items-center sm:justify-evenly">
+      <span v-if="serverStore.user" class="text-sm sm:mr-2">
+        Logged in as {{ serverStore.user.username }}
+      </span>
       <router-link class="router-link" to="/">Home</router-link>
-      <router-link class="router-link" :to="{ name: 'login' }">Login</router-link>
-      <router-link class="router-link" :to="{ name: 'register' }">Register</router-link>
+      <router-link class="router-link" :to="{ name: 'friendList' }" v-if="serverStore.IsLoggedIn">
+        App
+      </router-link>
+      <button
+        class="router-link bg-red-600"
+        v-if="serverStore.IsLoggedIn"
+        @click="serverStore.LogoutAsync()">
+        Logout
+      </button>
+      <router-link class="router-link" :to="{ name: 'login' }" v-if="!serverStore.IsLoggedIn">
+        Login
+      </router-link>
+      <router-link class="router-link" :to="{ name: 'register' }" v-if="!serverStore.IsLoggedIn">
+        Register
+      </router-link>
     </div>
   </header>
 </template>
 
 <style scoped>
 .router-link {
-  @apply p-4 transition-colors ease-in-out hover:bg-black/30;
+  @apply p-2 transition-colors ease-in-out hover:bg-black/30;
 }
 
 .router-link-exact-active {
