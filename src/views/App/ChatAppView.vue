@@ -1,32 +1,20 @@
 <script setup>
 import ChatSideMenu from '@/components/sideMenus/ChatSideMenu.vue';
+import { useServerStore } from '@/stores/server.js';
+import { useRouter } from 'vue-router';
+import { watch } from 'vue';
 
-//
-// const connection = new signalR.HubConnectionBuilder()
-//   .withUrl("/hub?token=94357bd0-f57b-483d-b425-f1311ea2ed6f")
-//   .withHubProtocol(new MessagePackHubProtocol())
-//   .configureLogging(signalR.LogLevel.Information)
-//   .withAutomaticReconnect()
-//   .build();
-//
-// async function start() {
-//   try {
-//     await connection.start();
-//     console.log("SignalR Connected.");
-//   } catch (err) {
-//     console.log(err);
-//     setTimeout(() => start(), 5000);
-//   }
-// }
-//
-// connection.on("ReceiveNotification", (message, message2) => {
-//   console.log(`message type: ${typeof message} content: ${message}`);
-//   console.log(message2)
-//
-//
-// });
-//
-// start();
+const serverStore = useServerStore();
+const router = useRouter();
+
+if (!serverStore.IsLoggedIn) router.push({ name: 'login' });
+
+watch(
+  () => serverStore.IsLoggedIn,
+  (isLoggedIn) => {
+    if (!isLoggedIn) router.push({ name: 'login' });
+  },
+);
 </script>
 
 <template>
