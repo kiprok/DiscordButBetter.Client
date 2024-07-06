@@ -96,7 +96,7 @@ const props = defineProps(['convoId']);
                 :src="userStore.GetUserById(participant).profilePicture"
                 alt="pfp"
                 class="size-10 flex-none rounded-full" />
-              <span> {{ userStore.GetUserById(participant).userName }} </span>
+              <span> {{ userStore.GetUserById(participant).username }} </span>
             </div>
           </li>
         </ul>

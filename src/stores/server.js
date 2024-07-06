@@ -38,6 +38,16 @@ export const useServerStore = defineStore('server', () => {
     }
   }
 
+  async function GetUserByIdAsync(id) {
+    const response = await fetch(`/api/users/${id}`, {
+      method: 'GET',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok ? await response.json() : null;
+  }
+
   async function LoginAsync(username, password) {
     if (username === '' || password === '') return false;
 
@@ -86,6 +96,96 @@ export const useServerStore = defineStore('server', () => {
     localStorage.removeItem('token');
   }
 
+  async function GetFriendListAsync() {
+    const response = await fetch('/api/users/friends', {
+      method: 'GET',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok ? await response.json() : null;
+  }
+
+  async function DeleteFriendAsync(id) {
+    const response = await fetch(`/api/users/friends/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok;
+  }
+
+  async function GetFriendRequestsAsync() {
+    const response = await fetch('/api/users/friends/requests', {
+      method: 'GET',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok ? await response.json() : null;
+  }
+
+  async function AcceptFriendRequestAsync(requestId, userId) {
+    const response = await fetch(`/api/users/friends/requests`, {
+      method: 'POST',
+      headers: {
+        Authorization: GetToken(),
+      },
+      body: JSON.stringify({
+        requestType: 1,
+        userId: userId,
+        requestId: requestId,
+      }),
+    });
+    return response.ok;
+  }
+
+  async function DeclineFriendRequestAsync(requestId, userId) {
+    const response = await fetch(`/api/users/friends/requests`, {
+      method: 'POST',
+      headers: {
+        Authorization: GetToken(),
+      },
+      body: JSON.stringify({
+        requestType: 2,
+        userId: userId,
+        requestId: requestId,
+      }),
+    });
+    return response.ok;
+  }
+
+  async function SendFriendRequestAsync(userId) {
+    const response = await fetch(`/api/users/friends/requests`, {
+      method: 'POST',
+      headers: {
+        Authorization: GetToken(),
+      },
+      body: JSON.stringify({
+        requestType: 0,
+        userId: userId,
+      }),
+    });
+    return response.ok;
+  }
+
+  async function CancelFriendRequestAsync(requestId, userId) {
+    const response = await fetch(`/api/users/friends/requests`, {
+      method: 'POST',
+      headers: {
+        Authorization: GetToken(),
+      },
+      body: JSON.stringify({
+        requestType: 3,
+        userId: userId,
+        requestId: requestId,
+      }),
+    });
+    return response.ok;
+  }
+
+
   async function ConnectSocketAsync() {
     connection.value = new signalR.HubConnectionBuilder()
       .withUrl(`/hub?token=${GetToken()}`)
@@ -106,5 +206,13 @@ export const useServerStore = defineStore('server', () => {
     LogoutAsync,
     ConnectSocketAsync,
     GetUserAsync,
+    GetUserByIdAsync,
+    GetFriendListAsync,
+    DeleteFriendAsync,
+    GetFriendRequestsAsync,
+    AcceptFriendRequestAsync,
+    DeclineFriendRequestAsync,
+    SendFriendRequestAsync,
+    CancelFriendRequestAsync,
   };
 });

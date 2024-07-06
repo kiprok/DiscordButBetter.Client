@@ -2,8 +2,10 @@
 import { ref } from 'vue';
 import { useServerStore } from '@/stores/server.js';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/user.js';
 
 const serverStore = useServerStore();
+const userStore = useUserStore();
 const router = useRouter();
 
 const username = ref('');
@@ -20,6 +22,7 @@ async function Login() {
   if (!success) {
     loginStatus.value = 2;
   } else {
+    userStore.users[serverStore.User.userId] = serverStore.User;
     await router.push({ name: 'friendList' });
   }
 

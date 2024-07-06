@@ -5,7 +5,7 @@ const props = defineProps(['user']);
 <template>
   <div>
     <div class="relative size-full">
-      <img :src="user?.profilePicture" :alt="user?.userName" class="rounded-full size-full" />
+      <img :src="user?.profilePicture" :alt="user?.username" class="rounded-full size-full" />
       <div v-if="user?.status === 0" class="bg-gray-600 notification-dot" />
       <div v-if="user?.status === 1" class="bg-green-600 notification-dot" />
       <div v-if="user?.status === 2" class="bg-yellow-500 notification-dot">

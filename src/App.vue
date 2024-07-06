@@ -4,13 +4,18 @@ import ContextModal from '@/components/modals/ContextModal.vue';
 import AddFriendModal from '@/components/modals/AddFriendModal.vue';
 import UserProfileModal from '@/components/modals/UserProfileModal.vue';
 import { useServerStore } from '@/stores/server.js';
+import { useUserStore } from '@/stores/user.js';
 
 const serverStore = useServerStore();
+const userStore = useUserStore();
 
 const token = serverStore.GetToken();
 
 if (token !== '') {
-  serverStore.GetUserAsync();
+  serverStore.GetUserAsync().then((user) => {
+    if(user === null) return;
+    userStore.users[user.userId] = user;
+  });
 }
 </script>
 

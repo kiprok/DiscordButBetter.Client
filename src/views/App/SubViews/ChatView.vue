@@ -172,7 +172,7 @@ function SendChatMessage() {
           ">
           <span class="mr-1 text-white">replying to </span>
           <span class="font-bold text-white">
-            {{ userStore.GetUserById(sendMessageStore.replyTo.senderId)?.userName }}
+            {{ userStore.GetUserById(sendMessageStore.replyTo.senderId)?.username }}
           </span>
         </chat-area-info-bar>
         <div class="flex h-fit flex-none flex-row items-center bg-gray-600 px-6 py-2">

@@ -9,7 +9,7 @@ const props = defineProps(['user']);
     <user-profile-picture :user="user" class="size-10 flex-none mr-2" />
     <div class="flex flex-col min-w-0">
       <span class="truncate font-bold text-sm">
-        {{ user.userName }}
+        {{ user.username }}
       </span>
       <span class="truncate text-xs">
         {{ user.statusMessage }}

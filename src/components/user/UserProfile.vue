@@ -13,7 +13,7 @@ const props = defineProps(['user']);
     </div>
     <div class="mt-6 mx-2 p-2 min-h-0 text-white rounded-lg bg-gray-800">
       <h2 class="font-bold text-lg">
-        {{ user?.userName }}
+        {{ user?.username }}
       </h2>
       <span class="text-xs">{{ user?.statusMessage }}</span>
       <div class="w-full h-0.5 bg-gray-700 my-2" />

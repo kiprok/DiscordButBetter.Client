@@ -15,7 +15,7 @@ const serverStore = useServerStore();
         <i class="fa-solid fa-bars sm:hidden" />
       </label>
     </div>
-    <input type="checkbox" id="topbar-check" v-model="sideBarIsShowing" class="hidden peer" />
+    <input type="checkbox" id="topbar-check" class="hidden peer" />
     <div
       class="sm:ml-auto mt-4 sm:mt-0 sm:mr-2 hidden peer-checked:flex peer-checked:flex-col sm:!flex-row sm:flex
         sm:items-center sm:justify-evenly">

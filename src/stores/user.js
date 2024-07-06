@@ -1,15 +1,19 @@
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
+import { useServerStore } from '@/stores/server.js';
 
 export const useUserStore = defineStore('user', () => {
+  const serverStore = useServerStore();
+
   const myUserName = ref('kiprok');
   const myId = crypto.randomUUID();
   const myProfilePicture = ref('https://i.imgur.com/Y86bvSa.jpeg');
 
+
   const users = reactive({
     [myId]: {
       userId: myId,
-      userName: myUserName,
+      username: myUserName,
       profilePicture: myProfilePicture,
       status: 1,
       statusMessage: 'I am a cool person',
@@ -17,8 +21,8 @@ export const useUserStore = defineStore('user', () => {
     },
   });
 
-  const friends = reactive([]);
-  const friendRequests = reactive([]);
+  const friends = reactive(new Set());
+  const friendRequests = reactive(new Set());
 
   const messages = reactive({
     /*
@@ -81,8 +85,8 @@ export const useUserStore = defineStore('user', () => {
     if (query === '' || query === undefined || query === null) return [];
     return Object.values(users).filter(
       (user) =>
-        user.userName.toLowerCase().includes(query.toLowerCase()) &&
-        !friends.includes(user.userId) &&
+        user.username.toLowerCase().includes(query.toLowerCase()) &&
+        !friends.has(user.userId) &&
         user.userId !== myId,
     );
   }
@@ -96,26 +100,32 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function GetFriendList() {
-    return friends.map((friend) => users[friend]);
+    return [...friends].map((friend) => users[friend]);
   }
 
   function GetFriendRequests() {
-    return friendRequests.map((request) => users[request]);
+    return [...friendRequests].map((request) => users[request]);
+  }
+
+  function AddFriendRequest(request, user) {
+    if (friendRequests.has(request.senderId)) return;
+    users[request.senderId] = user;
+    friendRequests.add(request.senderId);
   }
 
   function AcceptFriendRequest(userId) {
-    if (friends.includes(userId)) return;
-    friends.push(userId);
-    friendRequests.splice(friendRequests.indexOf(userId), 1);
+    if (friends.has(userId)) return;
+    friends.add(userId);
+    friendRequests.delete(userId)
   }
 
   function RejectFriendRequest(userId) {
-    if (!friends.includes(userId)) return;
-    friendRequests.splice(friendRequests.indexOf(userId), 1);
+    if (!friends.has(userId)) return;
+    friendRequests.delete(userId)
   }
 
   function RemoveFriend(userId) {
-    friends.splice(friends.indexOf(userId), 1);
+    friends.delete(userId)
   }
 
   function DeleteMessage(messageId) {
@@ -126,24 +136,27 @@ export const useUserStore = defineStore('user', () => {
     let id = crypto.randomUUID();
     users[id] = {
       userId: id,
-      userName: name,
+      username: name,
       profilePicture: pfp,
       status: Math.floor(Math.random() * 4),
       statusMessage: `i am ${name}`,
       biography: `I am ${name}\nAnd my id is ${id}`,
     };
 
+    serverStore.RegisterAsync(name,"12345678");
+
     return id;
   }
 
-  function AddFriend(userId) {
-    if (friends.includes(userId)) return;
-    friends.push(userId);
+  function AddFriend(user) {
+    if (friends.has(user.userId)) return;
+    users[user.userId] = user;
+    friends.add(user.userId);
   }
 
   function SendFriendRequest(userId) {
-    if (friends.includes(userId)) return;
-    friends.push(userId);
+    if (friends.has(userId)) return;
+    friends.add(userId);
   }
 
   return {
@@ -167,6 +180,7 @@ export const useUserStore = defineStore('user', () => {
     GetMessageById,
     GetFriendList,
     GetFriendRequests,
+    AddFriendRequest,
     AcceptFriendRequest,
     RejectFriendRequest,
     SendFriendRequest,

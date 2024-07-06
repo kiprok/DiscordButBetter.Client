@@ -71,7 +71,7 @@ function OpenContextMenu() {
         class="flex items-center content-center grow min-w-0 hover:cursor-pointer hover:text-white hover:underline"
         @click="$emit('scroll-reply', reply.messageId)">
         <span class="block mr-0.5 w-fit flex-none min-w-0 text-sm">{{
-          userStore.GetUserById(reply.senderId)?.userName
+          userStore.GetUserById(reply.senderId)?.username
         }}</span>
         <span
           class="block text-xs grow min-w-0 truncate"
@@ -104,7 +104,7 @@ function OpenContextMenu() {
       <div class="flex w-12 grow flex-col">
         <div class="flex items-center gap-1" v-if="!previousAlsoOwner">
           <h3 class="block truncate text-lg">
-            {{ userStore.GetUserById(props.message.senderId).userName }}
+            {{ userStore.GetUserById(props.message.senderId).username }}
           </h3>
           <span class="block shrink-0 text-xs">
             {{ timeSend.toLocaleTimeString() }}

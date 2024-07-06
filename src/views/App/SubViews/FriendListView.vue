@@ -49,7 +49,7 @@ const sortingMethods = {
   search: () =>
     userStore
       .GetFriendList()
-      .filter((friend) => friend.userName.toLowerCase().includes(searchText.value.toLowerCase())),
+      .filter((friend) => friend.username.toLowerCase().includes(searchText.value.toLowerCase())),
 };
 
 const sortMethodAliases = {
@@ -79,7 +79,7 @@ async function OpenConversation(userId) {
     } else {
       let user = userStore.GetUserById(userId);
       let newConvo = await GenerateConversation(
-        user.userName,
+        user.username,
         user.profilePicture,
         userStore.myId,
         userId,
@@ -116,7 +116,7 @@ async function GenFriend() {
     !userStore.GetFriendList().find((user) => user.userId === userId) &&
     !userStore.GetFriendRequests().find((user) => user.userId === userId)
   ) {
-    userStore.friendRequests.push(userId);
+    userStore.friendRequests.add(userId);
     await new Promise((resolve) => setTimeout(resolve, 100));
   } else {
     userId = await GenerateUser();
@@ -215,7 +215,7 @@ async function GenRandomMessage() {
                 <span>pending</span>
                 <notification-badge
                   class="-top-2 -right-2 absolute text-[10px] size-4"
-                  :notifications="userStore.friendRequests.length" />
+                  :notifications="userStore.friendRequests.size" />
               </friend-sort-button>
             </div>
           </div>
