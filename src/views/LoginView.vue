@@ -22,7 +22,7 @@ async function Login() {
   if (!success) {
     loginStatus.value = 2;
   } else {
-    userStore.users[serverStore.User.userId] = serverStore.User;
+    userStore.users[serverStore.user.userId] = serverStore.user;
     await router.push({ name: 'friendList' });
   }
 

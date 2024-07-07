@@ -48,6 +48,16 @@ export const useServerStore = defineStore('server', () => {
     return response.ok ? await response.json() : null;
   }
 
+  async function SearchUsersAsync(searchString) {
+    const response = await fetch(`/api/users/search?query=${searchString}`, {
+      method: 'GET',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok ? await response.json() : null;
+  }
+
   async function LoginAsync(username, password) {
     if (username === '' || password === '') return false;
 
@@ -100,6 +110,7 @@ export const useServerStore = defineStore('server', () => {
     const response = await fetch('/api/users/friends', {
       method: 'GET',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: GetToken(),
       },
     });
@@ -130,10 +141,11 @@ export const useServerStore = defineStore('server', () => {
     const response = await fetch(`/api/users/friends/requests`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: GetToken(),
       },
       body: JSON.stringify({
-        requestType: 1,
+        type: 1,
         userId: userId,
         requestId: requestId,
       }),
@@ -145,10 +157,11 @@ export const useServerStore = defineStore('server', () => {
     const response = await fetch(`/api/users/friends/requests`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: GetToken(),
       },
       body: JSON.stringify({
-        requestType: 2,
+        type: 2,
         userId: userId,
         requestId: requestId,
       }),
@@ -160,24 +173,26 @@ export const useServerStore = defineStore('server', () => {
     const response = await fetch(`/api/users/friends/requests`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: GetToken(),
       },
       body: JSON.stringify({
-        requestType: 0,
+        type: 0,
         userId: userId,
       }),
     });
-    return response.ok;
+    return response.ok ? await response.json() : null;
   }
 
   async function CancelFriendRequestAsync(requestId, userId) {
     const response = await fetch(`/api/users/friends/requests`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: GetToken(),
       },
       body: JSON.stringify({
-        requestType: 3,
+        type: 3,
         userId: userId,
         requestId: requestId,
       }),
@@ -286,6 +301,7 @@ export const useServerStore = defineStore('server', () => {
     LogoutAsync,
     GetUserAsync,
     GetUserByIdAsync,
+    SearchUsersAsync,
     GetFriendListAsync,
     DeleteFriendAsync,
     GetFriendRequestsAsync,

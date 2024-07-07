@@ -21,7 +21,8 @@ export const useUserStore = defineStore('user', () => {
   });
 
   const friends = reactive(new Set());
-  const friendRequests = reactive(new Set());
+  const friendRequestsReceived = reactive(new Set());
+  const friendRequestsSend = reactive(new Set());
 
   const messages = reactive({
     /*
@@ -103,27 +104,44 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function GetFriendRequests() {
-    return [...friendRequests].map((request) => ({
+    return [...friendRequestsReceived].map((request) => ({
       ...users[request.senderId],
       requestId: request.requestId,
     }));
   }
 
+  function GetFriendRequestsSend() {
+    return [...friendRequestsSend].map((request) => ({
+      ...users[request.receiverId],
+      requestId: request.requestId,
+    }));
+  }
+
   function AddFriendRequest(request, user) {
-    if (friendRequests.has(request.senderId)) return;
+    if (friendRequestsReceived.has(request.senderId)) return;
     users[request.senderId] = user;
-    friendRequests.add(request);
+    friendRequestsReceived.add(request);
+  }
+
+  function AddFriendRequestSent(request, user) {
+    if (friendRequestsSend.has(request.receiverId)) return;
+    users[request.receiverId] = user;
+    friendRequestsSend.add(request);
+  }
+
+  function RemoveFriendRequestSent(request) {
+    const rq = [...friendRequestsSend].find((r) => r.senderId === request.userId);
+    friendRequestsSend.delete(rq);
   }
 
   function AcceptFriendRequest(request) {
-    if (friends.has(request)) return;
-    friends.add(request);
-    friendRequests.delete(request);
+    const rq = [...friendRequestsReceived].find((r) => r.senderId === request.userId);
+    friendRequestsReceived.delete(rq);
   }
 
   function RejectFriendRequest(request) {
-    if (!friends.has(request)) return;
-    friendRequests.delete(request);
+    const rq = [...friendRequestsReceived].find((r) => r.senderId === request.userId);
+    friendRequestsReceived.delete(rq);
   }
 
   function RemoveFriend(userId) {
@@ -157,8 +175,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function SendFriendRequest(userId) {
-    if (friends.has(userId)) return;
-    friends.add(userId);
+    friendRequestsSend.add(userId);
   }
 
   return {
@@ -167,7 +184,8 @@ export const useUserStore = defineStore('user', () => {
     myProfilePicture,
     users,
     friends,
-    friendRequests,
+    friendRequestsReceived,
+    friendRequestsSend,
     messages,
     SearchUsers,
     AddUser,
@@ -182,6 +200,9 @@ export const useUserStore = defineStore('user', () => {
     GetMessageById,
     GetFriendList,
     GetFriendRequests,
+    GetFriendRequestsSend,
+    AddFriendRequestSent,
+    RemoveFriendRequestSent,
     AddFriendRequest,
     AcceptFriendRequest,
     RejectFriendRequest,

@@ -5,14 +5,18 @@ import { useUserStore } from '@/stores/user.js';
 import FriendListItemButton from '@/components/FriendListItemButton.vue';
 import DefaultListAnimation from '@/components/animations/DefaultListAnimation.vue';
 import { useModalStore } from '@/stores/modalStore.js';
+import { useServerStore } from '@/stores/server.js';
 
 const userStore = useUserStore();
+const serverStore = useServerStore();
 const modalStore = useModalStore();
 
 const inputBox = ref();
 const searchQuery = ref('');
 
 const modalName = 'addFriend';
+
+const searchedUsers = ref([]);
 
 modalStore.RegisterModal(modalName);
 
@@ -27,6 +31,38 @@ watch(
     });
   },
 );
+
+watch(searchQuery, async () => {
+  if (searchQuery.value.length < 2) {
+    searchedUsers.value = [];
+    return;
+  }
+  searchedUsers.value = await serverStore.SearchUsersAsync(searchQuery.value);
+  for (const user of searchedUsers.value) {
+    userStore.users[user.userId] = user;
+  }
+});
+
+async function SendFriendRequest(userId) {
+  var request = await serverStore.SendFriendRequestAsync(userId);
+  if (request) {
+    userStore.friendRequestsSend.add(request);
+  }
+}
+
+async function AcceptFriendRequest(request) {
+  console.log(request);
+  userStore.AcceptFriendRequest(request);
+  const success = await serverStore.AcceptFriendRequestAsync(request.requestId, request.userId);
+  if (success) {
+    userStore.AddFriend(userStore.GetUserById(request.userId));
+  }
+}
+
+async function RejectFriendRequest(request) {
+  userStore.RejectFriendRequest(request);
+  await serverStore.DeclineFriendRequestAsync(request.requestId, request.userId);
+}
 </script>
 
 <template>
@@ -54,33 +90,58 @@ watch(
           <div class="flex-none border-b-2 border-gray-700 my-4" />
           <ul class="relative grow min-h-0 min-w-0 overflow-y-scroll">
             <default-list-animation>
-              <li
-                v-for="user in userStore.SearchUsers(searchQuery)"
-                :key="user.userId"
-                class="w-full">
+              <li v-for="user in searchedUsers" :key="user.userId" class="w-full">
                 <FriendListUserItem :user>
                   <div
                     class="ml-auto text-black"
                     v-if="
                       !userStore
                         .GetFriendRequests()
+                        .find((otherUser) => otherUser.userId === user.userId) &&
+                      !userStore
+                        .GetFriendRequestsSend()
+                        .find((otherUser) => otherUser.userId === user.userId) &&
+                      !userStore
+                        .GetFriendList()
                         .find((otherUser) => otherUser.userId === user.userId)
                     ">
                     <friend-list-item-button
                       class="hover:text-green-500"
-                      @click="userStore.SendFriendRequest(user.userId)">
+                      @click="SendFriendRequest(user.userId)">
                       <i class="fa-solid fa-plus" />
                     </friend-list-item-button>
                   </div>
-                  <div v-else class="ml-auto h-full flex flex-row gap-2 text-black">
+
+                  <div
+                    v-else-if="
+                      !userStore
+                        .GetFriendRequestsSend()
+                        .find((otherUser) => otherUser.userId === user.userId) &&
+                      !userStore
+                        .GetFriendList()
+                        .find((otherUser) => otherUser.userId === user.userId)
+                    "
+                    class="ml-auto h-full flex flex-row gap-2 text-black">
                     <friend-list-item-button
                       class="hover:text-green-500"
-                      @click="userStore.AcceptFriendRequest(user.userId)">
+                      @click="
+                        AcceptFriendRequest(
+                          userStore
+                            .GetFriendRequests()
+                            .find((otherUser) => otherUser.userId === user.userId),
+                        )
+                      ">
                       <i class="fa-solid fa-check"></i>
                     </friend-list-item-button>
                     <friend-list-item-button
                       class="hover:text-red-500"
-                      @click="userStore.RejectFriendRequest(user.userId)">
+                      @click="
+                        RejectFriendRequest(
+                          userStore
+                            .GetFriendRequests()
+                            .find((otherUser) => otherUser.userId === user.userId),
+                        )
+                      ">
                       <i class="fa-solid fa-xmark"></i>
                     </friend-list-item-button>
                   </div>

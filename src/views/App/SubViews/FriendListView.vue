@@ -91,14 +91,20 @@ async function OpenConversation(userId) {
 
 async function RemoveFriend(user) {
   userStore.RemoveFriend(user.userId);
+  await serverStore.DeleteFriendAsync(user.userId);
 }
 
 async function AcceptFriendRequest(request) {
   userStore.AcceptFriendRequest(request);
+  const success = await serverStore.AcceptFriendRequestAsync(request.requestId, request.userId);
+  if (success) {
+    userStore.AddFriend(userStore.GetUserById(request.userId));
+  }
 }
 
 async function RejectFriendRequest(request) {
   userStore.RejectFriendRequest(request);
+  await serverStore.DeclineFriendRequestAsync(request.requestId, request.userId);
 }
 
 async function GenUsers() {
@@ -124,7 +130,7 @@ async function GenFriend() {
     !userStore.GetFriendList().find((user) => user.userId === userId) &&
     !userStore.GetFriendRequests().find((user) => user.userId === userId)
   ) {
-    userStore.friendRequests.add(userId);
+    userStore.friendRequestsReceived.add(userId);
     await new Promise((resolve) => setTimeout(resolve, 100));
   } else {
     userId = await GenerateUser();
@@ -223,7 +229,7 @@ async function GenRandomMessage() {
                 <span>pending</span>
                 <notification-badge
                   class="-top-2 -right-2 absolute text-[10px] size-4"
-                  :notifications="userStore.friendRequests.size" />
+                  :notifications="userStore.friendRequestsReceived.size" />
               </friend-sort-button>
             </div>
           </div>

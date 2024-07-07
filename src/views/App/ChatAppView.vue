@@ -36,18 +36,24 @@ async function LoadUserData() {
   const friendRequests = await serverStore.GetFriendRequestsAsync();
 
   for (const friendRequest of friendRequests) {
-    if (friendRequest.senderId === serverStore.user.userId) continue;
-    const user = await serverStore.GetUserByIdAsync(friendRequest.senderId);
-    userStore.AddFriendRequest(friendRequest, user);
+    if (friendRequest.senderId === serverStore.user.userId) {
+      const user = await serverStore.GetUserByIdAsync(friendRequest.receiverId);
+      userStore.AddFriendRequestSent(friendRequest, user);
+    } else {
+      const user = await serverStore.GetUserByIdAsync(friendRequest.senderId);
+      userStore.AddFriendRequest(friendRequest, user);
+    }
   }
 
   const conversations = await serverStore.GetConversationsAsync();
-  console.log(conversations);
   for (const convo of conversations) {
     conversationStore.AddConversation(convo);
+    for (const participantId of convo.participants) {
+      var user = await serverStore.GetUserByIdAsync(participantId);
+      userStore.users[participantId] = user;
+    }
   }
   const visibleConversations = await serverStore.GetVisibleConversationsAsync();
-  console.log(visibleConversations);
   for (const convo of visibleConversations) {
     conversationStore.AddVisibleConversation(convo);
   }
