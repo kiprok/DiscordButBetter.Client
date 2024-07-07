@@ -103,24 +103,27 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function GetFriendRequests() {
-    return [...friendRequests].map((request) => users[request]);
+    return [...friendRequests].map((request) => ({
+      ...users[request.senderId],
+      requestId: request.requestId,
+    }));
   }
 
   function AddFriendRequest(request, user) {
     if (friendRequests.has(request.senderId)) return;
     users[request.senderId] = user;
-    friendRequests.add(request.senderId);
+    friendRequests.add(request);
   }
 
-  function AcceptFriendRequest(userId) {
-    if (friends.has(userId)) return;
-    friends.add(userId);
-    friendRequests.delete(userId);
+  function AcceptFriendRequest(request) {
+    if (friends.has(request)) return;
+    friends.add(request);
+    friendRequests.delete(request);
   }
 
-  function RejectFriendRequest(userId) {
-    if (!friends.has(userId)) return;
-    friendRequests.delete(userId);
+  function RejectFriendRequest(request) {
+    if (!friends.has(request)) return;
+    friendRequests.delete(request);
   }
 
   function RemoveFriend(userId) {

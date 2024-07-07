@@ -19,7 +19,7 @@ export const useConversationStore = defineStore('messageList', () => {
     // },
   });
 
-  const visibleConversations = reactive([]);
+  const visibleConversations = reactive(new Set());
 
   const jumpToPlaceCallback = ref(null);
 
@@ -83,17 +83,15 @@ export const useConversationStore = defineStore('messageList', () => {
   }
 
   function GetVisibleConversations() {
-    return visibleConversations.map((x) => conversations[x]);
+    return [...visibleConversations].map((x) => conversations[x]);
   }
 
   function AddVisibleConversation(conversationId) {
-    if (visibleConversations.indexOf(conversationId) === -1)
-      visibleConversations.push(conversationId);
+    visibleConversations.add(conversationId);
   }
 
   function RemoveVisibleConversation(conversationId) {
-    const index = visibleConversations.indexOf(conversationId);
-    if (index > -1) visibleConversations.splice(index, 1);
+    visibleConversations.delete(conversationId);
   }
 
   function GetConversationById(id) {

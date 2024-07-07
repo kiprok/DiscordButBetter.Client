@@ -205,6 +205,16 @@ export const useServerStore = defineStore('server', () => {
     return response.ok ? await response.json() : null;
   }
 
+  async function RemoveFromVisibleConversationsAsync(id) {
+    const response = await fetch(`/api/conversations/visible/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok;
+  }
+
   async function GetConversationByIdAsync(id) {
     const response = await fetch(`/api/conversations/${id}`, {
       method: 'GET',
@@ -229,7 +239,7 @@ export const useServerStore = defineStore('server', () => {
         conversationPicture: picture,
       }),
     });
-    return response.ok;
+    return response.ok ? await response.json() : null;
   }
 
   async function DeleteConversationAsync(id) {
@@ -285,6 +295,7 @@ export const useServerStore = defineStore('server', () => {
     CancelFriendRequestAsync,
     GetConversationsAsync,
     GetVisibleConversationsAsync,
+    RemoveFromVisibleConversationsAsync,
     GetConversationByIdAsync,
     CreateConversationAsync,
     DeleteConversationAsync,

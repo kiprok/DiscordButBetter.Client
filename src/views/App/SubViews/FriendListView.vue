@@ -18,10 +18,12 @@ import { useRouter } from 'vue-router';
 import DefaultListAnimation from '@/components/animations/DefaultListAnimation.vue';
 import PaginationAnimation from '@/components/animations/PaginationAnimation.vue';
 import { useModalStore } from '@/stores/modalStore.js';
+import { useServerStore } from '@/stores/server.js';
 
 document.title = 'Friends';
 
 const userStore = useUserStore();
+const serverStore = useServerStore();
 const conversationStore = useConversationStore();
 const modalStore = useModalStore();
 
@@ -66,7 +68,7 @@ async function OpenConversation(userId) {
     .find((convo) => convo.participants.includes(userId) && convo.conversationType === 0);
 
   if (conversation) {
-    router.push({ name: 'chat', params: { id: conversation.conversationId } });
+    await router.push({ name: 'chat', params: { id: conversation.conversationId } });
   } else {
     let conversationId = Object.keys(conversationStore.GetALLConversations()).find(
       (conversationId) =>
@@ -78,19 +80,25 @@ async function OpenConversation(userId) {
       await router.push({ name: 'chat', params: { id: conversationId } });
     } else {
       let user = userStore.GetUserById(userId);
-      let newConvo = await GenerateConversation(
-        user.username,
-        user.profilePicture,
-        serverStore.user.userId,
-        userId,
-      );
-      conversationStore.conversations[newConvo.conversationId] = newConvo;
-      await GenerateConversationMessages(newConvo.conversationId, userId, 1000);
+      let newConvo = await serverStore.CreateConversationAsync('private', 0, [userId]);
+      conversationStore.AddConversation(newConvo);
       conversationStore.UpdateLastMessageTime(newConvo.conversationId, Date.now());
       conversationStore.AddVisibleConversation(newConvo.conversationId);
       await router.push({ name: 'chat', params: { id: newConvo.conversationId } });
     }
   }
+}
+
+async function RemoveFriend(user) {
+  userStore.RemoveFriend(user.userId);
+}
+
+async function AcceptFriendRequest(request) {
+  userStore.AcceptFriendRequest(request);
+}
+
+async function RejectFriendRequest(request) {
+  userStore.RejectFriendRequest(request);
 }
 
 async function GenUsers() {
@@ -239,7 +247,7 @@ async function GenRandomMessage() {
                         <i class="fa-solid fa-comment"></i>
                       </friend-list-item-button>
                       <friend-list-item-button
-                        @click.stop="userStore.RemoveFriend(listItem.userId)"
+                        @click.stop="RemoveFriend(listItem)"
                         class="hover:text-red-500">
                         <i class="fa-solid fa-xmark"></i>
                       </friend-list-item-button>
@@ -249,12 +257,12 @@ async function GenRandomMessage() {
                       class="ml-auto h-full flex flex-row gap-2">
                       <friend-list-item-button
                         class="hover:text-green-500"
-                        @click.stop="userStore.AcceptFriendRequest(listItem.userId)">
+                        @click.stop="AcceptFriendRequest(listItem)">
                         <i class="fa-solid fa-check"></i>
                       </friend-list-item-button>
                       <friend-list-item-button
                         class="hover:text-red-500"
-                        @click.stop="userStore.RejectFriendRequest(listItem.userId)">
+                        @click.stop="RejectFriendRequest(listItem)">
                         <i class="fa-solid fa-xmark"></i>
                       </friend-list-item-button>
                     </div>
