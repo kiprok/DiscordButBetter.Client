@@ -13,11 +13,13 @@ import {
   ReplyToChatMessage,
 } from '@/composables/commands/chatMessageCommands.js';
 import { useModalStore } from '@/stores/modalStore.js';
+import { useServerStore } from '@/stores/server.js';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner', 'tag']);
 const userStore = useUserStore();
 const modalStore = useModalStore();
+const serverStore = useServerStore();
 
 const refTextMessage = ref();
 const timeSend = new Date(props.message.timeSend);
@@ -50,7 +52,7 @@ function OpenContextMenu() {
     componentType: ChatMessageItemContent,
     message: props.message,
     allowedFunctions: props.allowedFunctions,
-    convoId: props.message.convoId,
+    conversationId: props.message.conversationId,
   });
 }
 </script>
@@ -131,13 +133,13 @@ function OpenContextMenu() {
       <button
         @click.stop="EditChatMessage(props.message)"
         class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700"
-        v-if="props.message.senderId === userStore.myId && allowedFunctions.allowEdit">
+        v-if="props.message.senderId === serverStore.user.userId && allowedFunctions.allowEdit">
         <i class="fa-solid fa-pen-to-square"></i>
       </button>
       <button
-        @click.stop="RemoveChatMessage(props.message.convoId, props.message.messageId)"
+        @click.stop="RemoveChatMessage(props.message.conversationId, props.message.messageId)"
         class="h-fit bg-gray-800 px-1 py-1 text-white first:rounded-l-lg last:rounded-r-lg hover:bg-gray-700"
-        v-if="props.message.senderId === userStore.myId && allowedFunctions.allowDelete">
+        v-if="props.message.senderId === serverStore.user.userId && allowedFunctions.allowDelete">
         <i class="fa-solid fa-delete-left"></i>
       </button>
     </div>

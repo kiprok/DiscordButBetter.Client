@@ -1,4 +1,5 @@
 import { useUserStore } from '@/stores/user.js';
+import { useServerStore } from '@/stores/server.js';
 
 export async function GenerateUser() {
   const userStore = useUserStore();
@@ -11,14 +12,19 @@ export async function GenerateUser() {
   return userStore.AddUser(name, picture);
 }
 
-export async function GenerateConversation(convoName, convoPicture, userId1, userId2) {
+export async function GenerateConversation(
+  conversationName,
+  conversationPicture,
+  userId1,
+  userId2,
+) {
   let newConvoId = crypto.randomUUID();
 
   return {
-    convoId: newConvoId,
-    convoName: convoName,
-    convoType: 0, // 0 = private, 1 = group
-    convoPicture: convoPicture,
+    conversationId: newConvoId,
+    conversationName: conversationName,
+    conversationType: 0, // 0 = private, 1 = group
+    conversationPicture: conversationPicture,
     visibleMessages: [],
     participants: [userId1, userId2],
     scrollPosition: 0,
@@ -29,8 +35,9 @@ export async function GenerateConversation(convoName, convoPicture, userId1, use
   };
 }
 
-export async function GenerateConversationMessages(convoId, otherId, amount) {
+export async function GenerateConversationMessages(conversationId, otherId, amount) {
   const userStore = useUserStore();
+  const serverStore = useServerStore();
 
   let lastMsgId = null;
   let startTimeOffset = 100000000;
@@ -42,13 +49,13 @@ export async function GenerateConversationMessages(convoId, otherId, amount) {
 
     if (i === 40) {
       messageToJumpTo = newMessageId;
-      userToJumpTo = i % 2 === 0 ? otherId : userStore.myId;
+      userToJumpTo = i % 2 === 0 ? otherId : serverStore.user.userId;
     }
 
     userStore.messages[newMessageId] = {
       messageId: newMessageId,
-      senderId: i % 2 === 0 ? otherId : userStore.myId,
-      convoId: convoId,
+      senderId: i % 2 === 0 ? otherId : serverStore.user.userId,
+      conversationId: conversationId,
       messageText: `Random message ${i}`,
       timeSend: Date.now() - timeOffset,
       meta: lastMsgId !== null ? { reply: { messageId: lastMsgId, userId: otherId } } : {},
@@ -58,8 +65,8 @@ export async function GenerateConversationMessages(convoId, otherId, amount) {
   let newMessageId = crypto.randomUUID();
   userStore.messages[newMessageId] = {
     messageId: newMessageId,
-    senderId: userStore.myId,
-    convoId: convoId,
+    senderId: serverStore.user.userId,
+    conversationId: conversationId,
     messageText: `I replied to the 40th message`,
     timeSend: Date.now(),
     meta: { reply: { messageId: messageToJumpTo, userId: userToJumpTo } },

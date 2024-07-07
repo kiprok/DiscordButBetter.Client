@@ -2,12 +2,12 @@ import { useConversationStore } from '@/stores/conversation.js';
 import { useUserStore } from '@/stores/user.js';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 
-export function RemoveChatMessage(convoId, messageId) {
+export function RemoveChatMessage(conversationId, messageId) {
   const userStore = useUserStore();
   const conversationStore = useConversationStore();
 
   userStore.DeleteMessage(messageId);
-  conversationStore.DeleteMessage(convoId, messageId);
+  conversationStore.DeleteMessage(conversationId, messageId);
 }
 
 export function EditChatMessage(newMessage) {

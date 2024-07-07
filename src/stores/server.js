@@ -185,6 +185,75 @@ export const useServerStore = defineStore('server', () => {
     return response.ok;
   }
 
+  async function GetConversationsAsync() {
+    const response = await fetch('/api/conversations', {
+      method: 'GET',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok ? await response.json() : null;
+  }
+
+  async function GetVisibleConversationsAsync() {
+    const response = await fetch('/api/conversations/visible', {
+      method: 'GET',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok ? await response.json() : null;
+  }
+
+  async function GetConversationByIdAsync(id) {
+    const response = await fetch(`/api/conversations/${id}`, {
+      method: 'GET',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok ? await response.json() : null;
+  }
+
+  async function CreateConversationAsync(name, conversationType, userIds, picture = null) {
+    const response = await fetch('/api/conversations', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: GetToken(),
+      },
+      body: JSON.stringify({
+        conversationName: name,
+        conversationType: conversationType,
+        participants: userIds,
+        conversationPicture: picture,
+      }),
+    });
+    return response.ok;
+  }
+
+  async function DeleteConversationAsync(id) {
+    const response = await fetch(`/api/conversations/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok;
+  }
+
+  // toUpdate = { conversationName: "", conversationPicture: "", participantsToAdd: [], participantsToRemove: []}
+  async function UpdateConversationAsync(id, toUpdate) {
+    const response = await fetch(`/api/conversations/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: GetToken(),
+      },
+      body: JSON.stringify(toUpdate),
+    });
+    return response.ok;
+  }
 
   async function ConnectSocketAsync() {
     connection.value = new signalR.HubConnectionBuilder()
@@ -193,6 +262,7 @@ export const useServerStore = defineStore('server', () => {
       .configureLogging(signalR.LogLevel.Information)
       .withAutomaticReconnect()
       .build();
+
     return connection.value;
   }
 
@@ -204,7 +274,6 @@ export const useServerStore = defineStore('server', () => {
     LoginAsync,
     RegisterAsync,
     LogoutAsync,
-    ConnectSocketAsync,
     GetUserAsync,
     GetUserByIdAsync,
     GetFriendListAsync,
@@ -214,5 +283,12 @@ export const useServerStore = defineStore('server', () => {
     DeclineFriendRequestAsync,
     SendFriendRequestAsync,
     CancelFriendRequestAsync,
+    GetConversationsAsync,
+    GetVisibleConversationsAsync,
+    GetConversationByIdAsync,
+    CreateConversationAsync,
+    DeleteConversationAsync,
+    UpdateConversationAsync,
+    ConnectSocketAsync,
   };
 });

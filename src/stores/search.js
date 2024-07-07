@@ -11,7 +11,7 @@ export const useSearchStore = defineStore('search', () => {
 
   const searchData = reactive({
     id: {
-      searchId: 'convoId',
+      searchId: 'conversationId',
       searchQuery: '',
       searchIsShowing: false,
       searchResults: [],
@@ -78,7 +78,7 @@ export const useSearchStore = defineStore('search', () => {
         return (
           userStore.messages[message].messageText.includes(
             GetSearchDataById(searchId).searchQuery,
-          ) && userStore.messages[message].convoId === searchId
+          ) && userStore.messages[message].conversationId === searchId
         );
       })
       .map((message) => userStore.messages[message])

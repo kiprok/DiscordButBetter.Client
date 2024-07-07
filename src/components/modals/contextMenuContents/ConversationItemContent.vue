@@ -12,8 +12,8 @@ const modalStore = useModalStore();
 const conversationStore = useConversationStore();
 
 async function CloseConversation() {
-  conversationStore.RemoveVisibleConversation(props.modalArguments.convoId);
-  if (route.params.id === props.modalArguments.convoId) {
+  conversationStore.RemoveVisibleConversation(props.modalArguments.conversationId);
+  if (route.params.id === props.modalArguments.conversationId) {
     await router.push({ name: 'friendList' });
   }
 }

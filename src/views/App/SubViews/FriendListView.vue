@@ -63,15 +63,15 @@ const sortMethodAliases = {
 async function OpenConversation(userId) {
   let conversation = conversationStore
     .GetVisibleConversations()
-    .find((convo) => convo.participants.includes(userId) && convo.convoType === 0);
+    .find((convo) => convo.participants.includes(userId) && convo.conversationType === 0);
 
   if (conversation) {
-    router.push({ name: 'chat', params: { id: conversation.convoId } });
+    router.push({ name: 'chat', params: { id: conversation.conversationId } });
   } else {
     let conversationId = Object.keys(conversationStore.GetALLConversations()).find(
-      (convoId) =>
-        conversationStore.GetConversationById(convoId).participants.includes(userId) &&
-        conversationStore.GetConversationById(convoId).convoType === 0,
+      (conversationId) =>
+        conversationStore.GetConversationById(conversationId).participants.includes(userId) &&
+        conversationStore.GetConversationById(conversationId).conversationType === 0,
     );
     if (conversationId) {
       conversationStore.AddVisibleConversation(conversationId);
@@ -81,14 +81,14 @@ async function OpenConversation(userId) {
       let newConvo = await GenerateConversation(
         user.username,
         user.profilePicture,
-        userStore.myId,
+        serverStore.user.userId,
         userId,
       );
-      conversationStore.conversations[newConvo.convoId] = newConvo;
-      await GenerateConversationMessages(newConvo.convoId, userId, 1000);
-      conversationStore.UpdateLastMessageTime(newConvo.convoId, Date.now());
-      conversationStore.AddVisibleConversation(newConvo.convoId);
-      await router.push({ name: 'chat', params: { id: newConvo.convoId } });
+      conversationStore.conversations[newConvo.conversationId] = newConvo;
+      await GenerateConversationMessages(newConvo.conversationId, userId, 1000);
+      conversationStore.UpdateLastMessageTime(newConvo.conversationId, Date.now());
+      conversationStore.AddVisibleConversation(newConvo.conversationId);
+      await router.push({ name: 'chat', params: { id: newConvo.conversationId } });
     }
   }
 }
@@ -112,7 +112,7 @@ async function GenFriend() {
 
   if (
     userId &&
-    userId !== userStore.myId &&
+    userId !== serverStore.user.userId &&
     !userStore.GetFriendList().find((user) => user.userId === userId) &&
     !userStore.GetFriendRequests().find((user) => user.userId === userId)
   ) {
@@ -127,8 +127,8 @@ async function GenFriend() {
 
 async function GenRandomMessage() {
   _sendingRandomMessage.value = true;
-  let conversation = Object.keys(conversationStore.GetALLConversations()).map((convoId) =>
-    conversationStore.GetConversationById(convoId),
+  let conversation = Object.keys(conversationStore.GetALLConversations()).map((conversationId) =>
+    conversationStore.GetConversationById(conversationId),
   )[Math.floor(Math.random() * Object.keys(conversationStore.GetALLConversations()).length)];
   if (!conversation) {
     _sendingRandomMessage.value = false;
@@ -142,19 +142,19 @@ async function GenRandomMessage() {
     userStore.messages[newMessageId] = {
       messageId: newMessageId,
       senderId: userid,
-      convoId: conversation.convoId,
+      conversationId: conversation.conversationId,
       messageText: `A new Random Message`,
       timeSend: Date.now(),
       meta: {},
     };
 
-    if (!conversationStore.GetVisibleConversations().includes(conversation.convoId)) {
-      conversationStore.AddVisibleConversation(conversation.convoId);
+    if (!conversationStore.GetVisibleConversations().includes(conversation.conversationId)) {
+      conversationStore.AddVisibleConversation(conversation.conversationId);
     }
 
-    if (!conversationStore.GetConversationById(conversation.convoId).viewingOlderMessages)
-      conversationStore.AddMessage(conversation.convoId, userStore.messages[newMessageId]);
-    conversationStore.UpdateLastMessageTime(conversation.convoId, Date.now());
+    if (!conversationStore.GetConversationById(conversation.conversationId).viewingOlderMessages)
+      conversationStore.AddMessage(conversation.conversationId, userStore.messages[newMessageId]);
+    conversationStore.UpdateLastMessageTime(conversation.conversationId, Date.now());
     conversation.newUnseenMessages.push(newMessageId);
   }
   _sendingRandomMessage.value = false;

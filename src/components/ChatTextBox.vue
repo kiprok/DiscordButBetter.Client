@@ -9,7 +9,7 @@ const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const sendMessageStore = useSendingMessageStore();
 const emit = defineEmits(['SendChatMessage']);
-const props = defineProps(['convoId']);
+const props = defineProps(['conversationId']);
 
 const textBox = ref();
 
@@ -38,7 +38,7 @@ function OnKeyDown(event) {
   }
 
   if (event.key === 'ArrowUp' && sendMessageStore.messageText === '') {
-    let lastMessage = conversationStore.GetLastMessage(props.convoId, userStore.myUserId);
+    let lastMessage = conversationStore.GetLastMessage(props.conversationId, userStore.myUserId);
 
     if (lastMessage) {
       sendMessageStore.EditMessage(lastMessage);
@@ -73,7 +73,9 @@ function onInput() {
           v-if="sendMessageStore.messageText.trim() === ''"
           class="absolute w-full min-w-0 z-10 top-1/2 -translate-y-1/2 left-2 select-none text-black/40 truncate
             pointer-events-none">
-          Message @{{ conversationStore.GetConversationById(props.convoId)?.convoName }}
+          Message @{{
+            conversationStore.GetConversationById(props.conversationId)?.conversationName
+          }}
         </div>
         <div
           contenteditable="true"

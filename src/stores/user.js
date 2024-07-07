@@ -9,7 +9,6 @@ export const useUserStore = defineStore('user', () => {
   const myId = crypto.randomUUID();
   const myProfilePicture = ref('https://i.imgur.com/Y86bvSa.jpeg');
 
-
   const users = reactive({
     [myId]: {
       userId: myId,
@@ -29,7 +28,7 @@ export const useUserStore = defineStore('user', () => {
             "": {
                 messageId: "",
                 senderId: "",
-                convoId: "",
+                conversationId: "",
                 messageText: "",
                 timeSend: 0,
                 meta: {}
@@ -37,12 +36,12 @@ export const useUserStore = defineStore('user', () => {
              */
   });
 
-  function SendMessage(convoId, message) {
+  function SendMessage(conversationId, message) {
     let newId = message.hasOwnProperty('messageId') ? message.messageId : crypto.randomUUID();
     messages[newId] = {
       messageId: newId,
       senderId: message.senderId,
-      convoId: message.convoId,
+      conversationId: message.conversationId,
       messageText: message.messageText,
       timeSend: message.timeSend,
       meta: message.meta,
@@ -50,11 +49,11 @@ export const useUserStore = defineStore('user', () => {
     return messages[newId];
   }
 
-  function GetOlderMessages(convoId, startpointId, amount) {
+  function GetOlderMessages(conversationId, startpointId, amount) {
     return Object.keys(messages)
       .filter(
         (key) =>
-          convoId === messages[key].convoId &&
+          conversationId === messages[key].conversationId &&
           (messages[startpointId]?.timeSend ?? Infinity) - messages[key].timeSend > 0,
       )
       .toSorted((a, b) => messages[b].timeSend - messages[a].timeSend)
@@ -62,11 +61,11 @@ export const useUserStore = defineStore('user', () => {
       .map((key) => messages[key]);
   }
 
-  function GetNewerMessages(convoId, startpointId, amount) {
+  function GetNewerMessages(conversationId, startpointId, amount) {
     return Object.keys(messages)
       .filter(
         (key) =>
-          convoId === messages[key].convoId &&
+          conversationId === messages[key].conversationId &&
           (messages[startpointId]?.timeSend ?? 0) - messages[key].timeSend < 0,
       )
       .toSorted((a, b) => messages[a].timeSend - messages[b].timeSend)
@@ -74,9 +73,9 @@ export const useUserStore = defineStore('user', () => {
       .map((key) => messages[key]);
   }
 
-  function GetConversationMessages(convoId) {
+  function GetConversationMessages(conversationId) {
     return Object.keys(messages)
-      .filter((key) => convoId === messages[key].convoId)
+      .filter((key) => conversationId === messages[key].conversationId)
       .toSorted((a, b) => messages[a].timeSend - messages[b].timeSend)
       .map((key) => messages[key]);
   }
@@ -116,16 +115,16 @@ export const useUserStore = defineStore('user', () => {
   function AcceptFriendRequest(userId) {
     if (friends.has(userId)) return;
     friends.add(userId);
-    friendRequests.delete(userId)
+    friendRequests.delete(userId);
   }
 
   function RejectFriendRequest(userId) {
     if (!friends.has(userId)) return;
-    friendRequests.delete(userId)
+    friendRequests.delete(userId);
   }
 
   function RemoveFriend(userId) {
-    friends.delete(userId)
+    friends.delete(userId);
   }
 
   function DeleteMessage(messageId) {
@@ -143,7 +142,7 @@ export const useUserStore = defineStore('user', () => {
       biography: `I am ${name}\nAnd my id is ${id}`,
     };
 
-    serverStore.RegisterAsync(name,"12345678");
+    serverStore.RegisterAsync(name, '12345678');
 
     return id;
   }

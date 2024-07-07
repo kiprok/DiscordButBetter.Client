@@ -5,10 +5,10 @@ import { useUserStore } from '@/stores/user.js';
 export const useConversationStore = defineStore('messageList', () => {
   const conversations = reactive({
     // id: {
-    //   convoId: "",
-    //   convoName: "",
-    //   convoType: 0, // 0 = private, 1 = group
-    //   convoPicture: "",
+    //   conversationId: "",
+    //   conversationName: "",
+    //   conversationType: 0, // 0 = private, 1 = group
+    //   conversationPicture: "",
     //   visibleMessages: [],
     //   participants: [],
     //   scrollPosition: 0,
@@ -31,34 +31,34 @@ export const useConversationStore = defineStore('messageList', () => {
     jumpToPlaceCallback.value = null;
   }
 
-  function TriggerJumpToBottom(convoId) {
+  function TriggerJumpToBottom(conversationId) {
     const userStore = useUserStore();
     if (!jumpToPlaceCallback.value) return;
-    const olderMessage = userStore.GetOlderMessages(convoId, null, 50);
-    ClearVisibleMessages(convoId);
-    AddMessages(convoId, olderMessage);
+    const olderMessage = userStore.GetOlderMessages(conversationId, null, 50);
+    ClearVisibleMessages(conversationId);
+    AddMessages(conversationId, olderMessage);
 
     jumpToPlaceCallback.value(olderMessage, null);
   }
 
-  function TriggerJumpToMessage(convoId, messageId) {
+  function TriggerJumpToMessage(conversationId, messageId) {
     const userStore = useUserStore();
     if (!jumpToPlaceCallback.value) return;
 
     let centerMessage;
     let final = [];
 
-    if (GetVisibleMessages(convoId).findIndex((x) => x.messageId === messageId) === -1) {
+    if (GetVisibleMessages(conversationId).findIndex((x) => x.messageId === messageId) === -1) {
       centerMessage = userStore.GetMessageById(messageId);
-      const newerMessages = userStore.GetNewerMessages(convoId, centerMessage.messageId, 25);
-      const olderMessages = userStore.GetOlderMessages(convoId, centerMessage.messageId, 25);
+      const newerMessages = userStore.GetNewerMessages(conversationId, centerMessage.messageId, 25);
+      const olderMessages = userStore.GetOlderMessages(conversationId, centerMessage.messageId, 25);
 
       final = newerMessages.concat([centerMessage], olderMessages);
 
-      ClearVisibleMessages(convoId);
-      AddMessages(convoId, final);
+      ClearVisibleMessages(conversationId);
+      AddMessages(conversationId, final);
 
-      conversations[convoId].viewingOlderMessages = true;
+      conversations[conversationId].viewingOlderMessages = true;
     } else {
       centerMessage = userStore.GetMessageById(messageId);
     }
@@ -70,16 +70,29 @@ export const useConversationStore = defineStore('messageList', () => {
     return conversations;
   }
 
+  function AddConversation(convo) {
+    conversations[convo.conversationId] = {
+      ...convo,
+      visibleMessages: [],
+      scrollPosition: 0,
+      viewingOlderMessages: false,
+      lastSeenMessage: '',
+      lastMessageTime: 0,
+      newUnseenMessages: [],
+    };
+  }
+
   function GetVisibleConversations() {
     return visibleConversations.map((x) => conversations[x]);
   }
 
-  function AddVisibleConversation(convoId) {
-    if (visibleConversations.indexOf(convoId) === -1) visibleConversations.push(convoId);
+  function AddVisibleConversation(conversationId) {
+    if (visibleConversations.indexOf(conversationId) === -1)
+      visibleConversations.push(conversationId);
   }
 
-  function RemoveVisibleConversation(convoId) {
-    const index = visibleConversations.indexOf(convoId);
+  function RemoveVisibleConversation(conversationId) {
+    const index = visibleConversations.indexOf(conversationId);
     if (index > -1) visibleConversations.splice(index, 1);
   }
 
@@ -87,87 +100,93 @@ export const useConversationStore = defineStore('messageList', () => {
     return conversations[id];
   }
 
-  function GetVisibleMessages(convoId) {
-    if (!conversations.hasOwnProperty(convoId)) {
-      conversations[convoId] = {
-        convoId: convoId,
+  function GetVisibleMessages(conversationId) {
+    if (!conversations.hasOwnProperty(conversationId)) {
+      conversations[conversationId] = {
+        conversationId: conversationId,
         visibleMessages: [],
         scrollPosition: 0,
         viewingOlderMessages: false,
       };
     }
-    return conversations[convoId].visibleMessages;
+    return conversations[conversationId].visibleMessages;
   }
 
-  function ClearVisibleMessages(convoId) {
-    conversations[convoId].visibleMessages.splice(0, conversations[convoId].visibleMessages.length);
+  function ClearVisibleMessages(conversationId) {
+    conversations[conversationId].visibleMessages.splice(
+      0,
+      conversations[conversationId].visibleMessages.length,
+    );
   }
 
-  function GetFirstMessage(convoId) {
-    return conversations[convoId].visibleMessages[0];
+  function GetFirstMessage(conversationId) {
+    return conversations[conversationId].visibleMessages[0];
   }
 
-  function GetLastMessage(convoId) {
-    return conversations[convoId].visibleMessages[
-      conversations[convoId].visibleMessages.length - 1
+  function GetLastMessage(conversationId) {
+    return conversations[conversationId].visibleMessages[
+      conversations[conversationId].visibleMessages.length - 1
     ];
   }
 
-  function AddMessage(convoId, message) {
-    conversations[convoId].visibleMessages.push(message);
-    conversations[convoId].visibleMessages.sort((a, b) => a.timeSend - b.timeSend);
+  function AddMessage(conversationId, message) {
+    conversations[conversationId].visibleMessages.push(message);
+    conversations[conversationId].visibleMessages.sort((a, b) => a.timeSend - b.timeSend);
   }
 
-  function AddMessages(convoId, messages) {
-    conversations[convoId].visibleMessages.push(...messages);
-    conversations[convoId].visibleMessages.sort((a, b) => a.timeSend - b.timeSend);
+  function AddMessages(conversationId, messages) {
+    conversations[conversationId].visibleMessages.push(...messages);
+    conversations[conversationId].visibleMessages.sort((a, b) => a.timeSend - b.timeSend);
   }
 
-  function RemoveNewerMessages(convoId, amount) {
-    return conversations[convoId].visibleMessages.splice(
-      conversations[convoId].visibleMessages.length - amount,
+  function RemoveNewerMessages(conversationId, amount) {
+    return conversations[conversationId].visibleMessages.splice(
+      conversations[conversationId].visibleMessages.length - amount,
       amount,
     );
   }
 
-  function RemoveOlderMessages(convoId, amount) {
-    return conversations[convoId].visibleMessages.splice(0, amount);
+  function RemoveOlderMessages(conversationId, amount) {
+    return conversations[conversationId].visibleMessages.splice(0, amount);
   }
 
-  function DeleteMessage(convoId, messageId) {
+  function DeleteMessage(conversationId, messageId) {
     //this is insane
-    conversations[convoId].visibleMessages.splice(
-      conversations[convoId].visibleMessages.findIndex((x) => x.messageId === messageId),
+    conversations[conversationId].visibleMessages.splice(
+      conversations[conversationId].visibleMessages.findIndex((x) => x.messageId === messageId),
       1,
     );
   }
 
-  function GetLastMessageOfUser(convoId, userId) {
-    const messages = GetVisibleMessages(convoId).filter((x) => x.userId === userId);
+  function GetLastMessageOfUser(conversationId, userId) {
+    const messages = GetVisibleMessages(conversationId).filter((x) => x.userId === userId);
     return messages[messages.length - 1];
   }
 
-  function SetScrollPosition(convoId, pos) {
-    if (conversations.hasOwnProperty(convoId)) conversations[convoId].scrollPosition = pos;
+  function SetScrollPosition(conversationId, pos) {
+    if (conversations.hasOwnProperty(conversationId))
+      conversations[conversationId].scrollPosition = pos;
   }
 
-  function GetScrollPosition(convoId) {
-    if (conversations.hasOwnProperty(convoId)) return conversations[convoId].scrollPosition;
+  function GetScrollPosition(conversationId) {
+    if (conversations.hasOwnProperty(conversationId))
+      return conversations[conversationId].scrollPosition;
     else return 0;
   }
 
-  function UpdateLastMessageTime(convoId, time) {
-    conversations[convoId].lastMessageTime = time;
+  function UpdateLastMessageTime(conversationId, time) {
+    conversations[conversationId].lastMessageTime = time;
   }
 
-  function RemoveNewUnseenMessage(convoId, messageId) {
-    const index = conversations[convoId].newUnseenMessages.indexOf(messageId);
-    if (index > -1) conversations[convoId].newUnseenMessages.splice(index, 1);
+  function RemoveNewUnseenMessage(conversationId, messageId) {
+    const index = conversations[conversationId].newUnseenMessages.indexOf(messageId);
+    if (index > -1) conversations[conversationId].newUnseenMessages.splice(index, 1);
   }
 
   return {
     conversations,
     GetConversationById,
+    AddConversation,
     GetALLConversations,
     GetVisibleConversations,
     AddVisibleConversation,

@@ -12,12 +12,14 @@ import { useSearchStore } from '@/stores/search.js';
 import MessageListItem from '@/components/MessageListItem.vue';
 import PaginationButtons from '@/components/PaginationButtons.vue';
 import ChatInfoMenu from '@/components/sideMenus/ChatInfoMenu.vue';
+import { useServerStore } from '@/stores/server.js';
 
 const MessageList = defineAsyncComponent(() => import('@/components/MessageList.vue'));
 
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
+const serverStore = useServerStore();
 const sendMessageStore = useSendingMessageStore();
 const conversationStore = useConversationStore();
 const searchStore = useSearchStore();
@@ -38,7 +40,7 @@ watch(
     sideBarIsShowing.value = false;
 
     conversation = conversationStore.GetConversationById(route.params.id);
-    if (conversation) document.title = conversation.convoName;
+    if (conversation) document.title = conversation.conversationName;
   },
   { immediate: true },
 );
@@ -58,8 +60,8 @@ onMounted(() => {
 
 function SendChatMessage() {
   let messageToSend = {
-    senderId: userStore.myId,
-    convoId: route.params.id,
+    senderId: serverStore.user.userId,
+    conversationId: route.params.id,
     messageText: sendMessageStore.messageText,
     timeSend: Date.now(),
     meta: {},
@@ -111,7 +113,7 @@ function SendChatMessage() {
       </label>
 
       <h1 class="text-2xl font-bold text-white truncate group-[.sidebar-checked]:hidden lg:!block">
-        {{ conversationStore.GetConversationById(route.params.id)?.convoName }}
+        {{ conversationStore.GetConversationById(route.params.id)?.conversationName }}
       </h1>
       <label
         for="sidebar-check"
@@ -138,7 +140,7 @@ function SendChatMessage() {
       <div class="flex flex-col bg-blue-600 grow min-w-0 lg:!flex" ref="messageListRef">
         <div class="size-full bg-gray-300">
           <message-list
-            :convoId="conversationStore.GetConversationById(route.params.id)?.convoId"
+            :conversationId="conversationStore.GetConversationById(route.params.id)?.conversationId"
             :key="$route.path" />
         </div>
         <chat-area-info-bar
@@ -182,7 +184,7 @@ function SendChatMessage() {
       <chat-info-menu
         class="flex-none absolute z-10 top-0 translate-x-full transition-transform h-full ease-out
           group-[.sidebar-checked]:translate-x-0 lg:translate-x-0 lg:transition-none lg:static"
-        :convoId="route.params.id" />
+        :conversationId="route.params.id" />
     </div>
   </div>
 </template>

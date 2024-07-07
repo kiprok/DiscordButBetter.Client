@@ -10,7 +10,7 @@ const route = useRoute();
 
 const MessageListItem = defineAsyncComponent(() => import('@/components/MessageListItem.vue'));
 
-const props = defineProps(['convoId']);
+const props = defineProps(['conversationId']);
 const amountToLoad = 25;
 
 const userStore = useUserStore();
@@ -53,7 +53,7 @@ onUnmounted(() => {
 function ScrollToMessage(messageId) {
   let msgElement = document.querySelector(`#message-list [data-msg-id="${messageId}"]`);
   if (!msgElement) {
-    conversationStore.TriggerJumpToMessage(props.convoId, messageId);
+    conversationStore.TriggerJumpToMessage(props.conversationId, messageId);
     return;
   }
 
@@ -66,75 +66,75 @@ function ScrollToMessage(messageId) {
 function ScrollToSavedLocation() {
   if (messageListContainer.value) {
     messageListContainer.value.scrollTo({
-      top: conversationStore.GetScrollPosition(props.convoId),
+      top: conversationStore.GetScrollPosition(props.conversationId),
       behavior: 'instant',
     });
   }
 }
 
 function LoadFirstMessages() {
-  if (conversationStore.GetVisibleMessages(props.convoId).length === 0) {
+  if (conversationStore.GetVisibleMessages(props.conversationId).length === 0) {
     LoadOlderMessages(null);
   } else {
-    waitingMessagesAbove.push(...conversationStore.GetVisibleMessages(props.convoId));
+    waitingMessagesAbove.push(...conversationStore.GetVisibleMessages(props.conversationId));
   }
 }
 
 function LoadOlderMessages(startPointId) {
   if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0) return;
-  const newMessages = userStore.GetOlderMessages(props.convoId, startPointId, amountToLoad);
+  const newMessages = userStore.GetOlderMessages(props.conversationId, startPointId, amountToLoad);
   waitingMessagesAbove.push(...newMessages);
 
-  conversationStore.AddMessages(props.convoId, newMessages);
+  conversationStore.AddMessages(props.conversationId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
 
-  if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
-    waitingMessagesAbove.push(...conversationStore.RemoveNewerMessages(props.convoId, 25));
-    conversationStore.GetConversationById(props.convoId).viewingOlderMessages = true;
+  if (conversationStore.GetVisibleMessages(props.conversationId).length >= 100) {
+    waitingMessagesAbove.push(...conversationStore.RemoveNewerMessages(props.conversationId, 25));
+    conversationStore.GetConversationById(props.conversationId).viewingOlderMessages = true;
   }
 }
 
 function LoadNewerMessages(startPointId) {
-  if (!conversationStore.GetConversationById(props.convoId).viewingOlderMessages) return;
+  if (!conversationStore.GetConversationById(props.conversationId).viewingOlderMessages) return;
   if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0) return;
 
-  const newMessages = userStore.GetNewerMessages(props.convoId, startPointId, amountToLoad);
+  const newMessages = userStore.GetNewerMessages(props.conversationId, startPointId, amountToLoad);
 
   if (newMessages.length < amountToLoad) {
-    conversationStore.GetConversationById(props.convoId).viewingOlderMessages = false;
+    conversationStore.GetConversationById(props.conversationId).viewingOlderMessages = false;
     return;
   }
 
   waitingMessagesBelow.push(...newMessages);
 
-  conversationStore.AddMessages(props.convoId, newMessages);
+  conversationStore.AddMessages(props.conversationId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
 
-  if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
-    waitingMessagesBelow.push(...conversationStore.RemoveOlderMessages(props.convoId, 25));
+  if (conversationStore.GetVisibleMessages(props.conversationId).length >= 100) {
+    waitingMessagesBelow.push(...conversationStore.RemoveOlderMessages(props.conversationId, 25));
   }
 }
 
 function OnScrolling(event) {
   const { scrollTop, offsetHeight, scrollHeight } = event.target;
   if (scrollTop === 0) {
-    const lastMessage = conversationStore.GetLastMessage(props.convoId);
+    const lastMessage = conversationStore.GetLastMessage(props.conversationId);
     LoadNewerMessages(lastMessage.messageId);
   } else if (scrollHeight - (-scrollTop + offsetHeight) <= 2) {
-    const firstMessage = conversationStore.GetFirstMessage(props.convoId);
+    const firstMessage = conversationStore.GetFirstMessage(props.conversationId);
     LoadOlderMessages(firstMessage.messageId);
   }
-  conversationStore.SetScrollPosition(props.convoId, scrollTop);
+  conversationStore.SetScrollPosition(props.conversationId, scrollTop);
 }
 
 function OnMessageMountChange(message, eventType) {
   if (
     eventType === 1 &&
     conversationStore
-      .GetConversationById(props.convoId)
+      .GetConversationById(props.conversationId)
       .newUnseenMessages.includes(message.messageId)
   ) {
-    conversationStore.RemoveNewUnseenMessage(props.convoId, message.messageId);
+    conversationStore.RemoveNewUnseenMessage(props.conversationId, message.messageId);
   }
 
   if (IsLoadingCompleted(waitingMessagesAbove, message)) {
@@ -161,9 +161,9 @@ function OnMessageMountChange(message, eventType) {
 
 function HandleNewAboveMessages() {
   if (!chatIsLoading.value) {
-    // if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
-    //   conversationStore.RemoveNewerMessages(props.convoId, 25);
-    //   conversationStore.GetConversationById(props.convoId).viewingOlderMessages = true;
+    // if (conversationStore.GetVisibleMessages(props.conversationId).length >= 100) {
+    //   conversationStore.RemoveNewerMessages(props.conversationId, 25);
+    //   conversationStore.GetConversationById(props.conversationId).viewingOlderMessages = true;
     // }
   } else {
     ScrollToSavedLocation();
@@ -177,8 +177,8 @@ function HandleNewBelowMessages() {
   if (!chatIsLoading.value) {
     messageListContainer.value.scrollTop += dif;
 
-    // if (conversationStore.GetVisibleMessages(props.convoId).length >= 100) {
-    //   conversationStore.RemoveOlderMessages(props.convoId, 25);
+    // if (conversationStore.GetVisibleMessages(props.conversationId).length >= 100) {
+    //   conversationStore.RemoveOlderMessages(props.conversationId, 25);
     // }
   } else {
     ScrollToSavedLocation();
@@ -191,7 +191,7 @@ function HandleNewJumpMessages() {
   if (!waitingMessagesJump.focus) {
     messageListContainer.value.scrollTop = 0;
 
-    conversationStore.GetConversationById(props.convoId).viewingOlderMessages = false;
+    conversationStore.GetConversationById(props.conversationId).viewingOlderMessages = false;
   } else {
     const focusElement = document.querySelector(
       `#message-list [data-msg-id="${waitingMessagesJump.focus.messageId}"]`,
@@ -206,7 +206,7 @@ function HandleNewJumpMessages() {
 }
 
 function previousAlsoOwner(message, index) {
-  const prevMsg = conversationStore.GetVisibleMessages(message.convoId)[index - 1];
+  const prevMsg = conversationStore.GetVisibleMessages(message.conversationId)[index - 1];
   return (
     !message.meta.edited &&
     !userStore.GetMessageById(message.meta.reply?.messageId) &&
@@ -232,7 +232,7 @@ function previousAlsoOwner(message, index) {
             :data-msg-id="message.messageId"
             :data-msg-list-index="index"
             :data-msg-sender-id="message.senderId"
-            v-for="(message, index) in conversationStore.GetVisibleMessages(props.convoId)"
+            v-for="(message, index) in conversationStore.GetVisibleMessages(props.conversationId)"
             :message="message"
             @scroll-reply="ScrollToMessage"
             @on-mount-change="OnMessageMountChange"

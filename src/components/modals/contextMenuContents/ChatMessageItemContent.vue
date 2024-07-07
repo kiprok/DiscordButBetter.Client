@@ -6,9 +6,11 @@ import {
   ReplyToChatMessage,
 } from '@/composables/commands/chatMessageCommands.js';
 import { useUserStore } from '@/stores/user.js';
+import { useServerStore } from '@/stores/server.js';
 
 const modalStore = useModalStore();
 const userStore = useUserStore();
+const serverStore = useServerStore();
 
 const props = defineProps(['modalName', 'modalArguments']);
 </script>
@@ -34,7 +36,7 @@ const props = defineProps(['modalName', 'modalArguments']);
     "
     class="w-full py-4 text-xl text-white hover:bg-gray-700"
     v-if="
-      modalArguments.message.senderId === userStore.myId &&
+      modalArguments.message.senderId === serverStore.user.userId &&
       modalArguments.allowedFunctions.allowEdit
     ">
     Edit
@@ -42,13 +44,13 @@ const props = defineProps(['modalName', 'modalArguments']);
   <button
     @click="
       () => {
-        RemoveChatMessage(modalArguments.convoId, modalArguments.message.messageId);
+        RemoveChatMessage(modalArguments.conversationId, modalArguments.message.messageId);
         modalStore.CloseModal(modalName);
       }
     "
     class="w-full py-4 text-xl text-white hover:bg-gray-700"
     v-if="
-      modalArguments.message.senderId === userStore.myId &&
+      modalArguments.message.senderId === serverStore.user.userId &&
       modalArguments.allowedFunctions.allowDelete
     ">
     Delete

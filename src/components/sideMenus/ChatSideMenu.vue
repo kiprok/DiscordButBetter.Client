@@ -29,9 +29,9 @@ function ToggleSideMenu() {
   chatLeftSideMenuStore.toggleLeftSideMenu();
 }
 
-async function CloseConversation(convoId) {
-  conversationStore.RemoveVisibleConversation(convoId);
-  if (route.params.id === convoId) {
+async function CloseConversation(conversationId) {
+  conversationStore.RemoveVisibleConversation(conversationId);
+  if (route.params.id === conversationId) {
     await router.push({ name: 'friendList' });
   }
 }
@@ -66,9 +66,9 @@ async function CloseConversation(convoId) {
                 if (a.lastMessageTime > b.lastMessageTime) return -1;
                 return 0;
               })"
-            :key="convo.convoId"
+            :key="convo.conversationId"
             class="router-link group"
-            :to="{ name: 'chat', params: { id: convo.convoId } }"
+            :to="{ name: 'chat', params: { id: convo.conversationId } }"
             @click="ToggleSideMenu">
             <touch-component-hold
               class="p-2 min-w-0 size-full flex flex-row flex-nowrap items-center gap-2"
@@ -78,29 +78,35 @@ async function CloseConversation(convoId) {
                 () => {
                   modalStore.OpenModal('contextMenu', {
                     componentType: ConversationItemContent,
-                    convoId: convo.convoId,
+                    conversationId: convo.conversationId,
                   });
                 }
               ">
-              <div class="flex" v-if="convo.convoType === 1">
-                <img :src="convo.convoPicture" alt="pfp" class="size-10 flex-none rounded-full" />
-                <span class="truncate">{{ convo.convoName }}</span>
+              <div class="flex" v-if="convo.conversationType === 1">
+                <img
+                  :src="convo.conversationPicture"
+                  alt="pfp"
+                  class="size-10 flex-none rounded-full" />
+                <span class="truncate">{{ convo.conversationName }}</span>
               </div>
               <user-item-full-detail
                 v-else
                 :user="
-                  userStore.GetUserById(convo.participants.find((user) => user !== userStore.myId))
+                  userStore.GetUserById(
+                    convo.participants.find((user) => user !== serverStore.user.userId),
+                  )
                 "
                 class="flex" />
               <div class="ml-auto flex-none flex items-center gap-2 size-fit">
                 <notification-badge
                   class="flex-none size-5 text-sm"
                   :notifications="
-                    conversationStore.GetConversationById(convo.convoId).newUnseenMessages.length
+                    conversationStore.GetConversationById(convo.conversationId).newUnseenMessages
+                      .length
                   " />
                 <button
                   class="size-fit flex-none hover:text-gray-400 sm:hidden touch:hidden mouse:group-hover:block"
-                  @click.stop.prevent="CloseConversation(convo.convoId)">
+                  @click.stop.prevent="CloseConversation(convo.conversationId)">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
