@@ -1,13 +1,19 @@
 import { useConversationStore } from '@/stores/conversation.js';
 import { useUserStore } from '@/stores/user.js';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
+import { useServerStore } from '@/stores/server.js';
 
 export function RemoveChatMessage(conversationId, messageId) {
   const userStore = useUserStore();
   const conversationStore = useConversationStore();
+  const serverStore = useServerStore();
 
-  userStore.DeleteMessage(messageId);
-  conversationStore.DeleteMessage(conversationId, messageId);
+  serverStore.DeleteMessageAsync(messageId).then((response) => {
+    console.log(response);
+    if (!response) return;
+    userStore.DeleteMessage(messageId);
+    conversationStore.DeleteMessage(conversationId, messageId);
+  });
 }
 
 export function EditChatMessage(newMessage) {
