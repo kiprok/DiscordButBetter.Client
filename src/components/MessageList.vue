@@ -5,15 +5,17 @@ import { useRoute } from 'vue-router';
 import { useConversationStore } from '@/stores/conversation.js';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import { IsLoadingCompleted } from '@/composables/utility.js';
+import { useServerStore } from '@/stores/server.js';
 
 const route = useRoute();
 
 const MessageListItem = defineAsyncComponent(() => import('@/components/MessageListItem.vue'));
 
-const props = defineProps(['conversationId']);
+const props = defineProps(['conversation']);
 const amountToLoad = 25;
 
 const userStore = useUserStore();
+const serverStore = useServerStore();
 const conversationStore = useConversationStore();
 const sendingMessageStore = useSendingMessageStore();
 
@@ -53,7 +55,7 @@ onUnmounted(() => {
 function ScrollToMessage(messageId) {
   let msgElement = document.querySelector(`#message-list [data-msg-id="${messageId}"]`);
   if (!msgElement) {
-    conversationStore.TriggerJumpToMessage(props.conversationId, messageId);
+    conversationStore.TriggerJumpToMessage(props.conversation.conversationId, messageId);
     return;
   }
 
@@ -66,85 +68,101 @@ function ScrollToMessage(messageId) {
 function ScrollToSavedLocation() {
   if (messageListContainer.value) {
     messageListContainer.value.scrollTo({
-      top: conversationStore.GetScrollPosition(props.conversationId),
+      top: conversationStore.GetScrollPosition(props.conversation.conversationId),
       behavior: 'instant',
     });
   }
 }
 
-function LoadFirstMessages() {
-  if (conversationStore.GetVisibleMessages(props.conversationId).length === 0) {
-    LoadOlderMessages(null);
+async function LoadFirstMessages() {
+  if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length === 0) {
+    await LoadOlderMessages(null);
   } else {
     waitingMessagesAbove.push(...conversationStore.GetVisibleMessages(props.conversationId));
   }
 }
 
-function LoadOlderMessages(startPointId) {
-  if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0) return;
-  const newMessages = userStore.GetOlderMessages(props.conversationId, startPointId, amountToLoad);
+async function LoadOlderMessages(startPointId) {
+  if (props.conversation.isLoadingMessages) return;
+  props.conversation.isLoadingMessages = true;
+
+  const newMessages =
+    startPointId == null
+      ? await serverStore.GetMessagesAsync(props.conversation.conversationId)
+      : [];
+
+  userStore.AddMessages(newMessages);
+
   waitingMessagesAbove.push(...newMessages);
 
-  conversationStore.AddMessages(props.conversationId, newMessages);
+  conversationStore.AddMessages(props.conversation.conversationId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
 
-  if (conversationStore.GetVisibleMessages(props.conversationId).length >= 100) {
+  if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 100) {
     waitingMessagesAbove.push(...conversationStore.RemoveNewerMessages(props.conversationId, 25));
-    conversationStore.GetConversationById(props.conversationId).viewingOlderMessages = true;
+    props.conversation.viewingOlderMessages = true;
   }
 }
 
-function LoadNewerMessages(startPointId) {
-  if (!conversationStore.GetConversationById(props.conversationId).viewingOlderMessages) return;
-  if (waitingMessagesAbove.length > 0 && waitingMessagesBelow.length > 0) return;
+async function LoadNewerMessages(startPointId) {
+  if (props.conversation.isLoadingMessages) return;
 
-  const newMessages = userStore.GetNewerMessages(props.conversationId, startPointId, amountToLoad);
+  props.conversation.isLoadingMessages = true;
+
+  if (!props.conversation.viewingOlderMessages) return;
+
+  const newMessages = userStore.GetNewerMessages(
+    props.conversation.conversationId,
+    startPointId,
+    amountToLoad,
+  );
 
   if (newMessages.length < amountToLoad) {
-    conversationStore.GetConversationById(props.conversationId).viewingOlderMessages = false;
+    conversationStore.GetConversationById(props.conversation.conversationId).viewingOlderMessages =
+      false;
     return;
   }
 
   waitingMessagesBelow.push(...newMessages);
 
-  conversationStore.AddMessages(props.conversationId, newMessages);
+  conversationStore.AddMessages(props.conversation.conversationId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
 
-  if (conversationStore.GetVisibleMessages(props.conversationId).length >= 100) {
-    waitingMessagesBelow.push(...conversationStore.RemoveOlderMessages(props.conversationId, 25));
+  if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 100) {
+    waitingMessagesBelow.push(
+      ...conversationStore.RemoveOlderMessages(props.conversation.conversationId, 25),
+    );
   }
 }
 
 function OnScrolling(event) {
   const { scrollTop, offsetHeight, scrollHeight } = event.target;
   if (scrollTop === 0) {
-    const lastMessage = conversationStore.GetLastMessage(props.conversationId);
+    const lastMessage = conversationStore.GetLastMessage(props.conversation.conversationId);
     LoadNewerMessages(lastMessage.messageId);
   } else if (scrollHeight - (-scrollTop + offsetHeight) <= 2) {
-    const firstMessage = conversationStore.GetFirstMessage(props.conversationId);
+    const firstMessage = conversationStore.GetFirstMessage(props.conversation.conversationId);
     LoadOlderMessages(firstMessage.messageId);
   }
-  conversationStore.SetScrollPosition(props.conversationId, scrollTop);
+  conversationStore.SetScrollPosition(props.conversation.conversationId, scrollTop);
 }
 
 function OnMessageMountChange(message, eventType) {
-  if (
-    eventType === 1 &&
-    conversationStore
-      .GetConversationById(props.conversationId)
-      .newUnseenMessages.includes(message.messageId)
-  ) {
-    conversationStore.RemoveNewUnseenMessage(props.conversationId, message.messageId);
+  if (eventType === 1 && props.conversation.newUnseenMessages.includes(message.messageId)) {
+    conversationStore.RemoveNewUnseenMessage(props.conversation.conversationId, message.messageId);
   }
 
   if (IsLoadingCompleted(waitingMessagesAbove, message)) {
     HandleNewAboveMessages();
+    props.conversation.isLoadingMessages = false;
     return;
   } else if (IsLoadingCompleted(waitingMessagesBelow, message)) {
     HandleNewBelowMessages();
+    props.conversation.isLoadingMessages = false;
     return;
   } else if (IsLoadingCompleted(waitingMessagesJump.messages, message)) {
     HandleNewJumpMessages();
+    props.conversation.isLoadingMessages = false;
     return;
   }
 
@@ -191,7 +209,7 @@ function HandleNewJumpMessages() {
   if (!waitingMessagesJump.focus) {
     messageListContainer.value.scrollTop = 0;
 
-    conversationStore.GetConversationById(props.conversationId).viewingOlderMessages = false;
+    props.conversation.viewingOlderMessages = false;
   } else {
     const focusElement = document.querySelector(
       `#message-list [data-msg-id="${waitingMessagesJump.focus.messageId}"]`,
@@ -232,7 +250,9 @@ function previousAlsoOwner(message, index) {
             :data-msg-id="message.messageId"
             :data-msg-list-index="index"
             :data-msg-sender-id="message.senderId"
-            v-for="(message, index) in conversationStore.GetVisibleMessages(props.conversationId)"
+            v-for="(message, index) in conversationStore.GetVisibleMessages(
+              props.conversation.conversationId,
+            )"
             :message="message"
             @scroll-reply="ScrollToMessage"
             @on-mount-change="OnMessageMountChange"

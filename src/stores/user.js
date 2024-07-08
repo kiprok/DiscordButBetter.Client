@@ -41,6 +41,12 @@ export const useUserStore = defineStore('user', () => {
     messages[message.messageId] = message;
   }
 
+  function AddMessages(newMessages) {
+    newMessages.forEach((message) => {
+      messages[message.messageId] = message;
+    });
+  }
+
   function GetOlderMessages(conversationId, startpointId, amount) {
     return Object.keys(messages)
       .filter(
@@ -182,6 +188,7 @@ export const useUserStore = defineStore('user', () => {
     AddUser,
     AddFriend,
     RemoveFriend,
+    AddMessages,
     SendMessage,
     DeleteMessage,
     GetOlderMessages,

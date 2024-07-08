@@ -16,6 +16,7 @@ export const useConversationStore = defineStore('messageList', () => {
     //   lastMessageTime: 0,
     //   lastSeenMessage: "",
     //   newUnseenMessages: [],
+    //   isLoadingMessages: false,
     // },
   });
 
@@ -79,6 +80,7 @@ export const useConversationStore = defineStore('messageList', () => {
       lastSeenMessage: '',
       lastMessageTime: 0,
       newUnseenMessages: [],
+      isLoadingMessages: false,
     };
   }
 

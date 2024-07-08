@@ -113,7 +113,7 @@ function SendChatMessage() {}
       <div class="flex flex-col bg-blue-600 grow min-w-0 lg:!flex" ref="messageListRef">
         <div class="size-full bg-gray-300">
           <message-list
-            :conversationId="conversationStore.GetConversationById(route.params.id)?.conversationId"
+            :conversation="conversationStore.GetConversationById(route.params.id)"
             :key="$route.path" />
         </div>
         <chat-area-info-bar

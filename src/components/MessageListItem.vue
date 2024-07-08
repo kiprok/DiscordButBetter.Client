@@ -40,6 +40,9 @@ const finalReply = computed(() => {
 });
 
 onMounted(() => {
+  console.log(userStore.messages);
+  console.log(props.message.metadata.reply?.messageId);
+  console.log(reply.value);
   emits('OnMountChange', props.message, 1);
 });
 

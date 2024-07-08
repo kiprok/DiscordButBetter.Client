@@ -314,6 +314,16 @@ export const useServerStore = defineStore('server', () => {
     return response.ok;
   }
 
+  async function GetMessagesAsync(conversationId) {
+    const response = await fetch(`/api/messages/conversation/${conversationId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok ? await response.json() : null;
+  }
+
   async function ConnectSocketAsync() {
     connection.value = new signalR.HubConnectionBuilder()
       .withUrl(`/hub?token=${GetToken()}`)
@@ -353,6 +363,7 @@ export const useServerStore = defineStore('server', () => {
     SendMessageAsync,
     UpdateMessageAsync,
     DeleteMessageAsync,
+    GetMessagesAsync,
     ConnectSocketAsync,
   };
 });
