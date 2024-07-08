@@ -22,20 +22,20 @@ const modalStore = useModalStore();
 const serverStore = useServerStore();
 
 const refTextMessage = ref();
-const timeSend = new Date(props.message.timeSend);
+const sentAt = new Date(props.message.sentAt);
 
 const reply = computed(() => {
-  return userStore.GetMessageById(props.message.meta.reply?.messageId) ?? null;
+  return userStore.GetMessageById(props.message.metadata.reply?.messageId) ?? null;
 });
 
 const finalMessage = computed(() => {
-  let escapedMessage = escapeHtml(props.message.messageText);
+  let escapedMessage = escapeHtml(props.message.content);
   return parseMarkdownMessage(escapedMessage);
 });
 
 const finalReply = computed(() => {
   if (!reply.value) return '';
-  let escapedMessage = escapeHtml(reply.value.messageText);
+  let escapedMessage = escapeHtml(reply.value.content);
   return parseMarkdownReply(escapedMessage);
 });
 
@@ -95,7 +95,7 @@ function OpenContextMenu() {
         <div v-if="previousAlsoOwner" class="flex h-6 items-center justify-center">
           <span class="invisible text-xs group-hover/item:visible">
             {{
-              timeSend.toLocaleTimeString([], {
+              sentAt.toLocaleTimeString([], {
                 hour: '2-digit',
                 minute: '2-digit',
               })
@@ -109,9 +109,9 @@ function OpenContextMenu() {
             {{ userStore.GetUserById(props.message.senderId).username }}
           </h3>
           <span class="block shrink-0 text-xs">
-            {{ timeSend.toLocaleTimeString() }}
+            {{ sentAt.toLocaleTimeString() }}
           </span>
-          <span class="block shrink-0 text-xs" v-if="props.message.meta.edited" title="edited">
+          <span class="block shrink-0 text-xs" v-if="props.message.metadata.edited" title="edited">
             <i class="fa-solid fa-pencil"></i>
           </span>
         </div>

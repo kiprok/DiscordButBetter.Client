@@ -4,7 +4,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import ChatTextBox from '@/components/ChatTextBox.vue';
 import { defineAsyncComponent, onMounted, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { useConversationStore } from '@/stores/conversation.js';
 import ChatAreaInfoBar from '@/components/ChatAreaInfoBar.vue';
 import ChatLeftSideMenuButton from '@/components/ChatLeftSideMenuButton.vue';
@@ -13,6 +13,7 @@ import MessageListItem from '@/components/MessageListItem.vue';
 import PaginationButtons from '@/components/PaginationButtons.vue';
 import ChatInfoMenu from '@/components/sideMenus/ChatInfoMenu.vue';
 import { useServerStore } from '@/stores/server.js';
+import UserItemFullDetail from '@/components/user/UserItemFullDetail.vue';
 
 const MessageList = defineAsyncComponent(() => import('@/components/MessageList.vue'));
 
@@ -58,47 +59,7 @@ onMounted(() => {
   });
 });
 
-function SendChatMessage() {
-  let messageToSend = {
-    senderId: serverStore.user.userId,
-    conversationId: route.params.id,
-    messageText: sendMessageStore.messageText,
-    timeSend: Date.now(),
-    meta: {},
-  };
-
-  if (sendMessageStore.messageEditing) {
-    messageToSend = sendMessageStore.messageEditing;
-    messageToSend.messageText = sendMessageStore.messageText;
-    messageToSend.meta['edited'] = true;
-  }
-
-  if (sendMessageStore.replyTo) {
-    messageToSend.meta['reply'] = {
-      messageId: sendMessageStore.replyTo.messageId,
-      userId: sendMessageStore.replyTo.senderId,
-    };
-  } else if (messageToSend.meta.hasOwnProperty('reply')) {
-    delete messageToSend.meta.reply;
-  }
-
-  messageToSend.messageText = messageToSend.messageText.trim();
-  let msg = userStore.SendMessage(route.params.id, messageToSend);
-  sendMessageStore.sendingMessage = msg.messageId;
-  if (
-    !sendMessageStore.messageEditing &&
-    !conversationStore.GetConversationById(route.params.id).viewingOlderMessages
-  )
-    conversationStore.AddMessage(route.params.id, msg);
-  else sendMessageStore.sendingMessage = null;
-
-  if (conversationStore.GetConversationById(route.params.id).lastMessageTime < msg.timeSend)
-    conversationStore.UpdateLastMessageTime(route.params.id, msg.timeSend);
-
-  sendMessageStore.messageText = '';
-  sendMessageStore.messageEditing = null;
-  sendMessageStore.replyTo = null;
-}
+function SendChatMessage() {}
 </script>
 
 <template>
@@ -112,9 +73,21 @@ function SendChatMessage() {
         <i class="fa-solid fa-chevron-left"></i>
       </label>
 
-      <h1 class="text-2xl font-bold text-white truncate group-[.sidebar-checked]:hidden lg:!block">
+      <h1
+        v-if="conversationStore.GetConversationById(route.params.id)?.conversationType === 1"
+        class="text-2xl font-bold text-white truncate group-[.sidebar-checked]:hidden lg:!block">
         {{ conversationStore.GetConversationById(route.params.id)?.conversationName }}
       </h1>
+      <user-item-full-detail
+        v-else-if="conversationStore.GetConversationById(route.params.id)"
+        :user="
+          userStore.GetUserById(
+            conversationStore
+              .GetConversationById(route.params.id)
+              ?.participants.find((user) => user !== serverStore.user.userId),
+          )
+        "
+        class="text-white group-[.sidebar-checked]:hidden lg:!flex" />
       <label
         for="sidebar-check"
         class="ml-auto text-xl text-white hover:text-gray-300 group-[.sidebar-checked]:hidden lg:hidden">
@@ -178,7 +151,9 @@ function SendChatMessage() {
           </span>
         </chat-area-info-bar>
         <div class="flex h-fit flex-none flex-row items-center bg-gray-600 px-6 py-2">
-          <ChatTextBox @send-chat-message="SendChatMessage" :convo-id="route.params.id" />
+          <ChatTextBox
+            @send-chat-message="SendChatMessage"
+            :conversation="conversationStore.GetConversationById(route.params.id)" />
         </div>
       </div>
       <chat-info-menu

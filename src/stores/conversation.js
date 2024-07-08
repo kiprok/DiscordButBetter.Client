@@ -127,14 +127,25 @@ export const useConversationStore = defineStore('messageList', () => {
     ];
   }
 
+  function UpdateMessage(conversationId, message) {
+    if (!conversations[conversationId]) return;
+    if (conversations[conversationId].visibleMessages.includes(message)) return;
+    const index = conversations[conversationId].visibleMessages.findIndex(
+      (x) => x.messageId === message.messageId,
+    );
+    conversations[conversationId].visibleMessages[index] = message;
+  }
+
   function AddMessage(conversationId, message) {
+    if (!conversations[conversationId]) return;
+    if (conversations[conversationId].visibleMessages.includes(message)) return;
     conversations[conversationId].visibleMessages.push(message);
-    conversations[conversationId].visibleMessages.sort((a, b) => a.timeSend - b.timeSend);
+    conversations[conversationId].visibleMessages.sort((a, b) => a.sentAt - b.sentAt);
   }
 
   function AddMessages(conversationId, messages) {
     conversations[conversationId].visibleMessages.push(...messages);
-    conversations[conversationId].visibleMessages.sort((a, b) => a.timeSend - b.timeSend);
+    conversations[conversationId].visibleMessages.sort((a, b) => a.sentAt - b.sentAt);
   }
 
   function RemoveNewerMessages(conversationId, amount) {
@@ -193,6 +204,7 @@ export const useConversationStore = defineStore('messageList', () => {
     ClearVisibleMessages,
     GetFirstMessage,
     GetLastMessage,
+    UpdateMessage,
     AddMessage,
     AddMessages,
     RemoveNewerMessages,

@@ -71,16 +71,17 @@ async function OpenConversation(userId) {
     await router.push({ name: 'chat', params: { id: conversation.conversationId } });
   } else {
     let conversationId = Object.keys(conversationStore.GetALLConversations()).find(
-      (conversationId) =>
-        conversationStore.GetConversationById(conversationId).participants.includes(userId) &&
-        conversationStore.GetConversationById(conversationId).conversationType === 0,
+      (id) =>
+        conversationStore.GetConversationById(id)?.participants?.includes(userId) &&
+        conversationStore.GetConversationById(id)?.conversationType === 0,
     );
     if (conversationId) {
+      await serverStore.CreateConversationAsync('', 0, [userId]);
       conversationStore.AddVisibleConversation(conversationId);
       await router.push({ name: 'chat', params: { id: conversationId } });
     } else {
       let user = userStore.GetUserById(userId);
-      let newConvo = await serverStore.CreateConversationAsync('private', 0, [userId]);
+      let newConvo = await serverStore.CreateConversationAsync('', 0, [userId]);
       conversationStore.AddConversation(newConvo);
       conversationStore.UpdateLastMessageTime(newConvo.conversationId, Date.now());
       conversationStore.AddVisibleConversation(newConvo.conversationId);
@@ -157,9 +158,9 @@ async function GenRandomMessage() {
       messageId: newMessageId,
       senderId: userid,
       conversationId: conversation.conversationId,
-      messageText: `A new Random Message`,
-      timeSend: Date.now(),
-      meta: {},
+      content: `A new Random Message`,
+      sentAt: Date.now(),
+      metadata: {},
     };
 
     if (!conversationStore.GetVisibleConversations().includes(conversation.conversationId)) {

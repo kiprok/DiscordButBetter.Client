@@ -76,9 +76,8 @@ export const useSearchStore = defineStore('search', () => {
     _fullSearchData[searchId] = Object.keys(userStore.messages)
       .filter((message) => {
         return (
-          userStore.messages[message].messageText.includes(
-            GetSearchDataById(searchId).searchQuery,
-          ) && userStore.messages[message].conversationId === searchId
+          userStore.messages[message].content.includes(GetSearchDataById(searchId).searchQuery) &&
+          userStore.messages[message].conversationId === searchId
         );
       })
       .map((message) => userStore.messages[message])

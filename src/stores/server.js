@@ -280,6 +280,40 @@ export const useServerStore = defineStore('server', () => {
     return response.ok;
   }
 
+  async function SendMessageAsync(message) {
+    const response = await fetch(`/api/messages`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: GetToken(),
+      },
+      body: JSON.stringify(message),
+    });
+    return response.ok ? await response.json() : null;
+  }
+
+  async function UpdateMessageAsync(messageId, message) {
+    const response = await fetch(`/api/messages/${messageId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: GetToken(),
+      },
+      body: JSON.stringify(message),
+    });
+    return response.ok ? await response.json() : null;
+  }
+
+  async function DeleteMessageAsync(messageId) {
+    const response = await fetch(`/api/messages/${messageId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok;
+  }
+
   async function ConnectSocketAsync() {
     connection.value = new signalR.HubConnectionBuilder()
       .withUrl(`/hub?token=${GetToken()}`)
@@ -316,6 +350,9 @@ export const useServerStore = defineStore('server', () => {
     CreateConversationAsync,
     DeleteConversationAsync,
     UpdateConversationAsync,
+    SendMessageAsync,
+    UpdateMessageAsync,
+    DeleteMessageAsync,
     ConnectSocketAsync,
   };
 });

@@ -65,8 +65,8 @@ async function LoadUserData() {
 <template>
   <div class="flex h-dvh w-screen flex-row overflow-hidden bg-amber-500">
     <ChatSideMenu />
-    <router-view />
-    <div v-if="_isLoading" class="z-[1000] bg-gray-600 w-screen h-dvh fixed top-0 left-0">
+    <router-view v-if="!_isLoading" />
+    <div v-else class="z-[1000] bg-gray-600 w-screen h-dvh fixed top-0 left-0">
       <skelly-loading class="size-full text-white text-[10rem]" />
     </div>
   </div>

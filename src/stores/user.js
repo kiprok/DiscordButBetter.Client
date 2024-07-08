@@ -30,24 +30,15 @@ export const useUserStore = defineStore('user', () => {
                 messageId: "",
                 senderId: "",
                 conversationId: "",
-                messageText: "",
-                timeSend: 0,
-                meta: {}
+                content: "",
+                sentAt: 0,
+                metadata: {}
             }
              */
   });
 
-  function SendMessage(conversationId, message) {
-    let newId = message.hasOwnProperty('messageId') ? message.messageId : crypto.randomUUID();
-    messages[newId] = {
-      messageId: newId,
-      senderId: message.senderId,
-      conversationId: message.conversationId,
-      messageText: message.messageText,
-      timeSend: message.timeSend,
-      meta: message.meta,
-    };
-    return messages[newId];
+  function SendMessage(message) {
+    messages[message.messageId] = message;
   }
 
   function GetOlderMessages(conversationId, startpointId, amount) {
@@ -55,9 +46,9 @@ export const useUserStore = defineStore('user', () => {
       .filter(
         (key) =>
           conversationId === messages[key].conversationId &&
-          (messages[startpointId]?.timeSend ?? Infinity) - messages[key].timeSend > 0,
+          (messages[startpointId]?.sentAt ?? Infinity) - messages[key].sentAt > 0,
       )
-      .toSorted((a, b) => messages[b].timeSend - messages[a].timeSend)
+      .toSorted((a, b) => messages[b].sentAt - messages[a].sentAt)
       .slice(0, amount)
       .map((key) => messages[key]);
   }
@@ -67,9 +58,9 @@ export const useUserStore = defineStore('user', () => {
       .filter(
         (key) =>
           conversationId === messages[key].conversationId &&
-          (messages[startpointId]?.timeSend ?? 0) - messages[key].timeSend < 0,
+          (messages[startpointId]?.sentAt ?? 0) - messages[key].sentAt < 0,
       )
-      .toSorted((a, b) => messages[a].timeSend - messages[b].timeSend)
+      .toSorted((a, b) => messages[a].sentAt - messages[b].sentAt)
       .slice(0, amount)
       .map((key) => messages[key]);
   }
@@ -77,7 +68,7 @@ export const useUserStore = defineStore('user', () => {
   function GetConversationMessages(conversationId) {
     return Object.keys(messages)
       .filter((key) => conversationId === messages[key].conversationId)
-      .toSorted((a, b) => messages[a].timeSend - messages[b].timeSend)
+      .toSorted((a, b) => messages[a].sentAt - messages[b].sentAt)
       .map((key) => messages[key]);
   }
 

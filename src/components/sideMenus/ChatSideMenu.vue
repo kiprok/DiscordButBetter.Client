@@ -31,8 +31,11 @@ function ToggleSideMenu() {
 
 async function CloseConversation(conversationId) {
   conversationStore.RemoveVisibleConversation(conversationId);
-  if (route.params.id === conversationId) {
-    await router.push({ name: 'friendList' });
+  const conversation = conversationStore.GetConversationById(conversationId);
+  if (conversation.conversationType === 0) {
+    await serverStore.RemoveFromVisibleConversationsAsync(conversationId);
+  } else {
+    await serverStore.DeleteConversationAsync(conversationId);
   }
 }
 </script>

@@ -4,18 +4,83 @@ import { ref, watch } from 'vue';
 import { insertAtCursor } from '@/composables/utility.js';
 import { useUserStore } from '@/stores/user.js';
 import { useConversationStore } from '@/stores/conversation.js';
+import { useServerStore } from '@/stores/server.js';
 
 const userStore = useUserStore();
+const serverStore = useServerStore();
 const conversationStore = useConversationStore();
 const sendMessageStore = useSendingMessageStore();
 const emit = defineEmits(['SendChatMessage']);
-const props = defineProps(['conversationId']);
+const props = defineProps(['conversation']);
 
 const textBox = ref();
 
-function SendChatMessage() {
+async function SendChatMessage() {
   if (!sendMessageStore.messageText.trim()) return;
-  emit('SendChatMessage');
+
+  if (sendMessageStore.messageEditing) {
+    const editedMessage = {
+      content: sendMessageStore.messageText,
+      metadata: {
+        ...sendMessageStore.messageEditing.metadata,
+        edited: true,
+      },
+    };
+
+    if (sendMessageStore.replyTo) {
+      editedMessage.metadata['reply'] = {
+        messageId: sendMessageStore.replyTo.messageId,
+        userId: sendMessageStore.replyTo.senderId,
+      };
+    } else if (editedMessage.metadata.hasOwnProperty('reply')) {
+      delete editedMessage.metadata.reply;
+    }
+
+    editedMessage.content = editedMessage.content.trim();
+
+    const response = await serverStore.UpdateMessageAsync(
+      sendMessageStore.messageEditing.messageId,
+      editedMessage,
+    );
+
+    if (response) {
+      userStore.SendMessage(response);
+      conversationStore.UpdateMessage(props.conversation.conversationId, response);
+      sendMessageStore.sendingMessage = response.messageId;
+    }
+  } else {
+    let messageToSend = {
+      conversationId: props.conversation.conversationId,
+      content: sendMessageStore.messageText,
+      metadata: {},
+    };
+
+    if (sendMessageStore.replyTo) {
+      messageToSend.metadata['reply'] = {
+        messageId: sendMessageStore.replyTo.messageId,
+        userId: sendMessageStore.replyTo.senderId,
+      };
+    } else if (messageToSend.metadata.hasOwnProperty('reply')) {
+      delete messageToSend.metadata.reply;
+    }
+
+    messageToSend.content = messageToSend.content.trim();
+    const response = await serverStore.SendMessageAsync(messageToSend);
+    if (response) {
+      userStore.SendMessage(response);
+      sendMessageStore.sendingMessage = response.messageId;
+
+      if (!sendMessageStore.messageEditing && !props.conversation.viewingOlderMessages)
+        conversationStore.AddMessage(props.conversation.conversationId, response);
+      else sendMessageStore.sendingMessage = null;
+    }
+  }
+
+  conversationStore.UpdateLastMessageTime(props.conversation.conversationId, Date.now());
+
+  sendMessageStore.messageText = '';
+  sendMessageStore.messageEditing = null;
+  sendMessageStore.replyTo = null;
 }
 
 function onPaste(event) {
@@ -74,7 +139,11 @@ function onInput() {
           class="absolute w-full min-w-0 z-10 top-1/2 -translate-y-1/2 left-2 select-none text-black/40 truncate
             pointer-events-none">
           Message @{{
-            conversationStore.GetConversationById(props.conversationId)?.conversationName
+            conversation?.conversationType === 1
+              ? conversation.conversationName
+              : userStore.GetUserById(
+                  conversation?.participants.find((user) => user !== serverStore.user?.userId),
+                )?.username
           }}
         </div>
         <div

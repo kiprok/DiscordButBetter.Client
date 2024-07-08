@@ -208,8 +208,8 @@ function HandleNewJumpMessages() {
 function previousAlsoOwner(message, index) {
   const prevMsg = conversationStore.GetVisibleMessages(message.conversationId)[index - 1];
   return (
-    !message.meta.edited &&
-    !userStore.GetMessageById(message.meta.reply?.messageId) &&
+    !message.metadata.edited &&
+    !userStore.GetMessageById(message.metadata.reply?.messageId) &&
     prevMsg &&
     prevMsg.senderId === message.senderId
   );

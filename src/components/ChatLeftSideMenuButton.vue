@@ -16,8 +16,8 @@ function ToggleSideMenu() {
 const totalNotifications = computed(() => {
   return (
     Object.keys(conversationStore.GetALLConversations()).reduce((acc, key) => {
-      return acc + conversationStore.GetConversationById(key).newUnseenMessages.length;
-    }, 0) + userStore.GetFriendRequests().length
+      return acc + (conversationStore.GetConversationById(key)?.newUnseenMessages?.length ?? 0);
+    }, 0) + (userStore.GetFriendRequests()?.length ?? 0)
   );
 });
 </script>

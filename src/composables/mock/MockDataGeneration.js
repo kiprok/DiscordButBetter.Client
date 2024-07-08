@@ -56,9 +56,9 @@ export async function GenerateConversationMessages(conversationId, otherId, amou
       messageId: newMessageId,
       senderId: i % 2 === 0 ? otherId : serverStore.user.userId,
       conversationId: conversationId,
-      messageText: `Random message ${i}`,
-      timeSend: Date.now() - timeOffset,
-      meta: lastMsgId !== null ? { reply: { messageId: lastMsgId, userId: otherId } } : {},
+      content: `Random message ${i}`,
+      sentAt: Date.now() - timeOffset,
+      metadata: lastMsgId !== null ? { reply: { messageId: lastMsgId, userId: otherId } } : {},
     };
     lastMsgId = newMessageId;
   }
@@ -67,8 +67,8 @@ export async function GenerateConversationMessages(conversationId, otherId, amou
     messageId: newMessageId,
     senderId: serverStore.user.userId,
     conversationId: conversationId,
-    messageText: `I replied to the 40th message`,
-    timeSend: Date.now(),
-    meta: { reply: { messageId: messageToJumpTo, userId: userToJumpTo } },
+    content: `I replied to the 40th message`,
+    sentAt: Date.now(),
+    metadata: { reply: { messageId: messageToJumpTo, userId: userToJumpTo } },
   };
 }
