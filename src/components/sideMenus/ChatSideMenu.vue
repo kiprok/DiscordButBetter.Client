@@ -37,6 +37,9 @@ async function CloseConversation(conversationId) {
   } else {
     await serverStore.DeleteConversationAsync(conversationId);
   }
+  if (route.params.id === conversationId) {
+    await router.push({ name: 'friendList' });
+  }
 }
 </script>
 
