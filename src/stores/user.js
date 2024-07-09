@@ -93,7 +93,10 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function GetMessageById(id) {
-    return messages[id];
+    if (messages[id]) return messages[id];
+    serverStore.GetMessageByIdAsync(id).then((message) => {
+      if (message) messages[message.messageId] = message;
+    });
   }
 
   function GetFriendList() {

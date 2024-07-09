@@ -25,7 +25,8 @@ const refTextMessage = ref();
 const sentAt = new Date(props.message.sentAt);
 
 const reply = computed(() => {
-  return userStore.GetMessageById(props.message.metadata.reply?.messageId) ?? null;
+  if (!props.message.metadata.reply) return null;
+  return userStore.GetMessageById(props.message.metadata.reply.messageId) ?? null;
 });
 
 const finalMessage = computed(() => {
@@ -40,9 +41,6 @@ const finalReply = computed(() => {
 });
 
 onMounted(() => {
-  console.log(userStore.messages);
-  console.log(props.message.metadata.reply?.messageId);
-  console.log(reply.value);
   emits('OnMountChange', props.message, 1);
 });
 

@@ -314,6 +314,16 @@ export const useServerStore = defineStore('server', () => {
     return response.ok;
   }
 
+  async function GetMessageByIdAsync(messageId) {
+    const response = await fetch(`/api/messages/${messageId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: GetToken(),
+      },
+    });
+    return response.ok ? await response.json() : null;
+  }
+
   async function GetMessagesAsync(conversationId) {
     const response = await fetch(`/api/messages/conversation/${conversationId}`, {
       method: 'GET',
@@ -321,6 +331,45 @@ export const useServerStore = defineStore('server', () => {
         Authorization: GetToken(),
       },
     });
+    return response.ok ? await response.json() : null;
+  }
+
+  async function GetOlderMessagesAsync(conversationId, messageTime) {
+    const response = await fetch(
+      `/api/messages/conversation/${conversationId}/older/${messageTime}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: GetToken(),
+        },
+      },
+    );
+    return response.ok ? await response.json() : null;
+  }
+
+  async function GetNewerMessagesAsync(conversationId, messageTime) {
+    const response = await fetch(
+      `/api/messages/conversation/${conversationId}/newer/${messageTime}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: GetToken(),
+        },
+      },
+    );
+    return response.ok ? await response.json() : null;
+  }
+
+  async function GetMessagesFromPointAsync(conversationId, messageId) {
+    const response = await fetch(
+      `/api/messages/conversation/${conversationId}/point/${messageId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: GetToken(),
+        },
+      },
+    );
     return response.ok ? await response.json() : null;
   }
 
@@ -363,7 +412,11 @@ export const useServerStore = defineStore('server', () => {
     SendMessageAsync,
     UpdateMessageAsync,
     DeleteMessageAsync,
+    GetMessageByIdAsync,
     GetMessagesAsync,
+    GetOlderMessagesAsync,
+    GetNewerMessagesAsync,
+    GetMessagesFromPointAsync,
     ConnectSocketAsync,
   };
 });

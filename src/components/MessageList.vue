@@ -33,6 +33,8 @@ LoadFirstMessages();
 
 onMounted(() => {
   conversationStore.RegisterJumpCallback((messages, focus) => {
+    console.log(messages);
+    console.log(focus);
     if (messages.length !== 0) {
       waitingMessagesJump.messages.push(...messages);
       waitingMessagesJump.focus = focus;
@@ -85,11 +87,15 @@ async function LoadFirstMessages() {
 async function LoadOlderMessages(startPointId) {
   if (props.conversation.isLoadingMessages) return;
   props.conversation.isLoadingMessages = true;
-
   const newMessages =
     startPointId == null
       ? await serverStore.GetMessagesAsync(props.conversation.conversationId)
-      : [];
+      : await serverStore.GetOlderMessagesAsync(
+          props.conversation.conversationId,
+          userStore.GetMessageById(startPointId).sentAt,
+        );
+
+  if (newMessages.length === 0) props.conversation.isLoadingMessages = false;
 
   userStore.AddMessages(newMessages);
 
@@ -98,24 +104,33 @@ async function LoadOlderMessages(startPointId) {
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
 
-  if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 100) {
-    waitingMessagesAbove.push(...conversationStore.RemoveNewerMessages(props.conversationId, 25));
+  if (
+    conversationStore.GetVisibleMessages(props.conversation.conversationId).length >=
+    newMessages.length * 3
+  ) {
+    waitingMessagesAbove.push(
+      ...conversationStore.RemoveNewerMessages(
+        props.conversation.conversationId,
+        newMessages.length,
+      ),
+    );
     props.conversation.viewingOlderMessages = true;
   }
 }
 
 async function LoadNewerMessages(startPointId) {
   if (props.conversation.isLoadingMessages) return;
-
   props.conversation.isLoadingMessages = true;
 
   if (!props.conversation.viewingOlderMessages) return;
-
-  const newMessages = userStore.GetNewerMessages(
+  const newMessages = await serverStore.GetNewerMessagesAsync(
     props.conversation.conversationId,
-    startPointId,
-    amountToLoad,
+    userStore.GetMessageById(startPointId).sentAt,
   );
+
+  if (newMessages.length === 0) props.conversation.isLoadingMessages = false;
+
+  userStore.AddMessages(newMessages);
 
   if (newMessages.length < amountToLoad) {
     conversationStore.GetConversationById(props.conversation.conversationId).viewingOlderMessages =
@@ -126,18 +141,26 @@ async function LoadNewerMessages(startPointId) {
   waitingMessagesBelow.push(...newMessages);
 
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
+
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
 
-  if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 100) {
+  if (
+    conversationStore.GetVisibleMessages(props.conversation.conversationId).length >=
+    newMessages.length * 3
+  ) {
     waitingMessagesBelow.push(
-      ...conversationStore.RemoveOlderMessages(props.conversation.conversationId, 25),
+      ...conversationStore.RemoveOlderMessages(
+        props.conversation.conversationId,
+        newMessages.length,
+      ),
     );
   }
+  if (newMessages.length === 0) props.conversation.isLoadingMessages = false;
 }
 
 function OnScrolling(event) {
   const { scrollTop, offsetHeight, scrollHeight } = event.target;
-  if (scrollTop === 0) {
+  if (scrollTop === 0 && props.conversation.viewingOlderMessages) {
     const lastMessage = conversationStore.GetLastMessage(props.conversation.conversationId);
     LoadNewerMessages(lastMessage.messageId);
   } else if (scrollHeight - (-scrollTop + offsetHeight) <= 2) {
@@ -225,9 +248,10 @@ function HandleNewJumpMessages() {
 
 function previousAlsoOwner(message, index) {
   const prevMsg = conversationStore.GetVisibleMessages(message.conversationId)[index - 1];
+
   return (
     !message.metadata.edited &&
-    !userStore.GetMessageById(message.metadata.reply?.messageId) &&
+    !message.metadata.reply &&
     prevMsg &&
     prevMsg.senderId === message.senderId
   );

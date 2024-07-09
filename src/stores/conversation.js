@@ -1,8 +1,12 @@
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
 import { useUserStore } from '@/stores/user.js';
+import { useServerStore } from '@/stores/server.js';
 
 export const useConversationStore = defineStore('messageList', () => {
+  const userStore = useUserStore();
+  const serverStore = useServerStore();
+
   const conversations = reactive({
     // id: {
     //   conversationId: "",
@@ -33,38 +37,51 @@ export const useConversationStore = defineStore('messageList', () => {
   }
 
   function TriggerJumpToBottom(conversationId) {
-    const userStore = useUserStore();
-    if (!jumpToPlaceCallback.value) return;
-    const olderMessage = userStore.GetOlderMessages(conversationId, null, 50);
-    ClearVisibleMessages(conversationId);
-    AddMessages(conversationId, olderMessage);
+    if (!jumpToPlaceCallback.value && conversations[conversationId].isLoadingMessages) return;
 
-    jumpToPlaceCallback.value(olderMessage, null);
+    //const olderMessage = userStore.GetOlderMessages(conversationId, null, 50);
+    conversations[conversationId].isLoadingMessages = true;
+    serverStore.GetMessagesAsync(conversationId).then((messages) => {
+      if (messages == null) {
+        conversations[conversationId].isLoadingMessages = false;
+        return;
+      }
+      if (messages.length === 0) conversations[conversationId].isLoadingMessages = false;
+      ClearVisibleMessages(conversationId);
+      userStore.AddMessages(messages);
+      AddMessages(conversationId, messages);
+      jumpToPlaceCallback.value(messages, null);
+    });
   }
 
   function TriggerJumpToMessage(conversationId, messageId) {
-    const userStore = useUserStore();
-    if (!jumpToPlaceCallback.value) return;
+    if (!jumpToPlaceCallback.value && conversations[conversationId].isLoadingMessages) return;
 
     let centerMessage;
-    let final = [];
 
     if (GetVisibleMessages(conversationId).findIndex((x) => x.messageId === messageId) === -1) {
-      centerMessage = userStore.GetMessageById(messageId);
-      const newerMessages = userStore.GetNewerMessages(conversationId, centerMessage.messageId, 25);
-      const olderMessages = userStore.GetOlderMessages(conversationId, centerMessage.messageId, 25);
+      conversations[conversationId].isLoadingMessages = true;
 
-      final = newerMessages.concat([centerMessage], olderMessages);
-
-      ClearVisibleMessages(conversationId);
-      AddMessages(conversationId, final);
-
-      conversations[conversationId].viewingOlderMessages = true;
-    } else {
-      centerMessage = userStore.GetMessageById(messageId);
+      serverStore.GetMessagesFromPointAsync(conversationId, messageId).then((messages) => {
+        if (messages == null) {
+          conversations[conversationId].isLoadingMessages = false;
+          return;
+        }
+        if (messages.length === 0) conversations[conversationId].isLoadingMessages = false;
+        userStore.AddMessages(messages);
+        centerMessage = userStore.GetMessageById(messageId);
+        console.log(messages);
+        ClearVisibleMessages(conversationId);
+        AddMessages(conversationId, messages);
+        conversations[conversationId].viewingOlderMessages = true;
+        jumpToPlaceCallback.value(messages, centerMessage);
+      });
+      return;
     }
 
-    jumpToPlaceCallback.value(final, centerMessage);
+    console.log('Jumping to message');
+    centerMessage = userStore.GetMessageById(messageId);
+    jumpToPlaceCallback.value([], centerMessage);
   }
 
   function GetALLConversations() {
@@ -117,6 +134,7 @@ export const useConversationStore = defineStore('messageList', () => {
       0,
       conversations[conversationId].visibleMessages.length,
     );
+    console.log(conversations[conversationId].visibleMessages);
   }
 
   function GetFirstMessage(conversationId) {
@@ -142,12 +160,18 @@ export const useConversationStore = defineStore('messageList', () => {
     if (!conversations[conversationId]) return;
     if (conversations[conversationId].visibleMessages.includes(message)) return;
     conversations[conversationId].visibleMessages.push(message);
-    conversations[conversationId].visibleMessages.sort((a, b) => a.sentAt - b.sentAt);
+
+    conversations[conversationId].visibleMessages.sort(
+      (a, b) => Date.parse(a.sentAt) - Date.parse(b.sentAt),
+    );
   }
 
   function AddMessages(conversationId, messages) {
     conversations[conversationId].visibleMessages.push(...messages);
-    conversations[conversationId].visibleMessages.sort((a, b) => a.sentAt - b.sentAt);
+
+    conversations[conversationId].visibleMessages.sort(
+      (a, b) => Date.parse(a.sentAt) - Date.parse(b.sentAt),
+    );
   }
 
   function RemoveNewerMessages(conversationId, amount) {
