@@ -30,10 +30,14 @@ watch(
 async function LoadUserData() {
   const friends = await serverStore.GetFriendListAsync();
 
+  if (friends == null) return;
+
   for (const friend of friends) {
     userStore.AddFriend(friend);
   }
   const friendRequests = await serverStore.GetFriendRequestsAsync();
+
+  if (friendRequests == null) return;
 
   for (const friendRequest of friendRequests) {
     if (friendRequest.senderId === serverStore.user.userId) {
@@ -46,6 +50,9 @@ async function LoadUserData() {
   }
 
   const conversations = await serverStore.GetConversationsAsync();
+
+  if (conversations == null) return;
+
   for (const convo of conversations) {
     conversationStore.AddConversation(convo);
     for (const participantId of convo.participants) {
@@ -54,6 +61,9 @@ async function LoadUserData() {
     }
   }
   const visibleConversations = await serverStore.GetVisibleConversationsAsync();
+
+  if (visibleConversations == null) return;
+
   for (const convo of visibleConversations) {
     conversationStore.AddVisibleConversation(convo);
   }

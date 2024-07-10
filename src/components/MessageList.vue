@@ -1,11 +1,12 @@
 <script setup>
 import { useUserStore } from '@/stores/user.js';
-import { computed, defineAsyncComponent, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { computed, defineAsyncComponent, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useConversationStore } from '@/stores/conversation.js';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import { IsLoadingCompleted } from '@/composables/utility.js';
 import { useServerStore } from '@/stores/server.js';
+import SkellyLoading from '@/components/Skeletons/SkellyLoading.vue';
 
 const route = useRoute();
 
@@ -23,6 +24,7 @@ const messageListContainer = ref();
 const messageListDom = ref();
 
 const oldScrollHeight = ref(0);
+const oldScrollTop = ref(0);
 
 const chatIsLoading = ref(true);
 const waitingMessagesAbove = reactive([]);
@@ -33,8 +35,6 @@ LoadFirstMessages();
 
 onMounted(() => {
   conversationStore.RegisterJumpCallback((messages, focus) => {
-    console.log(messages);
-    console.log(focus);
     if (messages.length !== 0) {
       waitingMessagesJump.messages.push(...messages);
       waitingMessagesJump.focus = focus;
@@ -69,6 +69,10 @@ function ScrollToMessage(messageId) {
 
 function ScrollToSavedLocation() {
   if (messageListContainer.value) {
+    console.log(
+      'Getting scroll position',
+      conversationStore.GetScrollPosition(props.conversation.conversationId),
+    );
     messageListContainer.value.scrollTo({
       top: conversationStore.GetScrollPosition(props.conversation.conversationId),
       behavior: 'instant',
@@ -103,6 +107,7 @@ async function LoadOlderMessages(startPointId) {
 
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
+  oldScrollTop.value = messageListContainer.value?.scrollTop ?? 0;
 
   if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
     waitingMessagesAbove.push(
@@ -117,9 +122,9 @@ async function LoadOlderMessages(startPointId) {
 
 async function LoadNewerMessages(startPointId) {
   if (props.conversation.isLoadingMessages) return;
+  if (!props.conversation.viewingOlderMessages) return;
   props.conversation.isLoadingMessages = true;
 
-  if (!props.conversation.viewingOlderMessages) return;
   const newMessages = await serverStore.GetNewerMessagesAsync(
     props.conversation.conversationId,
     userStore.GetMessageById(startPointId).sentAt,
@@ -138,6 +143,7 @@ async function LoadNewerMessages(startPointId) {
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
 
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
+  oldScrollTop.value = messageListContainer.value?.scrollTop ?? 0;
 
   if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
     waitingMessagesBelow.push(
@@ -153,10 +159,15 @@ async function LoadNewerMessages(startPointId) {
 function OnScrolling(event) {
   const { scrollTop, offsetHeight, scrollHeight } = event.target;
   if (scrollTop === 0) {
+    console.log(props.conversation.isLoadingMessages);
     const lastMessage = conversationStore.GetLastMessage(props.conversation.conversationId);
+    if (!lastMessage) return;
     LoadNewerMessages(lastMessage.messageId);
   } else if (scrollHeight - (-scrollTop + offsetHeight) <= 2) {
+    console.log(props.conversation.isLoadingMessages);
+
     const firstMessage = conversationStore.GetFirstMessage(props.conversation.conversationId);
+    if (!firstMessage) return;
     LoadOlderMessages(firstMessage.messageId);
   }
   conversationStore.SetScrollPosition(props.conversation.conversationId, scrollTop);
@@ -193,7 +204,15 @@ function OnMessageMountChange(message, eventType) {
 }
 
 function HandleNewAboveMessages() {
-  if (!chatIsLoading.value) return;
+  if (!chatIsLoading.value) {
+    let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
+    let scrollDif = oldScrollTop.value - messageListContainer.value.scrollTop;
+    console.log('above dif', dif);
+    console.log('scroll top above', messageListContainer.value.scrollTop);
+    console.log('scroll dif above', scrollDif);
+
+    return;
+  }
 
   ScrollToSavedLocation();
   chatIsLoading.value = false;
@@ -203,7 +222,7 @@ function HandleNewBelowMessages() {
   if (!messageListContainer.value) return;
   let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
   if (!chatIsLoading.value) {
-    console.log(dif);
+    console.log('below dif', dif);
     messageListContainer.value.scrollTop += dif;
     messageListContainer.value.scrollTop = Math.min(-5, messageListContainer.value.scrollTop);
     messageListContainer.value.scrollTop = Math.max(
@@ -254,7 +273,14 @@ function previousAlsoOwner(message, index) {
       id="list-container"
       @scroll="OnScrolling"
       ref="messageListContainer">
-      <ul class="p-4" id="message-list" ref="messageListDom">
+      <ul
+        v-if="
+          conversationStore.GetVisibleMessages(props.conversation.conversationId).length > 0 ||
+          !props.conversation.isLoadingMessages
+        "
+        class="p-4"
+        id="message-list"
+        ref="messageListDom">
         <transition-group name="message-list">
           <message-list-item
             class="hover:bg-gray-400"
@@ -277,6 +303,7 @@ function previousAlsoOwner(message, index) {
             }" />
         </transition-group>
       </ul>
+      <skelly-loading v-else class="size-full text-[8rem]" />
     </div>
   </div>
 </template>

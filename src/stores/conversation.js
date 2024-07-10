@@ -41,13 +41,13 @@ export const useConversationStore = defineStore('messageList', () => {
 
     //const olderMessage = userStore.GetOlderMessages(conversationId, null, 50);
     conversations[conversationId].isLoadingMessages = true;
+    ClearVisibleMessages(conversationId);
     serverStore.GetMessagesAsync(conversationId).then((messages) => {
       if (messages == null) {
         conversations[conversationId].isLoadingMessages = false;
         return;
       }
       if (messages.length === 0) conversations[conversationId].isLoadingMessages = false;
-      ClearVisibleMessages(conversationId);
       userStore.AddMessages(messages);
       AddMessages(conversationId, messages);
       jumpToPlaceCallback.value(messages, null);
@@ -61,7 +61,7 @@ export const useConversationStore = defineStore('messageList', () => {
 
     if (GetVisibleMessages(conversationId).findIndex((x) => x.messageId === messageId) === -1) {
       conversations[conversationId].isLoadingMessages = true;
-
+      ClearVisibleMessages(conversationId);
       serverStore.GetMessagesFromPointAsync(conversationId, messageId).then((messages) => {
         if (messages == null) {
           conversations[conversationId].isLoadingMessages = false;
@@ -71,7 +71,6 @@ export const useConversationStore = defineStore('messageList', () => {
         userStore.AddMessages(messages);
         centerMessage = userStore.GetMessageById(messageId);
         console.log(messages);
-        ClearVisibleMessages(conversationId);
         AddMessages(conversationId, messages);
         conversations[conversationId].viewingOlderMessages = true;
         jumpToPlaceCallback.value(messages, centerMessage);
@@ -199,6 +198,7 @@ export const useConversationStore = defineStore('messageList', () => {
   }
 
   function SetScrollPosition(conversationId, pos) {
+    //console.log('setting scroll position', pos);
     if (conversations.hasOwnProperty(conversationId))
       conversations[conversationId].scrollPosition = pos;
   }
