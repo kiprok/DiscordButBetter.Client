@@ -24,7 +24,6 @@ const messageListContainer = ref();
 const messageListDom = ref();
 
 const oldScrollHeight = ref(0);
-const oldScrollTop = ref(0);
 
 const chatIsLoading = ref(true);
 const waitingMessagesAbove = reactive([]);
@@ -107,7 +106,6 @@ async function LoadOlderMessages(startPointId) {
 
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
-  oldScrollTop.value = messageListContainer.value?.scrollTop ?? 0;
 
   if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
     waitingMessagesAbove.push(
@@ -143,8 +141,6 @@ async function LoadNewerMessages(startPointId) {
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
 
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
-  oldScrollTop.value = messageListContainer.value?.scrollTop ?? 0;
-
   if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
     waitingMessagesBelow.push(
       ...conversationStore.RemoveOlderMessages(
@@ -158,13 +154,14 @@ async function LoadNewerMessages(startPointId) {
 
 function OnScrolling(event) {
   const { scrollTop, offsetHeight, scrollHeight } = event.target;
-  if (scrollTop === 0) {
-    console.log(props.conversation.isLoadingMessages);
+  console.log(scrollTop);
+  if (Math.floor(scrollTop) === 0) {
+    console.log('hit bottom', props.conversation.isLoadingMessages);
     const lastMessage = conversationStore.GetLastMessage(props.conversation.conversationId);
     if (!lastMessage) return;
     LoadNewerMessages(lastMessage.messageId);
   } else if (scrollHeight - (-scrollTop + offsetHeight) <= 2) {
-    console.log(props.conversation.isLoadingMessages);
+    console.log('hit top', props.conversation.isLoadingMessages);
 
     const firstMessage = conversationStore.GetFirstMessage(props.conversation.conversationId);
     if (!firstMessage) return;
@@ -206,11 +203,8 @@ function OnMessageMountChange(message, eventType) {
 function HandleNewAboveMessages() {
   if (!chatIsLoading.value) {
     let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
-    let scrollDif = oldScrollTop.value - messageListContainer.value.scrollTop;
     console.log('above dif', dif);
     console.log('scroll top above', messageListContainer.value.scrollTop);
-    console.log('scroll dif above', scrollDif);
-
     return;
   }
 
