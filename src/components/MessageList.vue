@@ -107,15 +107,15 @@ async function LoadOlderMessages(startPointId) {
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
 
-  if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
-    waitingMessagesAbove.push(
-      ...conversationStore.RemoveNewerMessages(
-        props.conversation.conversationId,
-        conversationStore.GetVisibleMessages(props.conversation.conversationId).length - 80,
-      ),
-    );
-    props.conversation.viewingOlderMessages = true;
-  }
+  // if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
+  //   waitingMessagesAbove.push(
+  //     ...conversationStore.RemoveNewerMessages(
+  //       props.conversation.conversationId,
+  //       conversationStore.GetVisibleMessages(props.conversation.conversationId).length - 80,
+  //     ),
+  //   );
+  //   props.conversation.viewingOlderMessages = true;
+  // }
 }
 
 async function LoadNewerMessages(startPointId) {
@@ -141,14 +141,14 @@ async function LoadNewerMessages(startPointId) {
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
 
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
-  if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
-    waitingMessagesBelow.push(
-      ...conversationStore.RemoveOlderMessages(
-        props.conversation.conversationId,
-        conversationStore.GetVisibleMessages(props.conversation.conversationId).length - 80,
-      ),
-    );
-  }
+  // if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
+  //   waitingMessagesBelow.push(
+  //     ...conversationStore.RemoveOlderMessages(
+  //       props.conversation.conversationId,
+  //       conversationStore.GetVisibleMessages(props.conversation.conversationId).length - 80,
+  //     ),
+  //   );
+  // }
   if (newMessages.length === 0) props.conversation.isLoadingMessages = false;
 }
 
