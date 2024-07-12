@@ -67,12 +67,12 @@ async function SendChatMessage() {
     messageToSend.content = messageToSend.content.trim();
     const response = await serverStore.SendMessageAsync(messageToSend);
     if (response) {
-      userStore.SendMessage(response);
-      sendMessageStore.sendingMessage = response.messageId;
+      //userStore.SendMessage(response);
+      //sendMessageStore.sendingMessage = response.messageId;
 
-      if (!sendMessageStore.messageEditing && !props.conversation.viewingOlderMessages)
-        conversationStore.AddMessage(props.conversation.conversationId, response);
-      else sendMessageStore.sendingMessage = null;
+      if (!sendMessageStore.messageEditing && !props.conversation.viewingOlderMessages) {
+        //conversationStore.AddMessage(props.conversation.conversationId, response);
+      } else sendMessageStore.sendingMessage = null;
     }
   }
 

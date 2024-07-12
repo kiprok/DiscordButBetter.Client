@@ -154,7 +154,6 @@ async function LoadNewerMessages(startPointId) {
 
 function OnScrolling(event) {
   const { scrollTop, offsetHeight, scrollHeight } = event.target;
-  console.log(scrollTop);
   if (Math.floor(scrollTop) === 0) {
     console.log('hit bottom', props.conversation.isLoadingMessages);
     const lastMessage = conversationStore.GetLastMessage(props.conversation.conversationId);

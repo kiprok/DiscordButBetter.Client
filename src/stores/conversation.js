@@ -28,6 +28,10 @@ export const useConversationStore = defineStore('messageList', () => {
 
   const jumpToPlaceCallback = ref(null);
 
+  function Reset() {
+    visibleConversations.clear();
+  }
+
   function RegisterJumpCallback(callback) {
     jumpToPlaceCallback.value = callback;
   }
@@ -219,6 +223,7 @@ export const useConversationStore = defineStore('messageList', () => {
   }
 
   return {
+    Reset,
     conversations,
     GetConversationById,
     AddConversation,

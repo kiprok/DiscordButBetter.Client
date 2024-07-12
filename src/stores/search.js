@@ -1,8 +1,12 @@
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
 import { useUserStore } from '@/stores/user.js';
+import { useServerStore } from '@/stores/server.js';
 
 export const useSearchStore = defineStore('search', () => {
+  const serverStore = useServerStore();
+  const userStore = useUserStore();
+
   const _fullSearchData = reactive({
     searchId: {
       searchResults: [],
@@ -64,28 +68,43 @@ export const useSearchStore = defineStore('search', () => {
   }
 
   function SetSearchPagePlace(searchId, page) {
-    GetSearchDataById(searchId).searchPagePlace = page;
-    GetSearchDataById(searchId).searchResults = _fullSearchData[searchId].slice(
-      (page - 1) * 25,
-      page * 25,
-    );
+    serverStore
+      .SearchMessagesAsync(searchId, GetSearchDataById(searchId).searchQuery, page)
+      .then((results) => {
+        if (results == null) return;
+        userStore.AddMessages(results.messages);
+        GetSearchDataById(searchId).searchPagePlace = page;
+        GetSearchDataById(searchId).searchResults = results.messages;
+      });
   }
 
-  function SearchMessages(searchId) {
-    const userStore = useUserStore();
-    _fullSearchData[searchId] = Object.keys(userStore.messages)
-      .filter((message) => {
-        return (
-          userStore.messages[message].content.includes(GetSearchDataById(searchId).searchQuery) &&
-          userStore.messages[message].conversationId === searchId
-        );
-      })
-      .map((message) => userStore.messages[message])
-      .toReversed();
+  // function SearchMessages(searchId) {
+  //   const userStore = useUserStore();
+  //   _fullSearchData[searchId] = Object.keys(userStore.messages)
+  //     .filter((message) => {
+  //       return (
+  //         userStore.messages[message].content.includes(GetSearchDataById(searchId).searchQuery) &&
+  //         userStore.messages[message].conversationId === searchId
+  //       );
+  //     })
+  //     .map((message) => userStore.messages[message])
+  //     .toReversed();
+  //
+  //   GetSearchDataById(searchId).searchPagePlace = 1;
+  //   GetSearchDataById(searchId).totalSearchResults = _fullSearchData[searchId].length;
+  //   GetSearchDataById(searchId).searchResults = _fullSearchData[searchId].slice(0, 25);
+  // }
 
-    GetSearchDataById(searchId).searchPagePlace = 1;
-    GetSearchDataById(searchId).totalSearchResults = _fullSearchData[searchId].length;
-    GetSearchDataById(searchId).searchResults = _fullSearchData[searchId].slice(0, 25);
+  function SearchMessages(searchId) {
+    serverStore
+      .SearchMessagesAsync(searchId, GetSearchDataById(searchId).searchQuery)
+      .then((results) => {
+        if (results == null) return;
+        userStore.AddMessages(results.messages);
+        GetSearchDataById(searchId).searchPagePlace = 1;
+        GetSearchDataById(searchId).totalSearchResults = results.totalCount;
+        GetSearchDataById(searchId).searchResults = results.messages;
+      });
   }
 
   function GetSearchResults(searchId) {

@@ -373,15 +373,35 @@ export const useServerStore = defineStore('server', () => {
     return response.ok ? await response.json() : null;
   }
 
+  async function SearchMessagesAsync(conversationId, query, page = 1) {
+    const response = await fetch(
+      `/api/messages/conversation/${conversationId}/search?query=${query}&page=${page}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: GetToken(),
+        },
+      },
+    );
+    return response.ok ? await response.json() : null;
+  }
+
   async function ConnectSocketAsync() {
     connection.value = new signalR.HubConnectionBuilder()
       .withUrl(`/hub?token=${GetToken()}`)
-      .withHubProtocol(new MessagePackHubProtocol())
       .configureLogging(signalR.LogLevel.Information)
       .withAutomaticReconnect()
       .build();
 
     return connection.value;
+  }
+
+  async function AddToGroupAsync(groupId) {
+    await connection.value.invoke('AddUserToGroup', groupId);
+  }
+
+  function GetConnectionState() {
+    return connection.value?.state;
   }
 
   return {
@@ -417,6 +437,8 @@ export const useServerStore = defineStore('server', () => {
     GetOlderMessagesAsync,
     GetNewerMessagesAsync,
     GetMessagesFromPointAsync,
+    SearchMessagesAsync,
     ConnectSocketAsync,
+    GetConnectionState,
   };
 });

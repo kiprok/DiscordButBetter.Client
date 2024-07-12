@@ -1,21 +1,27 @@
 <script setup>
 import ChatSideMenu from '@/components/sideMenus/ChatSideMenu.vue';
 import { useServerStore } from '@/stores/server.js';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ref, watch } from 'vue';
 import { useUserStore } from '@/stores/user.js';
 import SkellyLoading from '@/components/Skeletons/SkellyLoading.vue';
 import { useConversationStore } from '@/stores/conversation.js';
+import { HubConnectionState } from '@microsoft/signalr';
 
 const serverStore = useServerStore();
 const conversationStore = useConversationStore();
 const userStore = useUserStore();
 const router = useRouter();
+const route = useRoute();
 const _isLoading = ref(true);
 
 if (!serverStore.IsLoggedIn) router.push({ name: 'login' });
-
-LoadUserData();
+console.log('Connected', serverStore.GetConnectionState() === HubConnectionState.Connected);
+if (serverStore.GetConnectionState() !== HubConnectionState.Connected) {
+  ConnectToServer();
+} else {
+  LoadUserData();
+}
 
 watch(
   () => serverStore.IsLoggedIn,
@@ -27,7 +33,53 @@ watch(
   },
 );
 
+watch(
+  () => serverStore.GetConnectionState(),
+  async (state) => {
+    console.log(state);
+  },
+);
+
+async function ConnectToServer() {
+  const connection = await serverStore.ConnectSocketAsync();
+  connection.on('InitializedUser', async () => {
+    console.log('User Initialized');
+    await LoadUserData();
+  });
+
+  connection.on('ReceiveMessage', async (message) => {
+    userStore.SendMessage(message);
+    const conversation = conversationStore.GetConversationById(message.conversationId);
+    console.log('Conversation', conversation);
+
+    if (!conversationStore.GetVisibleConversations().includes(message.conversationId)) {
+      conversationStore.AddVisibleConversation(message.conversationId);
+    }
+
+    if (!conversation.viewingOlderMessages)
+      conversationStore.AddMessage(message.conversationId, message);
+    conversationStore.UpdateLastMessageTime(message.conversationId, Date.now());
+
+    console.log('Route', route.name);
+    console.log('Params', route.params.id);
+
+    console.log(route.name === 'chat');
+    console.log(route.params.id !== message.conversationId);
+
+    if (route.params.id !== message.conversationId) {
+      console.log('Not in chat');
+      conversation.newUnseenMessages.push(message.messageId);
+    }
+  });
+
+  await connection.start();
+  console.log('Connected to server');
+}
+
 async function LoadUserData() {
+  userStore.Reset();
+  conversationStore.Reset();
+
   const friends = await serverStore.GetFriendListAsync();
 
   if (friends == null) return;
@@ -75,7 +127,8 @@ async function LoadUserData() {
 <template>
   <div class="flex h-dvh w-screen flex-row overflow-hidden bg-amber-500">
     <ChatSideMenu />
-    <router-view v-if="!_isLoading" />
+    <router-view
+      v-if="!_isLoading && serverStore.GetConnectionState() === HubConnectionState.Connected" />
     <div v-else class="z-[1000] bg-gray-600 w-screen h-dvh fixed top-0 left-0">
       <skelly-loading class="size-full text-white text-[10rem]" />
     </div>
