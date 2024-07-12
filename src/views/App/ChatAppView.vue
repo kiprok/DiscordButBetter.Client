@@ -56,17 +56,17 @@ async function ConnectToServer() {
       conversationStore.AddVisibleConversation(message.conversationId);
     }
 
-    if (!conversation.viewingOlderMessages)
+    if (
+      !conversation.viewingOlderMessages &&
+      conversationStore.GetVisibleMessages(message.conversationId).length !== 0
+    )
       conversationStore.AddMessage(message.conversationId, message);
     conversationStore.UpdateLastMessageTime(message.conversationId, Date.now());
 
-    console.log('Route', route.name);
-    console.log('Params', route.params.id);
-
-    console.log(route.name === 'chat');
-    console.log(route.params.id !== message.conversationId);
-
-    if (route.params.id !== message.conversationId) {
+    if (
+      route.params.id !== message.conversationId &&
+      message.senderId !== serverStore.user.userId
+    ) {
       console.log('Not in chat');
       conversation.newUnseenMessages.push(message.messageId);
     }
