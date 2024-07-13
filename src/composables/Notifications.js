@@ -41,7 +41,6 @@ async function NewMessageAsync(message) {
       conversationStore.GetVisibleMessages(message.conversationId).length !== 0) ||
     _route.params.id === message.conversationId
   ) {
-    console.log('message', message);
     conversationStore.AddMessage(message.conversationId, message);
   }
   conversationStore.UpdateLastMessageTime(message.conversationId, Date.now());

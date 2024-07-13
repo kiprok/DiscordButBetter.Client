@@ -9,7 +9,6 @@ export function RemoveChatMessage(conversationId, messageId) {
   const serverStore = useServerStore();
 
   serverStore.DeleteMessageAsync(messageId).then((response) => {
-    console.log(response);
     if (!response) return;
     //userStore.DeleteMessage(messageId);
     //conversationStore.DeleteMessage(conversationId, messageId);
