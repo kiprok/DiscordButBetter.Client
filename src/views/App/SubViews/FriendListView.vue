@@ -91,20 +91,21 @@ async function OpenConversation(userId) {
 }
 
 async function RemoveFriend(user) {
-  userStore.RemoveFriend(user.userId);
+  //userStore.RemoveFriend(user.userId);
   await serverStore.DeleteFriendAsync(user.userId);
 }
 
 async function AcceptFriendRequest(request) {
-  userStore.AcceptFriendRequest(request);
+  //userStore.AcceptFriendRequest(request);
   const success = await serverStore.AcceptFriendRequestAsync(request.requestId, request.userId);
   if (success) {
-    userStore.AddFriend(userStore.GetUserById(request.userId));
+    //userStore.AddFriend(userStore.GetUserById(request.userId));
   }
 }
 
 async function RejectFriendRequest(request) {
-  userStore.RejectFriendRequest(request);
+  //userStore.RejectFriendRequest(request);
+  console.log(request);
   await serverStore.DeclineFriendRequestAsync(request.requestId, request.userId);
 }
 

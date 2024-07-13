@@ -131,7 +131,7 @@ function onInput() {
   <div class="size-full">
     <form class="flex size-full items-center" @submit.prevent="SendChatMessage">
       <div
-        class="relative h-fit max-h-44 md:max-h-96 min-h-8 w-24 grow content-center overflow-y-scroll
+        class="relative h-fit max-h-44 md:max-h-96 min-h-8 w-24 grow content-center overflow-y-auto
           overflow-x-hidden rounded-l-lg bg-white"
         @click="textBox.focus">
         <div

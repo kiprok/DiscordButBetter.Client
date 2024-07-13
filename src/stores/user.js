@@ -134,17 +134,19 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function RemoveFriendRequestSent(request) {
-    const rq = [...friendRequestsSend].find((r) => r.senderId === request.userId);
+    const rq = [...friendRequestsSend].find((r) => r.requestId === request.requestId);
+    console.log('request', rq);
     friendRequestsSend.delete(rq);
   }
 
   function AcceptFriendRequest(request) {
-    const rq = [...friendRequestsReceived].find((r) => r.senderId === request.userId);
+    const rq = [...friendRequestsReceived].find((r) => r.requestId === request.requestId);
     friendRequestsReceived.delete(rq);
   }
 
   function RejectFriendRequest(request) {
-    const rq = [...friendRequestsReceived].find((r) => r.senderId === request.userId);
+    const rq = [...friendRequestsReceived].find((r) => r.requestId === request.requestId);
+    console.log('request', rq);
     friendRequestsReceived.delete(rq);
   }
 

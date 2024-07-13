@@ -46,16 +46,17 @@ watch(searchQuery, async () => {
 async function SendFriendRequest(userId) {
   var request = await serverStore.SendFriendRequestAsync(userId);
   if (request) {
-    userStore.friendRequestsSend.add(request);
+    //userStore.friendRequestsSend.add(request);
   }
 }
 
 async function AcceptFriendRequest(request) {
   console.log(request);
-  userStore.AcceptFriendRequest(request);
+  //userStore.AcceptFriendRequest(request);
+
   const success = await serverStore.AcceptFriendRequestAsync(request.requestId, request.userId);
   if (success) {
-    userStore.AddFriend(userStore.GetUserById(request.userId));
+    //userStore.AddFriend(userStore.GetUserById(request.userId));
   }
 }
 

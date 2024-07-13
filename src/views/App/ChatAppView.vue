@@ -7,6 +7,7 @@ import { useUserStore } from '@/stores/user.js';
 import SkellyLoading from '@/components/Skeletons/SkellyLoading.vue';
 import { useConversationStore } from '@/stores/conversation.js';
 import { HubConnectionState } from '@microsoft/signalr';
+import { RegisterNotificationAsync } from '@/composables/Notifications.js';
 
 const serverStore = useServerStore();
 const conversationStore = useConversationStore();
@@ -37,6 +38,10 @@ watch(
   () => serverStore.GetConnectionState(),
   async (state) => {
     console.log(state);
+    if (state === HubConnectionState.Connected && !_isLoading.value) {
+      _isLoading.value = true;
+      await LoadUserData();
+    }
   },
 );
 
@@ -47,30 +52,7 @@ async function ConnectToServer() {
     await LoadUserData();
   });
 
-  connection.on('ReceiveMessage', async (message) => {
-    userStore.SendMessage(message);
-    const conversation = conversationStore.GetConversationById(message.conversationId);
-    console.log('Conversation', conversation);
-
-    if (!conversationStore.GetVisibleConversations().includes(message.conversationId)) {
-      conversationStore.AddVisibleConversation(message.conversationId);
-    }
-
-    if (
-      !conversation.viewingOlderMessages &&
-      conversationStore.GetVisibleMessages(message.conversationId).length !== 0
-    )
-      conversationStore.AddMessage(message.conversationId, message);
-    conversationStore.UpdateLastMessageTime(message.conversationId, Date.now());
-
-    if (
-      route.params.id !== message.conversationId &&
-      message.senderId !== serverStore.user.userId
-    ) {
-      console.log('Not in chat');
-      conversation.newUnseenMessages.push(message.messageId);
-    }
-  });
+  await RegisterNotificationAsync(connection, route);
 
   await connection.start();
   console.log('Connected to server');
