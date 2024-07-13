@@ -4,7 +4,8 @@ const props = defineProps({
 });
 const model = defineModel();
 
-const id = crypto.randomUUID();
+const id = Math.random().toString(36).substring(2);
+console.log(id);
 </script>
 
 <template>

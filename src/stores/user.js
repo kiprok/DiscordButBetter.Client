@@ -158,22 +158,6 @@ export const useUserStore = defineStore('user', () => {
     delete messages[messageId];
   }
 
-  function AddUser(name, pfp) {
-    let id = crypto.randomUUID();
-    users[id] = {
-      userId: id,
-      username: name,
-      profilePicture: pfp,
-      status: Math.floor(Math.random() * 4),
-      statusMessage: `i am ${name}`,
-      biography: `I am ${name}\nAnd my id is ${id}`,
-    };
-
-    serverStore.RegisterAsync(name, '12345678');
-
-    return id;
-  }
-
   function AddFriend(user) {
     if (friends.has(user.userId)) return;
     users[user.userId] = user;
@@ -192,7 +176,6 @@ export const useUserStore = defineStore('user', () => {
     friendRequestsSend,
     messages,
     SearchUsers,
-    AddUser,
     AddFriend,
     RemoveFriend,
     AddMessages,

@@ -1,13 +1,7 @@
 <script setup>
 import ChatTopBar from '@/components/ChatTopBar.vue';
 import { useUserStore } from '@/stores/user.js';
-import SimpleButton from '@/components/SimpleButton.vue';
 import { computed, ref } from 'vue';
-import {
-  GenerateUser,
-  GenerateConversation,
-  GenerateConversationMessages,
-} from '@/composables/mock/MockDataGeneration.js';
 import { useConversationStore } from '@/stores/conversation.js';
 import ChatLeftSideMenuButton from '@/components/ChatLeftSideMenuButton.vue';
 import FriendSortButton from '@/components/FriendSortButton.vue';
@@ -107,73 +101,6 @@ async function RejectFriendRequest(request) {
   //userStore.RejectFriendRequest(request);
   console.log(request);
   await serverStore.DeclineFriendRequestAsync(request.requestId, request.userId);
-}
-
-async function GenUsers() {
-  _addingUsers.value = true;
-
-  for (let i = 0; i < 50; i++) {
-    await GenerateUser();
-    await new Promise((resolve) => setTimeout(resolve, 50));
-  }
-  _addingUsers.value = false;
-}
-
-async function GenFriend() {
-  _addingFriends.value = true;
-
-  let userId = Object.values(userStore.users)[
-    Math.floor(Math.random() * Object.keys(userStore.users).length)
-  ]?.userId;
-
-  if (
-    userId &&
-    userId !== serverStore.user.userId &&
-    !userStore.GetFriendList().find((user) => user.userId === userId) &&
-    !userStore.GetFriendRequests().find((user) => user.userId === userId)
-  ) {
-    userStore.friendRequestsReceived.add(userId);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  } else {
-    userId = await GenerateUser();
-    userStore.AddFriend(userId);
-  }
-  _addingFriends.value = false;
-}
-
-async function GenRandomMessage() {
-  _sendingRandomMessage.value = true;
-  let conversation = Object.keys(conversationStore.GetALLConversations()).map((conversationId) =>
-    conversationStore.GetConversationById(conversationId),
-  )[Math.floor(Math.random() * Object.keys(conversationStore.GetALLConversations()).length)];
-  if (!conversation) {
-    _sendingRandomMessage.value = false;
-    return;
-  }
-  let userid =
-    conversation.participants[Math.floor(Math.random() * conversation.participants.length)];
-
-  if (conversation) {
-    let newMessageId = crypto.randomUUID();
-    userStore.messages[newMessageId] = {
-      messageId: newMessageId,
-      senderId: userid,
-      conversationId: conversation.conversationId,
-      content: `A new Random Message`,
-      sentAt: Date.now(),
-      metadata: {},
-    };
-
-    if (!conversationStore.GetVisibleConversations().includes(conversation.conversationId)) {
-      conversationStore.AddVisibleConversation(conversation.conversationId);
-    }
-
-    if (!conversationStore.GetConversationById(conversation.conversationId).viewingOlderMessages)
-      conversationStore.AddMessage(conversation.conversationId, userStore.messages[newMessageId]);
-    conversationStore.UpdateLastMessageTime(conversation.conversationId, Date.now());
-    conversation.newUnseenMessages.push(newMessageId);
-  }
-  _sendingRandomMessage.value = false;
 }
 </script>
 
@@ -285,13 +212,7 @@ async function GenRandomMessage() {
         class="w-full h-full absolute transition-transform ease-out lg:static lg:transition-none lg:translate-x-0
           lg:flex-none bg-gray-600 lg:flex lg:w-[22rem]"
         :class="{ 'translate-x-full': !sidePanelView }">
-        <div>
-          <simple-button :disabled="_addingUsers" @click="GenUsers">add users</simple-button>
-          <simple-button :disabled="_sendingRandomMessage" @click="GenRandomMessage">
-            send a random message
-          </simple-button>
-          <simple-button :disabled="_addingFriends" @click="GenFriend">add friend</simple-button>
-        </div>
+        <div></div>
       </div>
     </div>
   </div>
