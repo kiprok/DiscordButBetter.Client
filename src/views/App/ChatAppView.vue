@@ -16,6 +16,8 @@ const router = useRouter();
 const route = useRoute();
 const _isLoading = ref(true);
 
+serverStore.IsFullyLoaded = false;
+
 if (!serverStore.IsLoggedIn) router.push({ name: 'login' });
 console.log('Connected', serverStore.GetConnectionState() === HubConnectionState.Connected);
 if (serverStore.GetConnectionState() !== HubConnectionState.Connected) {
@@ -40,6 +42,7 @@ watch(
     console.log(state);
     if (state === HubConnectionState.Connected && !_isLoading.value) {
       _isLoading.value = true;
+      serverStore.IsFullyLoaded = false;
       await LoadUserData();
     }
   },
@@ -102,6 +105,7 @@ async function LoadUserData() {
     conversationStore.AddVisibleConversation(convo);
   }
 
+  serverStore.IsFullyLoaded = true;
   _isLoading.value = false;
 }
 </script>

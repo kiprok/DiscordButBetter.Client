@@ -11,8 +11,8 @@ export function RemoveChatMessage(conversationId, messageId) {
   serverStore.DeleteMessageAsync(messageId).then((response) => {
     console.log(response);
     if (!response) return;
-    userStore.DeleteMessage(messageId);
-    conversationStore.DeleteMessage(conversationId, messageId);
+    //userStore.DeleteMessage(messageId);
+    //conversationStore.DeleteMessage(conversationId, messageId);
   });
 }
 

@@ -53,6 +53,15 @@ onUnmounted(() => {
   conversationStore.UnRegisterJumpCallback();
 });
 
+watch(
+  () => serverStore.IsFullyLoaded,
+  async (isLoaded) => {
+    if (isLoaded) {
+      await LoadFirstMessages();
+    }
+  },
+);
+
 function ScrollToMessage(messageId) {
   let msgElement = document.querySelector(`#message-list [data-msg-id="${messageId}"]`);
   if (!msgElement) {

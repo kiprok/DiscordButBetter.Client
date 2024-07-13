@@ -9,6 +9,7 @@ export const useServerStore = defineStore('server', () => {
   const token = ref('');
 
   const IsLoggedIn = computed(() => token.value !== '');
+  const IsFullyLoaded = ref(false);
 
   function GetToken() {
     if (token.value !== '') {
@@ -407,6 +408,7 @@ export const useServerStore = defineStore('server', () => {
   return {
     user,
     IsLoggedIn,
+    IsFullyLoaded,
     GetToken,
     ResetUser,
     LoginAsync,
