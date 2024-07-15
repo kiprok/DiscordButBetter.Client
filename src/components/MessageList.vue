@@ -54,12 +54,15 @@ onUnmounted(() => {
 });
 
 watch(
-  () => serverStore.IsFullyLoaded,
+  serverStore.GetLoadingState,
   async (isLoaded) => {
+    console.log('changed fully loaded', isLoaded);
     if (isLoaded) {
+      console.log('Fully loaded');
       await LoadFirstMessages();
     }
   },
+  { immediate: true },
 );
 
 function ScrollToMessage(messageId) {

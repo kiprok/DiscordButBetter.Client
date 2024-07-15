@@ -11,6 +11,10 @@ export const useServerStore = defineStore('server', () => {
   const IsLoggedIn = computed(() => token.value !== '');
   const IsFullyLoaded = ref(false);
 
+  function GetLoadingState() {
+    return IsFullyLoaded.value;
+  }
+
   function GetToken() {
     if (token.value !== '') {
       return token.value;
@@ -98,6 +102,7 @@ export const useServerStore = defineStore('server', () => {
         Authorization: GetToken(),
       },
     });
+    await CloseSocketAsync();
     ResetUser();
   }
 
@@ -397,8 +402,8 @@ export const useServerStore = defineStore('server', () => {
     return connection.value;
   }
 
-  async function AddToGroupAsync(groupId) {
-    await connection.value.invoke('AddUserToGroup', groupId);
+  async function CloseSocketAsync() {
+    await connection.value.stop();
   }
 
   function GetConnectionState() {
@@ -409,6 +414,7 @@ export const useServerStore = defineStore('server', () => {
     user,
     IsLoggedIn,
     IsFullyLoaded,
+    GetLoadingState,
     GetToken,
     ResetUser,
     LoginAsync,
@@ -441,6 +447,7 @@ export const useServerStore = defineStore('server', () => {
     GetMessagesFromPointAsync,
     SearchMessagesAsync,
     ConnectSocketAsync,
+    CloseSocketAsync,
     GetConnectionState,
   };
 });

@@ -26,6 +26,7 @@ export async function RegisterNotificationAsync(connection, route) {
   connection.on('ConversationInfoChanged', ConversationInfoChangedAsync);
 
   connection.on('FriendRemoved', FriendRemovedAsync);
+  connection.on('UserInfoChanged', UserInfoChangedAsync);
 }
 
 async function NewMessageAsync(message) {
@@ -167,4 +168,11 @@ async function ConversationInfoChangedAsync(updatedConversation) {
     conversation.conversationImage = updatedConversation.conversationImage;
     conversation.participants = updatedConversation.participants;
   }
+}
+
+async function UserInfoChangedAsync(updateUser) {
+  const user = userStore.GetUserById(updateUser.userId);
+  if (updateUser.username !== undefined) user.username = updateUser.username;
+  if (updateUser.profilePicture !== undefined) user.profilePicture = updateUser.profilePicture;
+  if (updateUser.status !== undefined) user.status = updateUser.status;
 }

@@ -36,22 +36,30 @@ watch(
   },
 );
 
-watch(
-  () => serverStore.GetConnectionState(),
-  async (state) => {
-    console.log(state);
-    if (state === HubConnectionState.Connected && !_isLoading.value) {
-      _isLoading.value = true;
-      serverStore.IsFullyLoaded = false;
-      await LoadUserData();
-    }
-  },
-);
+watch(serverStore.GetConnectionState, async (state) => {
+  console.log('New connection state', state);
+  if (state === HubConnectionState.Connected && !_isLoading.value) {
+    _isLoading.value = true;
+    serverStore.IsFullyLoaded = false;
+    await LoadUserData();
+  }
+});
 
 async function ConnectToServer() {
   const connection = await serverStore.ConnectSocketAsync();
   connection.on('InitializedUser', async () => {
     console.log('User Initialized');
+    await LoadUserData();
+  });
+
+  connection.onreconnecting(() => {
+    console.log('Reconnecting to server');
+    _isLoading.value = true;
+    serverStore.IsFullyLoaded = false;
+  });
+
+  connection.onreconnected(async () => {
+    console.log('Reconnected to server');
     await LoadUserData();
   });
 
