@@ -5,6 +5,7 @@ import AddFriendModal from '@/components/modals/AddFriendModal.vue';
 import UserProfileModal from '@/components/modals/UserProfileModal.vue';
 import { useServerStore } from '@/stores/server.js';
 import { useUserStore } from '@/stores/user.js';
+import AccountSettingsModal from '@/components/modals/AccountSettingsModal.vue';
 
 const serverStore = useServerStore();
 const userStore = useUserStore();
@@ -13,7 +14,7 @@ const token = serverStore.GetToken();
 
 if (token !== '') {
   serverStore.GetUserAsync().then((user) => {
-    if(user === null) return;
+    if (user === null) return;
     userStore.users[user.userId] = user;
   });
 }
@@ -24,4 +25,5 @@ if (token !== '') {
   <context-modal />
   <add-friend-modal />
   <user-profile-modal />
+  <account-settings-modal />
 </template>

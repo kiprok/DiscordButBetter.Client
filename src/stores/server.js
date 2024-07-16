@@ -112,6 +112,18 @@ export const useServerStore = defineStore('server', () => {
     localStorage.removeItem('token');
   }
 
+  async function UpdateUserAsync(newInfo) {
+    const response = await fetch('/api/users', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: GetToken(),
+      },
+      body: JSON.stringify(newInfo),
+    });
+    return response.ok;
+  }
+
   async function GetFriendListAsync() {
     const response = await fetch('/api/users/friends', {
       method: 'GET',
@@ -417,6 +429,7 @@ export const useServerStore = defineStore('server', () => {
     GetLoadingState,
     GetToken,
     ResetUser,
+    UpdateUserAsync,
     LoginAsync,
     RegisterAsync,
     LogoutAsync,

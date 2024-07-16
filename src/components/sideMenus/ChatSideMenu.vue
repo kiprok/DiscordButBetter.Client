@@ -135,7 +135,7 @@ async function CloseConversation(conversationId) {
         <skelly-loading v-else class="w-full h-14 text-white" />
         <button
           class="ml-auto text-2xl p-2 text-white hover:text-gray-300 flex-none"
-          @click="router.push({ name: 'landingPage' })">
+          @click="modalStore.OpenModal('accountSettings')">
           <i class="fa-solid fa-cog" />
         </button>
       </div>
