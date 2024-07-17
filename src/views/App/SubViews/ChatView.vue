@@ -4,18 +4,16 @@ import { useUserStore } from '@/stores/user.js';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
 import ChatTextBox from '@/components/ChatTextBox.vue';
 import { defineAsyncComponent, onMounted, ref, watch } from 'vue';
-import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useConversationStore } from '@/stores/conversation.js';
 import ChatAreaInfoBar from '@/components/ChatAreaInfoBar.vue';
 import ChatLeftSideMenuButton from '@/components/ChatLeftSideMenuButton.vue';
 import { useSearchStore } from '@/stores/search.js';
-import MessageListItem from '@/components/MessageListItem.vue';
-import PaginationButtons from '@/components/PaginationButtons.vue';
-import ChatInfoMenu from '@/components/sideMenus/ChatInfoMenu.vue';
 import { useServerStore } from '@/stores/server.js';
 import UserItemFullDetail from '@/components/user/UserItemFullDetail.vue';
 
 const MessageList = defineAsyncComponent(() => import('@/components/MessageList.vue'));
+const ChatInfoMenu = defineAsyncComponent(() => import('@/components/sideMenus/ChatInfoMenu.vue'));
 
 const route = useRoute();
 const router = useRouter();

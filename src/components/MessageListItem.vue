@@ -1,10 +1,7 @@
 <script setup>
 import { useUserStore } from '@/stores/user.js';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { useSendingMessageStore } from '@/stores/sendingMessage.js';
-import { useConversationStore } from '@/stores/conversation.js';
 import { escapeHtml, parseMarkdownMessage, parseMarkdownReply } from '@/composables/markdown.js';
-import ContextModal from '@/components/modals/ContextModal.vue';
 import ChatMessageItemContent from '@/components/modals/contextMenuContents/ChatMessageItemContent.vue';
 import TouchComponentHold from '@/components/touch/TouchComponentHold.vue';
 import {

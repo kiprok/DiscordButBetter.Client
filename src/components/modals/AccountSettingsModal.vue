@@ -2,54 +2,70 @@
 import { useUserStore } from '@/stores/user.js';
 import { useModalStore } from '@/stores/modalStore.js';
 import { useServerStore } from '@/stores/server.js';
-import AccountSettings from '@/components/modals/SettingsComponents/AccountSettings.vue';
-import PlaceholderSettings from '@/components/modals/SettingsComponents/PlaceholderSettings.vue';
-import { computed, ref } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
 const serverStore = useServerStore();
 const modalStore = useModalStore();
+const router = useRouter();
 
 const SettingsMenuItems = {
   accountSettings: {
     text: 'Account Settings',
     icon: 'fa-solid fa-person',
-    component: AccountSettings,
+    component: defineAsyncComponent(
+      () => import('@/components/modals/SettingsComponents/AccountSettings.vue'),
+    ),
   },
   appSettings: {
     text: 'App Settings',
     icon: 'fa-cog',
-    component: PlaceholderSettings,
+    component: defineAsyncComponent(
+      () => import('@/components/modals/SettingsComponents/PlaceholderSettings.vue'),
+    ),
   },
   textSettings: {
     text: 'Text Settings',
     icon: 'fa-regular fa-comments',
-    component: PlaceholderSettings,
+    component: defineAsyncComponent(
+      () => import('@/components/modals/SettingsComponents/PlaceholderSettings.vue'),
+    ),
   },
   mediaSettings: {
     text: 'Media Settings',
     icon: 'fa-solid fa-video',
-    component: PlaceholderSettings,
+    component: defineAsyncComponent(
+      () => import('@/components/modals/SettingsComponents/PlaceholderSettings.vue'),
+    ),
   },
   notificationSettings: {
     text: 'Notification Settings',
     icon: 'fa-solid fa-bell',
-    component: PlaceholderSettings,
+    component: defineAsyncComponent(
+      () => import('@/components/modals/SettingsComponents/PlaceholderSettings.vue'),
+    ),
   },
   privacySettings: {
     text: 'Privacy Settings',
     icon: 'fa-solid fa-lock',
-    component: PlaceholderSettings,
+    component: defineAsyncComponent(
+      () => import('@/components/modals/SettingsComponents/PlaceholderSettings.vue'),
+    ),
   },
   securitySettings: {
     text: 'Security Settings',
     icon: 'fa-solid fa-shield',
-    component: PlaceholderSettings,
+    component: defineAsyncComponent(
+      () => import('@/components/modals/SettingsComponents/PlaceholderSettings.vue'),
+    ),
   },
   helpSettings: {
     text: 'Help',
     icon: 'fa-solid fa-question-circle',
-    component: PlaceholderSettings,
+    component: defineAsyncComponent(
+      () => import('@/components/modals/SettingsComponents/PlaceholderSettings.vue'),
+    ),
   },
 };
 
@@ -65,6 +81,12 @@ modalStore.RegisterModal(modalName);
 function OpenMenu(key) {
   console.log('Opening menu', key);
   _currentSelectedMenu.value = key;
+}
+
+async function Logout() {
+  modalStore.CloseModal(modalName);
+  await router.push({ name: 'login' });
+  await serverStore.LogoutAsync();
 }
 </script>
 
@@ -110,7 +132,7 @@ function OpenMenu(key) {
                 </li>
                 <li key="logout" class="w-full mt-auto">
                   <button
-                    @click="serverStore.LogoutAsync()"
+                    @click="Logout"
                     class="flex items-center justify-center sm:justify-start w-full gap-2 bg-red-600 hover:bg-red-700 p-2">
                     <i class="fa-solid fa-right-from-bracket"></i>
                     <span>logout</span>

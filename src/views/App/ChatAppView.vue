@@ -64,8 +64,11 @@ async function ConnectToServer() {
   });
 
   await RegisterNotificationAsync(connection, route);
-
-  await connection.start();
+  try {
+    await connection.start();
+  } catch (error) {
+    await router.push({ name: 'landingPage' });
+  }
   console.log('Connected to server');
 }
 
