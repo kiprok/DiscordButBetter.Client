@@ -8,6 +8,7 @@ import UserProfilePicture from '@/components/user/UserProfilePicture.vue';
 import PaginationAnimation from '@/components/animations/PaginationAnimation.vue';
 import UserProfile from '@/components/user/UserProfile.vue';
 import { useServerStore } from '@/stores/server.js';
+import { GetProfilePictureUrl } from '@/composables/utility.js';
 
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
@@ -96,7 +97,7 @@ const props = defineProps(['conversationId']);
             class="rounded-lg p-2 text-xl text-white transition-colors ease-in-out hover:bg-black/30">
             <div class="flex flex-row flex-nowrap items-center gap-2">
               <img
-                :src="userStore.GetUserById(participant).profilePicture"
+                :src="GetProfilePictureUrl(userStore.GetUserById(participant).profilePicture)"
                 alt="pfp"
                 class="size-10 flex-none rounded-full" />
               <span> {{ userStore.GetUserById(participant).username }} </span>

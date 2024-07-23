@@ -25,3 +25,16 @@ export function insertAtCursor(text) {
   selection.removeAllRanges();
   selection.addRange(range);
 }
+
+export async function UploadFileToS3(file, signedRequest) {
+  const response = await fetch(signedRequest, {
+    method: 'PUT',
+    body: file,
+  });
+
+  return response;
+}
+
+export function GetProfilePictureUrl(fileName) {
+  return `https://avatars.quinnsserver.com/${fileName !== '' ? fileName : 'default.png'}`;
+}

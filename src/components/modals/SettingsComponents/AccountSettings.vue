@@ -2,6 +2,7 @@
 import { useUserStore } from '@/stores/user.js';
 import { useServerStore } from '@/stores/server.js';
 import { ref } from 'vue';
+import { GetProfilePictureUrl, UploadFileToS3 } from '@/composables/utility.js';
 
 const userStore = useUserStore();
 const serverStore = useServerStore();
@@ -11,6 +12,7 @@ const statusMessage = ref(serverStore.user.statusMessage);
 const biography = ref(serverStore.user.biography);
 
 const _loading = ref(false);
+const _uploading = ref(false);
 
 async function SaveChanges() {
   _loading.value = true;
@@ -32,13 +34,53 @@ async function SaveChanges() {
 
   _loading.value = false;
 }
+
+async function UploadProfilePicture(event) {
+  _uploading.value = true;
+  const file = event.target.files[0];
+  console.log('File:', file);
+  var fileName = file.name;
+  var fileType = file.type;
+  var fileSize = file.size;
+
+  var response = await serverStore.UploadAvatarAsync(fileName, fileType, fileSize);
+  if (response) {
+    const presignedUrl = response.uploadUrl;
+    const newFileName = response.newFileName;
+    console.log('Upload URL:', presignedUrl);
+    console.log('reponse:', response);
+
+    const responseUpload = await UploadFileToS3(file, presignedUrl);
+
+    console.log('Upload response:', responseUpload);
+    if (responseUpload.ok) {
+      profilePicture.value = newFileName;
+      console.log('Uploaded profile picture');
+    }
+  }
+
+  _uploading.value = false;
+}
 </script>
 
 <template>
   <div class="flex flex-col overflow-y-auto">
     <label for="pfp" class="text-lg font-bold">Profile Picture</label>
     <!--    <input type="file" accept="image/*" @change="profilePicture = $event" />-->
-    <input type="text" v-model="profilePicture" id="pfp" class="text-black" />
+    <!--    <input type="text" v-model="profilePicture" id="pfp" class="text-black" />-->
+    <div class="flex">
+      <img
+        :src="GetProfilePictureUrl(profilePicture)"
+        alt="Profile Picture"
+        class="w-20 h-20 rounded-full flex-none" />
+      <input
+        type="file"
+        name="pfp"
+        id="pfp"
+        :disabled="_uploading"
+        accept="image/*"
+        @change="UploadProfilePicture" />
+    </div>
     <label for="status" class="text-lg font-bold">Status Message</label>
     <input type="text" v-model="statusMessage" id="status" class="text-black" />
     <label for="bio" class="text-lg font-bold">Biography</label>
@@ -46,7 +88,7 @@ async function SaveChanges() {
     <button
       @click="SaveChanges"
       class="w-fit mt-4 p-2 bg-blue-600 hover:bg-blue-800 disabled:bg-gray-600"
-      :disabled="_loading">
+      :disabled="_loading || _uploading">
       Save Changes
     </button>
   </div>

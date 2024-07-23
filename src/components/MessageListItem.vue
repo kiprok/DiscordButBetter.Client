@@ -11,6 +11,7 @@ import {
 } from '@/composables/commands/chatMessageCommands.js';
 import { useModalStore } from '@/stores/modalStore.js';
 import { useServerStore } from '@/stores/server.js';
+import { GetProfilePictureUrl } from '@/composables/utility.js';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner', 'tag']);
@@ -64,7 +65,7 @@ function OpenContextMenu() {
     <div class="pl-6 h-5 flex flex-row items-end truncate overflow-hidden w-full" v-if="reply">
       <div class="flex-none h-3 w-8 rounded-tl border border-b-0 border-r-0 border-black"></div>
       <img
-        :src="userStore.GetUserById(reply.senderId)?.profilePicture"
+        :src="GetProfilePictureUrl(userStore.GetUserById(reply.senderId)?.profilePicture)"
         alt="profile picture"
         class="mr-1 size-4 flex-none rounded-full" />
       <div
@@ -81,7 +82,7 @@ function OpenContextMenu() {
     <div class="relative flex flex-row justify-between">
       <div class="ml-1 mr-2 mt-0 w-10 flex-none">
         <img
-          :src="userStore.GetUserById(props.message.senderId).profilePicture"
+          :src="GetProfilePictureUrl(userStore.GetUserById(props.message.senderId).profilePicture)"
           alt="profile picture"
           class="size-full h-10 rounded-full hover:cursor-pointer"
           v-if="!previousAlsoOwner"

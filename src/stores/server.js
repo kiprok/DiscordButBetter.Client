@@ -404,6 +404,22 @@ export const useServerStore = defineStore('server', () => {
     return response.ok ? await response.json() : null;
   }
 
+  async function UploadAvatarAsync(fileName, fileType, fileSize) {
+    const response = await fetch('/api/media/avatars', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: GetToken(),
+      },
+      body: JSON.stringify({
+        fileName: fileName,
+        fileType: fileType,
+        fileSize: fileSize,
+      }),
+    });
+    return response.ok ? await response.json() : null;
+  }
+
   async function ConnectSocketAsync() {
     connection.value = new signalR.HubConnectionBuilder()
       .withUrl(`/hub?token=${GetToken()}`)
@@ -459,6 +475,7 @@ export const useServerStore = defineStore('server', () => {
     GetNewerMessagesAsync,
     GetMessagesFromPointAsync,
     SearchMessagesAsync,
+    UploadAvatarAsync,
     ConnectSocketAsync,
     CloseSocketAsync,
     GetConnectionState,
