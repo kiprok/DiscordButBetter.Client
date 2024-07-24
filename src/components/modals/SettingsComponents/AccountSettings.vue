@@ -12,13 +12,16 @@ const statusMessage = ref(serverStore.user.statusMessage);
 const biography = ref(serverStore.user.biography);
 
 const _loading = ref(false);
-const _uploading = ref(false);
+
+const uploadedImage = ref();
 
 async function SaveChanges() {
   _loading.value = true;
   const newInfo = {};
-  if (profilePicture.value !== serverStore.user.profilePicture)
-    newInfo.profilePicture = profilePicture.value;
+  if (uploadedImage.value) {
+    await UploadProfilePicture();
+    uploadedImage.value = null;
+  }
   if (statusMessage.value !== serverStore.user.statusMessage)
     newInfo.statusMessage = statusMessage.value;
   if (biography.value !== serverStore.user.biography) newInfo.biography = biography.value;
@@ -35,13 +38,19 @@ async function SaveChanges() {
   _loading.value = false;
 }
 
-async function UploadProfilePicture(event) {
-  _uploading.value = true;
-  const file = event.target.files[0];
+async function UploadProfilePicture() {
+  const filePicker = document.getElementById('pfp-settings-picker');
+  const file = filePicker.files[0];
   console.log('File:', file);
-  var fileName = file.name;
-  var fileType = file.type;
-  var fileSize = file.size;
+  const fileName = file.name;
+  const fileType = file.type;
+  const fileSize = file.size;
+
+  if (fileType.includes('image') === false) {
+    console.log('File is not an image');
+    _uploading.value = false;
+    return;
+  }
 
   var response = await serverStore.UploadAvatarAsync(fileName, fileType, fileSize);
   if (response) {
@@ -58,28 +67,55 @@ async function UploadProfilePicture(event) {
       console.log('Uploaded profile picture');
     }
   }
+}
 
-  _uploading.value = false;
+async function OnPfpChange(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.includes('image')) {
+    console.log('File is not an image');
+    return;
+  }
+
+  console.log(file);
+
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => {
+    uploadedImage.value = reader.result;
+    console.log(uploadedImage.value);
+  };
 }
 </script>
 
 <template>
-  <div class="flex flex-col overflow-y-auto">
-    <label for="pfp" class="text-lg font-bold">Profile Picture</label>
-    <!--    <input type="file" accept="image/*" @change="profilePicture = $event" />-->
-    <!--    <input type="text" v-model="profilePicture" id="pfp" class="text-black" />-->
-    <div class="flex">
-      <img
-        :src="GetProfilePictureUrl(profilePicture)"
-        alt="Profile Picture"
-        class="w-20 h-20 rounded-full flex-none" />
+  <div class="flex gap-1 flex-col overflow-y-auto">
+    <span class="text-lg font-bold">User settings</span>
+    <div class="flex items-center gap-4">
+      <label
+        for="pfp-settings-picker"
+        class="relative text-lg font-bold overflow-hidden w-20 h-20 rounded-full hover:cursor-pointer group/pfp">
+        <img
+          :src="uploadedImage ? uploadedImage : GetProfilePictureUrl(profilePicture)"
+          alt="Profile Picture"
+          class="size-full flex-none" />
+        <span
+          class="absolute inset-0 bg-black/50 items-center justify-center hidden group-hover/pfp:flex">
+          <i class="fa-solid fa-camera text-white text-2xl"></i>
+        </span>
+      </label>
       <input
         type="file"
         name="pfp"
-        id="pfp"
+        id="pfp-settings-picker"
         :disabled="_uploading"
         accept="image/*"
-        @change="UploadProfilePicture" />
+        @change="OnPfpChange"
+        hidden="hidden" />
+      <span>
+        {{ serverStore.user.username }}
+      </span>
     </div>
     <label for="status" class="text-lg font-bold">Status Message</label>
     <input type="text" v-model="statusMessage" id="status" class="text-black" />
@@ -88,7 +124,7 @@ async function UploadProfilePicture(event) {
     <button
       @click="SaveChanges"
       class="w-fit mt-4 p-2 bg-blue-600 hover:bg-blue-800 disabled:bg-gray-600"
-      :disabled="_loading || _uploading">
+      :disabled="_loading">
       Save Changes
     </button>
   </div>

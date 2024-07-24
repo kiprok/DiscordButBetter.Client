@@ -5,7 +5,6 @@ const props = defineProps({
 const model = defineModel();
 
 const id = Math.random().toString(36).substring(2);
-console.log(id);
 </script>
 
 <template>
