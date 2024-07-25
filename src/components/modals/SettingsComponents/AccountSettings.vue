@@ -20,7 +20,7 @@ async function SaveChanges() {
   const newInfo = {};
   if (uploadedImage.value) {
     await UploadProfilePicture();
-    uploadedImage.value = null;
+    newInfo.profilePicture = profilePicture.value;
   }
   if (statusMessage.value !== serverStore.user.statusMessage)
     newInfo.statusMessage = statusMessage.value;
@@ -35,6 +35,7 @@ async function SaveChanges() {
     console.log('Updated user info');
   }
 
+  uploadedImage.value = null;
   _loading.value = false;
 }
 
@@ -48,11 +49,10 @@ async function UploadProfilePicture() {
 
   if (fileType.includes('image') === false) {
     console.log('File is not an image');
-    _uploading.value = false;
     return;
   }
 
-  var response = await serverStore.UploadAvatarAsync(fileName, fileType, fileSize);
+  const response = await serverStore.UploadAvatarAsync(fileName, fileType, fileSize);
   if (response) {
     const presignedUrl = response.uploadUrl;
     const newFileName = response.newFileName;
@@ -109,7 +109,7 @@ async function OnPfpChange(event) {
         type="file"
         name="pfp"
         id="pfp-settings-picker"
-        :disabled="_uploading"
+        :disabled="_loading"
         accept="image/*"
         @change="OnPfpChange"
         hidden="hidden" />
