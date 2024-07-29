@@ -29,7 +29,7 @@ export const useUserStore = defineStore('user', () => {
                 senderId: "",
                 conversationId: "",
                 content: "",
-                sentAt: 0,
+                sentAt: "",
                 metadata: {}
             }
              */

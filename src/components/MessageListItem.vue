@@ -11,7 +11,11 @@ import {
 } from '@/composables/commands/chatMessageCommands.js';
 import { useModalStore } from '@/stores/modalStore.js';
 import { useServerStore } from '@/stores/server.js';
-import { GetProfilePictureUrl } from '@/composables/utility.js';
+import {
+  FormatMessageDateToStringLong,
+  FormatMessageDateToStringShort,
+  GetProfilePictureUrl,
+} from '@/composables/utility.js';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner', 'tag']);
@@ -93,12 +97,7 @@ function OpenContextMenu() {
           " />
         <div v-if="previousAlsoOwner" class="flex h-6 items-center justify-center">
           <span class="invisible text-xs group-hover/item:visible">
-            {{
-              sentAt.toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-              })
-            }}
+            {{ FormatMessageDateToStringShort(sentAt) }}
           </span>
         </div>
       </div>
@@ -108,7 +107,7 @@ function OpenContextMenu() {
             {{ userStore.GetUserById(props.message.senderId).username }}
           </h3>
           <span class="block shrink-0 text-xs">
-            {{ sentAt.toLocaleTimeString() }}
+            {{ FormatMessageDateToStringLong(sentAt) }}
           </span>
           <span class="block shrink-0 text-xs" v-if="props.message.metadata.edited" title="edited">
             <i class="fa-solid fa-pencil"></i>

@@ -98,7 +98,6 @@ export const useConversationStore = defineStore('messageList', () => {
       scrollPosition: 0,
       viewingOlderMessages: false,
       lastSeenMessage: '',
-      lastMessageTime: 0,
       newUnseenMessages: [],
       isLoadingMessages: false,
     };
@@ -214,7 +213,7 @@ export const useConversationStore = defineStore('messageList', () => {
   }
 
   function UpdateLastMessageTime(conversationId, time) {
-    conversations[conversationId].lastMessageTime = time;
+    conversations[conversationId].lastMessageTime = new Date(time).toISOString();
   }
 
   function RemoveNewUnseenMessage(conversationId, messageId) {

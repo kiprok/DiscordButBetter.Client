@@ -38,3 +38,37 @@ export async function UploadFileToS3(file, signedRequest) {
 export function GetProfilePictureUrl(fileName) {
   return `https://avatars.quinnsserver.com/${fileName !== '' ? fileName : 'default.png'}`;
 }
+
+export function IsSameDay(message1, message2) {
+  const date1 = new Date(message1?.sentAt) ?? new Date(Date.now());
+  const date2 = new Date(message2?.sentAt) ?? new Date(Date.now());
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
+export function FormatMessageDateToStringLong(date) {
+  const now = new Date(Date.now());
+  const messageDate = new Date(date);
+  if (now.getFullYear() === messageDate.getFullYear()) {
+    if (now.getMonth() === messageDate.getMonth() && now.getDate() === messageDate.getDate()) {
+      return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return messageDate.toLocaleDateString([], { month: 'long', day: 'numeric' });
+  }
+  return messageDate.toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+export function FormatMessageDateToStringShort(date) {
+  const now = new Date(Date.now());
+  const messageDate = new Date(date);
+  if (now.getFullYear() === messageDate.getFullYear()) {
+    if (now.getMonth() === messageDate.getMonth() && now.getDate() === messageDate.getDate()) {
+      return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return messageDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  }
+  return messageDate.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
+}
