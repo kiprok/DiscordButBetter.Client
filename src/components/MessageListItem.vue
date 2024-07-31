@@ -16,12 +16,14 @@ import {
   FormatMessageDateToStringShort,
   GetProfilePictureUrl,
 } from '@/composables/utility.js';
+import { useCurrentTimeStore } from '@/stores/currentTime.js';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner', 'tag']);
 const userStore = useUserStore();
 const modalStore = useModalStore();
 const serverStore = useServerStore();
+const timeStore = useCurrentTimeStore();
 
 const refTextMessage = ref();
 const sentAt = new Date(props.message.sentAt);
@@ -106,8 +108,10 @@ function OpenContextMenu() {
           <h3 class="block truncate text-lg">
             {{ userStore.GetUserById(props.message.senderId).username }}
           </h3>
-          <span class="block shrink-0 text-xs">
-            {{ FormatMessageDateToStringLong(sentAt) }}
+          <span
+            class="block shrink-0 text-xs"
+            :title="sentAt.toLocaleString([], { hour: '2-digit', minute: '2-digit' })">
+            {{ FormatMessageDateToStringLong(sentAt, timeStore.currentTime) }}
           </span>
           <span class="block shrink-0 text-xs" v-if="props.message.metadata.edited" title="edited">
             <i class="fa-solid fa-pencil"></i>

@@ -38,6 +38,7 @@ async function SendChatMessage() {
 
     editedMessage.content = editedMessage.content.trim();
 
+    ResetMessage();
     const response = await serverStore.UpdateMessageAsync(
       sendMessageStore.messageEditing.messageId,
       editedMessage,
@@ -65,19 +66,22 @@ async function SendChatMessage() {
     }
 
     messageToSend.content = messageToSend.content.trim();
+    ResetMessage();
     const response = await serverStore.SendMessageAsync(messageToSend);
     if (response) {
-      //userStore.SendMessage(response);
-      //sendMessageStore.sendingMessage = response.messageId;
+      userStore.SendMessage(response);
+      sendMessageStore.sendingMessage = response.messageId;
 
       if (!sendMessageStore.messageEditing && !props.conversation.viewingOlderMessages) {
-        //conversationStore.AddMessage(props.conversation.conversationId, response);
+        conversationStore.AddMessage(props.conversation.conversationId, response);
       } else sendMessageStore.sendingMessage = null;
     }
   }
 
   conversationStore.UpdateLastMessageTime(props.conversation.conversationId, Date.now());
+}
 
+function ResetMessage() {
   sendMessageStore.messageText = '';
   sendMessageStore.messageEditing = null;
   sendMessageStore.replyTo = null;

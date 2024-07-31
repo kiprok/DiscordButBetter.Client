@@ -6,9 +6,13 @@ import UserProfileModal from '@/components/modals/UserProfileModal.vue';
 import { useServerStore } from '@/stores/server.js';
 import { useUserStore } from '@/stores/user.js';
 import AccountSettingsModal from '@/components/modals/AccountSettingsModal.vue';
+import { useCurrentTimeStore } from '@/stores/currentTime.js';
 
 const serverStore = useServerStore();
 const userStore = useUserStore();
+const timeStore = useCurrentTimeStore();
+
+timeStore.StartClock();
 
 const token = serverStore.GetToken();
 

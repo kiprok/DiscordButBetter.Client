@@ -13,6 +13,8 @@ import UserItemFullDetail from '@/components/user/UserItemFullDetail.vue';
 import { ref } from 'vue';
 import { useServerStore } from '@/stores/server.js';
 import SkellyLoading from '@/components/Skeletons/SkellyLoading.vue';
+import { FormatLastMessageTimeShort } from '../../composables/utility.js';
+import { useCurrentTimeStore } from '@/stores/currentTime.js';
 
 const route = useRoute();
 const router = useRouter();
@@ -22,6 +24,7 @@ const conversationStore = useConversationStore();
 const chatLeftSideMenuStore = useChatLeftSideMenuStore();
 const modalStore = useModalStore();
 const serverStore = useServerStore();
+const timeStore = useCurrentTimeStore();
 
 const userAnchorRef = ref();
 
@@ -73,7 +76,7 @@ async function CloseConversation(conversationId) {
                 return 0;
               })"
             :key="convo.conversationId"
-            class="router-link group"
+            class="router-link relative group"
             :to="{ name: 'chat', params: { id: convo.conversationId } }"
             @click="ToggleSideMenu">
             <touch-component-hold
@@ -110,6 +113,9 @@ async function CloseConversation(conversationId) {
                     conversationStore.GetConversationById(convo.conversationId).newUnseenMessages
                       .length
                   " />
+                <span class="absolute right-1 top-0 text-xs text-gray-300">
+                  {{ FormatLastMessageTimeShort(convo.lastMessageTime, timeStore.currentTime) }}
+                </span>
                 <button
                   class="size-fit flex-none hover:text-gray-400 sm:hidden touch:hidden mouse:group-hover:block"
                   @click.stop.prevent="CloseConversation(convo.conversationId)">

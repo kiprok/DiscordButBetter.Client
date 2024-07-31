@@ -160,7 +160,10 @@ export const useConversationStore = defineStore('messageList', () => {
 
   function AddMessage(conversationId, message) {
     if (!conversations[conversationId]) return;
-    if (conversations[conversationId].visibleMessages.includes(message)) return;
+    if (
+      conversations[conversationId].visibleMessages.find((x) => x.messageId === message.messageId)
+    )
+      return;
     conversations[conversationId].visibleMessages.push(message);
 
     conversations[conversationId].visibleMessages.sort(

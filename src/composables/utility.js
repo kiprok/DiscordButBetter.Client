@@ -1,3 +1,5 @@
+import { useCurrentTimeStore } from '@/stores/currentTime.js';
+
 export function IsLoadingCompleted(messageList, message) {
   if (messageList.length > 0) {
     const index = messageList.findIndex((x) => x.messageId === message.messageId);
@@ -49,8 +51,7 @@ export function IsSameDay(message1, message2) {
   );
 }
 
-export function FormatMessageDateToStringLong(date) {
-  const now = new Date(Date.now());
+export function FormatMessageDateToStringLong(date, now) {
   const messageDate = new Date(date);
   if (now.getFullYear() === messageDate.getFullYear()) {
     if (now.getMonth() === messageDate.getMonth() && now.getDate() === messageDate.getDate()) {
@@ -62,13 +63,29 @@ export function FormatMessageDateToStringLong(date) {
 }
 
 export function FormatMessageDateToStringShort(date) {
-  const now = new Date(Date.now());
   const messageDate = new Date(date);
-  if (now.getFullYear() === messageDate.getFullYear()) {
-    if (now.getMonth() === messageDate.getMonth() && now.getDate() === messageDate.getDate()) {
-      return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    return messageDate.toLocaleDateString([], { month: 'short', day: 'numeric' });
+
+  return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+export function FormatLastMessageTimeShort(date, now) {
+  const messageDate = new Date(date);
+  const diff = now - messageDate;
+
+  if (diff < 60000) {
+    return 'Now';
   }
-  return messageDate.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
+  if (diff < 3600000) {
+    return `${Math.floor(diff / 60000)} Min`;
+  }
+  if (diff < 86400000) {
+    return `${Math.floor(diff / 3600000)} Hr`;
+  }
+  if (diff < 2592000000) {
+    return `${Math.floor(diff / 86400000)}D`;
+  }
+  if (diff < 31536000000) {
+    return `${Math.floor(diff / 2592000000)}M`;
+  }
+  return `${Math.floor(diff / 31536000000)}Y`;
 }
