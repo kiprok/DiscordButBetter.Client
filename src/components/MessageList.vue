@@ -288,7 +288,7 @@ function previousAlsoOwner(message, index) {
         id="message-list"
         ref="messageListDom">
         <transition-group name="message-list">
-          <template
+          <li
             v-for="(message, index) in conversationStore.GetVisibleMessages(
               props.conversation.conversationId,
             )"
@@ -307,7 +307,7 @@ function previousAlsoOwner(message, index) {
             </div>
             <message-list-item
               class="hover:bg-gray-400"
-              tag="li"
+              tag="div"
               :data-msg-id="message.messageId"
               :data-msg-list-index="index"
               :data-msg-sender-id="message.senderId"
@@ -320,7 +320,7 @@ function previousAlsoOwner(message, index) {
                 allowEdit: true,
                 allowDelete: true,
               }" />
-          </template>
+          </li>
         </transition-group>
       </ul>
       <skelly-loading v-else class="size-full text-[8rem]" />
