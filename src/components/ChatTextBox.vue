@@ -37,12 +37,10 @@ async function SendChatMessage() {
     }
 
     editedMessage.content = editedMessage.content.trim();
+    const messageId = sendMessageStore.messageEditing.messageId;
 
     ResetMessage();
-    const response = await serverStore.UpdateMessageAsync(
-      sendMessageStore.messageEditing.messageId,
-      editedMessage,
-    );
+    const response = await serverStore.UpdateMessageAsync(messageId, editedMessage);
 
     if (response) {
       userStore.SendMessage(response);

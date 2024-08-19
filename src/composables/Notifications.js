@@ -127,8 +127,8 @@ async function CreatedNewConversationAsync(conversation) {
   conversationStore.AddConversation(conversation);
 }
 
-async function AddedToConversationAsync(conversation, userId) {
-  if (serverStore.user.userId === userId) {
+async function AddedToConversationAsync(conversation) {
+  if (serverStore.user.userId === conversation.userId) {
     conversationStore.AddVisibleConversation(conversation.conversationId);
     for (const paId of conversation.participants) {
       if (paId !== serverStore.user.userId) {
@@ -138,6 +138,7 @@ async function AddedToConversationAsync(conversation, userId) {
         }
       }
     }
+    delete conversation.userId;
     conversationStore.AddConversation(conversation);
   } else {
     if (!userStore.GetUserById(userId)) {
