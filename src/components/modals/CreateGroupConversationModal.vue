@@ -87,7 +87,13 @@ function RemoveFriendFromConversation(userId) {
                   )"
                 :key="user.userId"
                 class="w-full">
-                <FriendListUserItem :user>
+                <FriendListUserItem
+                  :user
+                  :class="{
+                    '!bg-white/20': friendsAddedToConversation.find(
+                      (newFriendId) => newFriendId === user.userId,
+                    ),
+                  }">
                   <div
                     class="ml-auto text-black"
                     v-if="
