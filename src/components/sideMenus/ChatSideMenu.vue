@@ -66,6 +66,14 @@ async function CloseConversation(conversationId) {
             class="ml-auto size-5 text-sm"
             :notifications="userStore.GetFriendRequests().length" />
         </router-link>
+        <div class="flex flex-none items-center mb-4">
+          <div class="w-full h-0 min-w-0 border border-gray-400" />
+          <span
+            class="text-gray-400 hover:text-gray-300"
+            @click="modalStore.OpenModal('createConversation')">
+            <i class="fa-solid fa-plus text-2xl ml-2" />
+          </span>
+        </div>
         <transition-group name="con-list">
           <router-link
             v-for="(convo, index) in conversationStore
