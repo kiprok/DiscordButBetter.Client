@@ -17,6 +17,8 @@ const searchQuery = ref('');
 const newConversationName = ref('');
 const friendsAddedToConversation = ref([]);
 
+const _isLoading = ref(false);
+
 const modalName = 'createConversation';
 
 modalStore.RegisterModal(modalName);
@@ -41,6 +43,19 @@ function RemoveFriendFromConversation(userId) {
   friendsAddedToConversation.value = friendsAddedToConversation.value.filter(
     (newFriendId) => newFriendId !== userId,
   );
+}
+
+async function CreateConversation() {
+  _isLoading.value = true;
+  const conversation = await serverStore.CreateConversationAsync(
+    newConversationName.value,
+    1,
+    friendsAddedToConversation.value,
+  );
+  if (conversation) {
+    modalStore.CloseModal(modalName);
+  }
+  _isLoading.value = false;
 }
 </script>
 
@@ -119,7 +134,10 @@ function RemoveFriendFromConversation(userId) {
           <div class="mt-auto flex flex-none gap-2">
             <button
               class="bg-green-500 hover:bg-green-400 text-white px-4 py-2 disabled:bg-green-300"
-              :disabled="newConversationName === '' || friendsAddedToConversation.length === 0">
+              @click="CreateConversation"
+              :disabled="
+                newConversationName === '' || friendsAddedToConversation.length === 0 || _isLoading
+              ">
               Create
             </button>
             <button
