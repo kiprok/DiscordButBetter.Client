@@ -99,12 +99,14 @@ async function CloseConversation(conversationId) {
                   });
                 }
               ">
-              <div class="flex min-w-0" v-if="convo.conversationType === 1">
+              <div class="flex items-center min-w-0" v-if="convo.conversationType === 1">
                 <img
                   :src="GetProfilePictureUrl(convo.conversationPicture)"
                   alt="pfp"
                   class="size-10 flex-none rounded-full" />
-                <span class="truncate min-w-0">{{ convo.conversationName }}</span>
+                <span class="truncate text-sm font-bold ml-2 min-w-0">
+                  {{ convo.conversationName }}
+                </span>
               </div>
               <user-item-full-detail
                 v-else
