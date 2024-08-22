@@ -1,7 +1,7 @@
 <script setup>
 import UserProfilePicture from '@/components/user/UserProfilePicture.vue';
 
-const props = defineProps(['user']);
+const props = defineProps(['user', 'owner']);
 </script>
 
 <template>
@@ -10,6 +10,7 @@ const props = defineProps(['user']);
     <div class="flex flex-col min-w-0">
       <span class="truncate font-bold text-sm">
         {{ user.username }}
+        <i v-if="owner" class="fa-solid fa-star text-yellow-500" />
       </span>
       <span class="truncate text-xs">
         {{ user.statusMessage }}

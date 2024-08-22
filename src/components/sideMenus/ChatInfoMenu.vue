@@ -19,6 +19,8 @@ const serverStore = useServerStore();
 const modalStore = useModalStore();
 
 const props = defineProps(['conversationId']);
+
+console.log(conversationStore.GetConversationById(props.conversationId));
 </script>
 
 <template>
@@ -108,7 +110,9 @@ const props = defineProps(['conversationId']);
                 });
               }
             ">
-            <user-item-full-detail :user="userStore.GetUserById(participant)" />
+            <user-item-full-detail
+              :owner="conversationStore.GetConversationById(conversationId).ownerId === participant"
+              :user="userStore.GetUserById(participant)" />
           </li>
         </ul>
       </div>
