@@ -12,6 +12,7 @@ import { useSearchStore } from '@/stores/search.js';
 import { useServerStore } from '@/stores/server.js';
 import UserItemFullDetail from '@/components/user/UserItemFullDetail.vue';
 import { GetProfilePictureUrl } from '@/composables/utility.js';
+import { useModalStore } from '@/stores/modalStore.js';
 
 const MessageList = defineAsyncComponent(() => import('@/components/MessageList.vue'));
 const ChatInfoMenu = defineAsyncComponent(() => import('@/components/sideMenus/ChatInfoMenu.vue'));
@@ -23,6 +24,7 @@ const serverStore = useServerStore();
 const sendMessageStore = useSendingMessageStore();
 const conversationStore = useConversationStore();
 const searchStore = useSearchStore();
+const modalStore = useModalStore();
 
 const messageListRef = ref();
 
@@ -78,7 +80,7 @@ function SendChatMessage() {}
         <i class="fa-solid fa-chevron-left"></i>
       </label>
       <div
-        class="flex min-w-0 gap-2 items-center"
+        class="flex min-w-0 gap-2 items-center text-white"
         v-if="conversationStore.GetConversationById(route.params.id)?.conversationType === 1">
         <img
           class="size-10 rounded-full"
@@ -88,10 +90,25 @@ function SendChatMessage() {}
             )
           "
           alt="chat image" />
-        <h1
-          class="text-2xl font-bold text-white truncate group-[.sidebar-checked]:hidden lg:!block">
+        <h1 class="text-2xl font-bold truncate min-w-0 group-[.sidebar-checked]:hidden lg:!block">
           {{ conversationStore.GetConversationById(route.params.id)?.conversationName }}
         </h1>
+        <span
+          v-if="
+            conversationStore.GetConversationById(route.params.id)?.ownerId ===
+            serverStore.user.userId
+          "
+          class="rounded-lg bg-white/20 p-1 flex-none hover:bg-white/40 select-none cursor-pointer"
+          @click="
+            () => {
+              modalStore.OpenModal('editConversation', {
+                conversation: conversationStore.GetConversationById(route.params.id),
+              });
+            }
+          ">
+          Edit
+          <i class="fa-solid fa-pencil"></i>
+        </span>
       </div>
 
       <user-item-full-detail

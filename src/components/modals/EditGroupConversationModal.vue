@@ -16,43 +16,76 @@ const conversationNameBox = ref();
 const searchQuery = ref('');
 const newConversationName = ref('');
 const friendsAddedToConversation = ref([]);
+const currentParticipants = ref([]);
+const participantsToRemove = ref([]);
+const participantsToAdd = ref([]);
 
 const _isLoading = ref(false);
 
-const modalName = 'createConversation';
+const modalName = 'editConversation';
+
+const addingFriends = ref(false);
 
 modalStore.RegisterModal(modalName);
 
 watch(
   () => modalStore.GetModalShowStatus(modalName),
-  () => {
-    searchQuery.value = '';
-    newConversationName.value = '';
-    friendsAddedToConversation.value = [];
+  (status) => {
+    if (status) {
+      const conversation = modalStore.GetModalArguments(modalName).conversation;
+      const participants = conversation.participants.filter((u) => u !== serverStore.user.userId);
+      searchQuery.value = '';
+      newConversationName.value = conversation.conversationName;
+      currentParticipants.value = participants;
+      friendsAddedToConversation.value = participants;
+      participantsToAdd.value = [];
+      participantsToRemove.value = [];
+      addingFriends.value = false;
+    } else {
+      searchQuery.value = '';
+      newConversationName.value = '';
+      currentParticipants.value = [];
+      friendsAddedToConversation.value = [];
+      participantsToAdd.value = [];
+      participantsToRemove.value = [];
+      addingFriends.value = false;
+    }
   },
 );
 
 function AddFriendToConversation(userId) {
-  friendsAddedToConversation.value.push(userId);
-  console.log(friendsAddedToConversation.value);
+  //friendsAddedToConversation.value.push(userId);
+  if (participantsToRemove.value.find((newFriendId) => newFriendId === userId)) {
+    participantsToRemove.value = participantsToRemove.value.filter(
+      (newFriendId) => newFriendId !== userId,
+    );
+  } else {
+    participantsToAdd.value.push(userId);
+  }
 }
 
 function RemoveFriendFromConversation(userId) {
-  friendsAddedToConversation.value = friendsAddedToConversation.value.filter(
+  /*friendsAddedToConversation.value = friendsAddedToConversation.value.filter(
     (newFriendId) => newFriendId !== userId,
-  );
+  );*/
+  if (participantsToRemove.value.find((newFriendId) => newFriendId === userId)) {
+    participantsToRemove.value = participantsToRemove.value.filter(
+      (newFriendId) => newFriendId !== userId,
+    );
+  } else {
+    if (participantsToAdd.value.find((newFriendId) => newFriendId === userId)) {
+      participantsToAdd.value = participantsToAdd.value.filter(
+        (newFriendId) => newFriendId !== userId,
+      );
+    } else {
+      participantsToRemove.value.push(userId);
+    }
+  }
 }
 
-async function CreateConversation() {
+async function SaveChanges() {
   _isLoading.value = true;
-  const conversation = await serverStore.CreateConversationAsync(
-    newConversationName.value,
-    1,
-    friendsAddedToConversation.value,
-  );
-  if (conversation) {
-    modalStore.CloseModal(modalName);
-  }
+
   _isLoading.value = false;
 }
 </script>
@@ -82,35 +115,57 @@ async function CreateConversation() {
             v-model="newConversationName"
             class="border-2 bg-gray-500 border-gray-700 mb-4 flex-none" />
           <label for="inputBox" class="">Search for friend to add:</label>
-          <input
-            type="text"
-            ref="inputBox"
-            id="inputBox"
-            v-model="searchQuery"
-            placeholder="friend name"
-            class="border-2 bg-gray-500 border-gray-700 flex-none" />
+          <div class="flex items-center min-w-0 gap-2">
+            <button
+              class="border border-green-500 hover:bg-green-500 text-white w-24 flex-none py-1"
+              :class="{ 'bg-green-600': addingFriends }"
+              @click="addingFriends = !addingFriends">
+              {{ addingFriends ? 'Done' : 'Add new' }}
+            </button>
+            <input
+              type="text"
+              ref="inputBox"
+              id="inputBox"
+              v-model="searchQuery"
+              placeholder="friend name"
+              class="border-2 bg-gray-500 grow min-w-0 border-gray-700" />
+          </div>
           <div class="flex-none border-b-2 border-gray-700 my-4" />
+
           <ul class="relative grow min-h-0 min-w-0 overflow-y-scroll">
             <default-list-animation>
               <li
-                v-for="user in userStore
-                  .GetFriendList()
-                  .filter((friend) =>
-                    friend.username.toLowerCase().includes(searchQuery.toLowerCase()),
-                  )"
+                v-for="user in !addingFriends
+                  ? [...currentParticipants, ...participantsToAdd].map((userId) =>
+                      userStore.GetUserById(userId),
+                    )
+                  : userStore
+                      .GetFriendList()
+                      .filter(
+                        (friend) =>
+                          friend.username.toLowerCase().includes(searchQuery.toLowerCase()) &&
+                          !currentParticipants.find((newFriendId) => newFriendId === friend.userId),
+                      )"
                 :key="user.userId"
                 class="w-full">
                 <FriendListUserItem
                   :user
                   :class="{
-                    '!bg-white/20': friendsAddedToConversation.find(
+                    '!bg-red-500/40': participantsToRemove.find(
+                      (newFriendId) => newFriendId === user.userId,
+                    ),
+                    '!bg-green-500/40': participantsToAdd.find(
                       (newFriendId) => newFriendId === user.userId,
                     ),
                   }">
                   <div
                     class="ml-auto text-black"
                     v-if="
-                      !friendsAddedToConversation.find((newFriendId) => newFriendId === user.userId)
+                      !currentParticipants.find((newFriendId) => newFriendId === user.userId) &&
+                      !(
+                        participantsToRemove.find((newFriendId) => newFriendId === user.userId) ||
+                        participantsToAdd.find((newFriendId) => newFriendId === user.userId)
+                      )
                     ">
                     <friend-list-item-button
                       class="hover:text-green-500"
@@ -132,11 +187,11 @@ async function CreateConversation() {
           <div class="mt-auto flex flex-none gap-2">
             <button
               class="bg-green-500 hover:bg-green-400 text-white px-4 py-2 disabled:bg-green-300"
-              @click="CreateConversation"
+              @click="SaveChanges"
               :disabled="
                 newConversationName === '' || friendsAddedToConversation.length === 0 || _isLoading
               ">
-              Create
+              Save
             </button>
             <button
               class="border border-red-700 hover:bg-red-700 text-white px-4 py-2"

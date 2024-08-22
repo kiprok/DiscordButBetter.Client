@@ -8,6 +8,7 @@ import { useUserStore } from '@/stores/user.js';
 import AccountSettingsModal from '@/components/modals/AccountSettingsModal.vue';
 import { useCurrentTimeStore } from '@/stores/currentTime.js';
 import CreateGroupConversationModal from '@/components/modals/CreateGroupConversationModal.vue';
+import EditGroupConversationModal from '@/components/modals/EditGroupConversationModal.vue';
 const serverStore = useServerStore();
 const userStore = useUserStore();
 const timeStore = useCurrentTimeStore();
@@ -31,4 +32,5 @@ if (token !== '') {
   <user-profile-modal />
   <account-settings-modal />
   <create-group-conversation-modal />
+  <edit-group-conversation-modal />
 </template>

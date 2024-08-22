@@ -10,6 +10,7 @@ export const useConversationStore = defineStore('messageList', () => {
   const conversations = reactive({
     // id: {
     //   conversationId: "",
+    //   ownerId: "",
     //   conversationName: "",
     //   conversationType: 0, // 0 = private, 1 = group
     //   conversationPicture: "",
