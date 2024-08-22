@@ -85,7 +85,21 @@ function RemoveFriendFromConversation(userId) {
 
 async function SaveChanges() {
   _isLoading.value = true;
-
+  const conversation = modalStore.GetModalArguments(modalName).conversation;
+  const request = {};
+  if (newConversationName.value !== conversation.conversationName) {
+    request.conversationName = newConversationName.value;
+  }
+  if (participantsToAdd.value.length > 0) {
+    request.participantsToAdd = participantsToAdd.value;
+  }
+  if (participantsToRemove.value.length > 0) {
+    request.participantsToRemove = participantsToRemove.value;
+  }
+  const response = await serverStore.UpdateConversationAsync(conversation.conversationId, request);
+  if (response) {
+    modalStore.CloseModal(modalName);
+  }
   _isLoading.value = false;
 }
 </script>

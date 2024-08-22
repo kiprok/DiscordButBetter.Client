@@ -162,12 +162,31 @@ async function RemovedFromConversationAsync(conversationId, userId) {
 
 async function ConversationInfoChangedAsync(updatedConversation) {
   if (!updatedConversation.participants.includes(serverStore.user.userId)) {
-    conversationStore.RemoveVisibleConversation(conversationId);
+    conversationStore.RemoveVisibleConversation(updatedConversation.conversationId);
+    if (_route.params.id === updatedConversation.conversationId) {
+      const router = useRouter();
+      router.push({ name: 'friendList' });
+    }
   } else {
     const conversation = conversationStore.GetConversationById(updatedConversation.conversationId);
-    conversation.conversationName = updatedConversation.conversationName;
-    conversation.conversationImage = updatedConversation.conversationImage;
-    conversation.participants = updatedConversation.participants;
+    if (conversation) {
+      if (
+        !conversationStore.GetVisibleConversations().includes(updatedConversation.conversationId)
+      ) {
+        conversationStore.AddVisibleConversation(updatedConversation.conversationId);
+      }
+      if (updatedConversation.conversationName !== undefined)
+        conversation.conversationName = updatedConversation.conversationName;
+      if (updatedConversation.conversationPicture !== undefined)
+        conversation.conversationPicture = updatedConversation.conversationPicture;
+      conversation.participants = updatedConversation.participants;
+    } else {
+      const newConversation = await serverStore.GetConversationByIdAsync(
+        updatedConversation.conversationId,
+      );
+      conversationStore.AddConversation(newConversation);
+      conversationStore.AddVisibleConversation(newConversation.conversationId);
+    }
   }
 }
 
