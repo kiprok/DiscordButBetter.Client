@@ -11,6 +11,7 @@ import ChatLeftSideMenuButton from '@/components/ChatLeftSideMenuButton.vue';
 import { useSearchStore } from '@/stores/search.js';
 import { useServerStore } from '@/stores/server.js';
 import UserItemFullDetail from '@/components/user/UserItemFullDetail.vue';
+import { GetProfilePictureUrl } from '@/composables/utility.js';
 
 const MessageList = defineAsyncComponent(() => import('@/components/MessageList.vue'));
 const ChatInfoMenu = defineAsyncComponent(() => import('@/components/sideMenus/ChatInfoMenu.vue'));
@@ -39,7 +40,13 @@ watch(
     sideBarIsShowing.value = false;
 
     conversation = conversationStore.GetConversationById(route.params.id);
-    if (conversation) document.title = conversation.conversationName;
+    if (conversation) {
+      if (conversation.conversationType === 1) document.title = conversation.conversationName;
+      else
+        document.title = userStore.GetUserById(
+          conversation.participants.find((user) => user !== serverStore.user.userId),
+        ).username;
+    }
   },
   { immediate: true },
 );
@@ -70,12 +77,23 @@ function SendChatMessage() {}
         class="hidden text-xl text-white hover:text-gray-300 group-[.sidebar-checked]:block lg:!hidden">
         <i class="fa-solid fa-chevron-left"></i>
       </label>
+      <div
+        class="flex min-w-0 gap-2 items-center"
+        v-if="conversationStore.GetConversationById(route.params.id)?.conversationType === 1">
+        <img
+          class="size-10 rounded-full"
+          :src="
+            GetProfilePictureUrl(
+              conversationStore.GetConversationById(route.params.id)?.conversationPicture,
+            )
+          "
+          alt="chat image" />
+        <h1
+          class="text-2xl font-bold text-white truncate group-[.sidebar-checked]:hidden lg:!block">
+          {{ conversationStore.GetConversationById(route.params.id)?.conversationName }}
+        </h1>
+      </div>
 
-      <h1
-        v-if="conversationStore.GetConversationById(route.params.id)?.conversationType === 1"
-        class="text-2xl font-bold text-white truncate group-[.sidebar-checked]:hidden lg:!block">
-        {{ conversationStore.GetConversationById(route.params.id)?.conversationName }}
-      </h1>
       <user-item-full-detail
         v-else-if="conversationStore.GetConversationById(route.params.id)"
         :user="

@@ -9,11 +9,14 @@ import PaginationAnimation from '@/components/animations/PaginationAnimation.vue
 import UserProfile from '@/components/user/UserProfile.vue';
 import { useServerStore } from '@/stores/server.js';
 import { GetProfilePictureUrl } from '@/composables/utility.js';
+import UserItemFullDetail from '@/components/user/UserItemFullDetail.vue';
+import { useModalStore } from '@/stores/modalStore.js';
 
 const userStore = useUserStore();
 const conversationStore = useConversationStore();
 const searchStore = useSearchStore();
 const serverStore = useServerStore();
+const modalStore = useModalStore();
 
 const props = defineProps(['conversationId']);
 </script>
@@ -88,20 +91,24 @@ const props = defineProps(['conversationId']);
       <div
         class="pt-4 px-4 pb-[0.37rem]"
         v-if="conversationStore.GetConversationById(conversationId)?.conversationType !== 0">
-        <span class="p-2 font-bold text-white">Members</span>
+        <span class="p-2 font-bold text-white">
+          Members - {{ conversationStore.GetConversationById(conversationId)?.participants.length }}
+        </span>
         <ul class="flex flex-col overflow-auto">
           <li
             v-for="participant in conversationStore.GetConversationById(conversationId)
               ?.participants"
             :key="participant"
-            class="rounded-lg p-2 text-xl text-white transition-colors ease-in-out hover:bg-black/30">
-            <div class="flex flex-row flex-nowrap items-center gap-2">
-              <img
-                :src="GetProfilePictureUrl(userStore.GetUserById(participant).profilePicture)"
-                alt="pfp"
-                class="size-10 flex-none rounded-full" />
-              <span> {{ userStore.GetUserById(participant).username }} </span>
-            </div>
+            class="rounded-lg p-2 text-xl text-white transition-colors ease-in-out hover:bg-black/30
+              hover:cursor-pointer"
+            @click="
+              () => {
+                modalStore.OpenModal('userProfile', {
+                  user: userStore.GetUserById(participant),
+                });
+              }
+            ">
+            <user-item-full-detail :user="userStore.GetUserById(participant)" />
           </li>
         </ul>
       </div>
