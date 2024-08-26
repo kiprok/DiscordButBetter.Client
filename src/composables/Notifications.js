@@ -173,41 +173,33 @@ async function ConversationInfoChangedAsync(updatedConversation) {
     delete conversationStore.conversations[updatedConversation.conversationId];
     return;
   }
-  const conversation = conversationStore.GetConversationById(updatedConversation.conversationId);
+  let conversation = conversationStore.GetConversationById(updatedConversation.conversationId);
 
-  if (conversation) {
-    if (!conversationStore.GetVisibleConversations().includes(updatedConversation.conversationId)) {
-      conversationStore.AddVisibleConversation(updatedConversation.conversationId);
-    }
-
-    if (updatedConversation.conversationName !== undefined)
-      conversation.conversationName = updatedConversation.conversationName;
-    if (updatedConversation.conversationPicture !== undefined)
-      conversation.conversationPicture = updatedConversation.conversationPicture;
-
-    for (const paId of updatedConversation.participants) {
-      if (!userStore.GetUserById(paId)) {
-        const user = await serverStore.GetUserByIdAsync(paId);
-        userStore.users[user.userId] = user;
-      }
-    }
-
-    conversation.participants = updatedConversation.participants;
-  } else {
+  if (!conversation) {
     const newConversation = await serverStore.GetConversationByIdAsync(
       updatedConversation.conversationId,
     );
-
-    for (const paId of updatedConversation.participants) {
-      if (!userStore.GetUserById(paId)) {
-        const user = await serverStore.GetUserByIdAsync(paId);
-        userStore.users[user.userId] = user;
-      }
-    }
-
-    conversationStore.AddConversation(newConversation);
-    conversationStore.AddVisibleConversation(newConversation.conversationId);
+    conversation = conversationStore.AddConversation(newConversation);
   }
+
+  if (!conversationStore.GetVisibleConversations().includes(updatedConversation.conversationId)) {
+    conversationStore.AddVisibleConversation(updatedConversation.conversationId);
+  }
+
+  if (updatedConversation.conversationName !== undefined)
+    conversation.conversationName = updatedConversation.conversationName;
+  if (updatedConversation.conversationPicture !== undefined)
+    conversation.conversationPicture = updatedConversation.conversationPicture;
+  if (updatedConversation.ownerId !== undefined) conversation.ownerId = updatedConversation.ownerId;
+
+  for (const paId of updatedConversation.participants) {
+    if (!userStore.GetUserById(paId)) {
+      const user = await serverStore.GetUserByIdAsync(paId);
+      userStore.users[user.userId] = user;
+    }
+  }
+
+  conversation.participants = updatedConversation.participants;
 }
 
 async function UserInfoChangedAsync(updateUser) {

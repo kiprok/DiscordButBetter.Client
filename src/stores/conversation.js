@@ -102,6 +102,7 @@ export const useConversationStore = defineStore('messageList', () => {
       newUnseenMessages: [],
       isLoadingMessages: false,
     };
+    return conversations[convo.conversationId];
   }
 
   function GetVisibleConversations() {
