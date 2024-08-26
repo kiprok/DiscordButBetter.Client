@@ -125,7 +125,7 @@ export function parseMarkdownMessage(text) {
   let codeBlocks = [];
 
   text = ApplyEmojiMarkdown(text, (match) => {
-    return `<span class="text-4xl">${match}</span>`;
+    return `<span class="text-5xl">${match}</span>`;
   });
 
   text = ApplyCodeMarkdown(text, (match, p1, p2, p3) => {
