@@ -102,6 +102,7 @@ console.log(conversationStore.GetConversationById(props.conversationId));
               .GetConversationById(conversationId)
               ?.participants.toSorted((a, b) => {
                 if (conversationStore.GetConversationById(conversationId)?.ownerId === a) return -1;
+                if (conversationStore.GetConversationById(conversationId)?.ownerId === b) return 1;
                 if (userStore.GetUserById(a).status > 0 && userStore.GetUserById(b).status === 0)
                   return -1;
                 if (userStore.GetUserById(a).status === 0 && userStore.GetUserById(b).status > 0)
