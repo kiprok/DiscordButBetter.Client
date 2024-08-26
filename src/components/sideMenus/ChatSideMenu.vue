@@ -120,7 +120,7 @@ async function CloseConversation(conversationId) {
                 <notification-badge
                   class="flex-none size-5 text-sm"
                   :notifications="
-                    conversationStore.GetConversationById(convo.conversationId).newUnseenMessages
+                    conversationStore.GetConversationById(convo.conversationId)?.newUnseenMessages
                       .length
                   " />
                 <span class="absolute right-1 top-0 text-xs text-gray-300">
@@ -139,12 +139,12 @@ async function CloseConversation(conversationId) {
       <div class="mt-auto h-14 w-full flex items-center flex-none bg-gray-800" ref="userAnchorRef">
         <user-item-full-detail
           v-if="serverStore.user"
-          :user="serverStore.user"
+          :user="userStore.GetUserById(serverStore.user.userId)"
           class="text-white hover:bg-white/30 hover:cursor-pointer rounded-lg p-1 select-none"
           @click="
             (event) =>
               modalStore.OpenModal('userProfile', {
-                user: serverStore.user,
+                user: userStore.GetUserById(serverStore.user.userId),
                 anchor: userAnchorRef,
               })
           " />

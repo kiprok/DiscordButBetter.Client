@@ -22,6 +22,11 @@ async function RemoveFriend() {
   await serverStore.DeleteFriendAsync(props.user.userId);
   _loading.value = false;
 }
+
+async function OnStatusChange(event) {
+  console.log(event.target.value);
+  const response = await serverStore.UpdateUserAsync({ status: event.target.value });
+}
 </script>
 
 <template>
@@ -61,6 +66,17 @@ async function RemoveFriend() {
       <span class="whitespace-pre-wrap text-sm">
         {{ user?.biography }}
       </span>
+    </div>
+    <div v-if="user.userId === serverStore.user.userId" class="mx-2 mt-2">
+      <select
+        class="w-full bg-gray-800 text-white p-2"
+        :value="user.status"
+        @change="OnStatusChange">
+        <option :value="1">Online</option>
+        <option :value="2">Idle</option>
+        <option :value="3">Do Not Disturb</option>
+        <option :value="0">Invisible</option>
+      </select>
     </div>
   </div>
 </template>

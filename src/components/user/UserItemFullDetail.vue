@@ -9,11 +9,11 @@ const props = defineProps(['user', 'owner']);
     <user-profile-picture :user="user" class="size-10 flex-none mr-2" />
     <div class="flex flex-col min-w-0">
       <span class="truncate font-bold text-sm">
-        {{ user.username }}
+        {{ user?.username }}
         <i v-if="owner" class="fa-solid fa-star text-yellow-500" />
       </span>
       <span class="truncate text-xs">
-        {{ user.statusMessage }}
+        {{ user?.statusMessage }}
       </span>
     </div>
   </div>

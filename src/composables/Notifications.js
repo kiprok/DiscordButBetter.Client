@@ -205,8 +205,6 @@ async function ConversationInfoChangedAsync(updatedConversation) {
 async function UserInfoChangedAsync(updateUser) {
   const user = userStore.GetUserById(updateUser.userId);
   if (user === undefined) return;
-  console.log('user new info', updateUser);
-  console.log('user old', user);
   if (updateUser.username !== undefined) user.username = updateUser.username;
   if (updateUser.profilePicture !== undefined) user.profilePicture = updateUser.profilePicture;
   if (updateUser.status !== undefined) user.status = updateUser.status;
