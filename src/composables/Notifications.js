@@ -8,9 +8,11 @@ const conversationStore = useConversationStore();
 const userStore = useUserStore();
 
 let _route;
+let _router;
 
-export async function RegisterNotificationAsync(connection, route) {
+export async function RegisterNotificationAsync(connection, route, router) {
   _route = route;
+  _router = router;
   connection.on('NewMessage', NewMessageAsync);
   connection.on('MessageEdited', MessageEditedAsync);
   connection.on('MessageDeleted', MessageDeletedAsync);
@@ -161,32 +163,50 @@ async function RemovedFromConversationAsync(conversationId, userId) {
 }
 
 async function ConversationInfoChangedAsync(updatedConversation) {
-  if (!updatedConversation.participants.includes(serverStore.user.userId)) {
+  console.log('conversation info changed', updatedConversation);
+
+  if (updatedConversation.participantsToRemove?.includes(serverStore.user.userId)) {
     conversationStore.RemoveVisibleConversation(updatedConversation.conversationId);
     if (_route.params.id === updatedConversation.conversationId) {
-      const router = useRouter();
-      router.push({ name: 'friendList' });
+      await _router.push({ name: 'friendList' });
     }
-  } else {
-    const conversation = conversationStore.GetConversationById(updatedConversation.conversationId);
-    if (conversation) {
-      if (
-        !conversationStore.GetVisibleConversations().includes(updatedConversation.conversationId)
-      ) {
-        conversationStore.AddVisibleConversation(updatedConversation.conversationId);
+    delete conversationStore.conversations[updatedConversation.conversationId];
+    return;
+  }
+  const conversation = conversationStore.GetConversationById(updatedConversation.conversationId);
+
+  if (conversation) {
+    if (!conversationStore.GetVisibleConversations().includes(updatedConversation.conversationId)) {
+      conversationStore.AddVisibleConversation(updatedConversation.conversationId);
+    }
+
+    if (updatedConversation.conversationName !== undefined)
+      conversation.conversationName = updatedConversation.conversationName;
+    if (updatedConversation.conversationPicture !== undefined)
+      conversation.conversationPicture = updatedConversation.conversationPicture;
+
+    for (const paId of updatedConversation.participants) {
+      if (!userStore.GetUserById(paId)) {
+        const user = await serverStore.GetUserByIdAsync(paId);
+        userStore.users[user.userId] = user;
       }
-      if (updatedConversation.conversationName !== undefined)
-        conversation.conversationName = updatedConversation.conversationName;
-      if (updatedConversation.conversationPicture !== undefined)
-        conversation.conversationPicture = updatedConversation.conversationPicture;
-      conversation.participants = updatedConversation.participants;
-    } else {
-      const newConversation = await serverStore.GetConversationByIdAsync(
-        updatedConversation.conversationId,
-      );
-      conversationStore.AddConversation(newConversation);
-      conversationStore.AddVisibleConversation(newConversation.conversationId);
     }
+
+    conversation.participants = updatedConversation.participants;
+  } else {
+    const newConversation = await serverStore.GetConversationByIdAsync(
+      updatedConversation.conversationId,
+    );
+
+    for (const paId of updatedConversation.participants) {
+      if (!userStore.GetUserById(paId)) {
+        const user = await serverStore.GetUserByIdAsync(paId);
+        userStore.users[user.userId] = user;
+      }
+    }
+
+    conversationStore.AddConversation(newConversation);
+    conversationStore.AddVisibleConversation(newConversation.conversationId);
   }
 }
 

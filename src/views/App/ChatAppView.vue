@@ -63,7 +63,7 @@ async function ConnectToServer() {
     await LoadUserData();
   });
 
-  await RegisterNotificationAsync(connection, route);
+  await RegisterNotificationAsync(connection, route, router);
   try {
     await connection.start();
   } catch (error) {

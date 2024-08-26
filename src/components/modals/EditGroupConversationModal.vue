@@ -198,12 +198,16 @@ async function SaveChanges() {
               </li>
             </default-list-animation>
           </ul>
-          <div class="mt-auto flex flex-none gap-2">
+          <div class="mt-2 flex flex-none gap-2">
             <button
               class="bg-green-500 hover:bg-green-400 text-white px-4 py-2 disabled:bg-green-300"
               @click="SaveChanges"
               :disabled="
-                newConversationName === '' || friendsAddedToConversation.length === 0 || _isLoading
+                (newConversationName ===
+                  modalStore.GetModalArguments(modalName).conversation.conversationName &&
+                  participantsToAdd.length === 0 &&
+                  participantsToRemove.length === 0) ||
+                _isLoading
               ">
               Save
             </button>
