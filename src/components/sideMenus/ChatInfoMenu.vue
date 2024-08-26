@@ -98,11 +98,20 @@ console.log(conversationStore.GetConversationById(props.conversationId));
         </span>
         <ul class="flex flex-col overflow-auto">
           <li
-            v-for="participant in conversationStore.GetConversationById(conversationId)
-              ?.participants"
+            v-for="participant in conversationStore
+              .GetConversationById(conversationId)
+              ?.participants.toSorted((a, b) => {
+                if (conversationStore.GetConversationById(conversationId)?.ownerId === a) return -1;
+                if (userStore.GetUserById(a).status > 0 && userStore.GetUserById(b).status === 0)
+                  return -1;
+                if (userStore.GetUserById(a).status === 0 && userStore.GetUserById(b).status > 0)
+                  return 1;
+                return 0;
+              })"
             :key="participant"
             class="rounded-lg p-2 text-xl text-white transition-colors ease-in-out hover:bg-black/30
               hover:cursor-pointer"
+            :class="{ 'opacity-40': userStore.GetUserById(participant).status === 0 }"
             @click="
               () => {
                 modalStore.OpenModal('userProfile', {
