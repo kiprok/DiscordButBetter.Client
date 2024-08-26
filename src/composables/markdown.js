@@ -43,6 +43,13 @@ export function ApplyHiddenTextMarkdown(text, callback) {
   return text.replace(/(\|\|)([\s\S]*?)\1/g, callback);
 }
 
+export function ApplyEmojiMarkdown(text, callback) {
+  return text.replace(
+    /^(?:\p{Emoji_Presentation}|\p{Emoji_Presentation}\u200D|\n\p{Emoji_Presentation})+$/u,
+    callback,
+  );
+}
+
 export function ApplyHeadingMarkdown(text, callback) {
   return text.replace(/(#{1,6}\s)(.+)/g, callback);
 }
@@ -119,6 +126,11 @@ export function GetBlockQuoteMarkDown(text) {
 
 export function parseMarkdownMessage(text) {
   let codeBlocks = [];
+
+  text = ApplyEmojiMarkdown(text, (match) => {
+    return `<span class="text-4xl">${match}</span>`;
+  });
+
   text = ApplyCodeMarkdown(text, (match, p1, p2, p3) => {
     codeBlocks.push(
       `<pre class="border border-black rounded overflow-x-auto xl:max-w-[90%] my-4 bg-[#2b2b2b] text-white"><code class="hljs p-4 block">${
