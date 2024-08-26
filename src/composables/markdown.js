@@ -44,10 +44,7 @@ export function ApplyHiddenTextMarkdown(text, callback) {
 }
 
 export function ApplyEmojiMarkdown(text, callback) {
-  return text.replace(
-    /^(?:\p{Emoji_Presentation}|\p{Emoji_Presentation}\u200D|\n\p{Emoji_Presentation})+$/u,
-    callback,
-  );
+  return text.replace(/^(?:\p{RGI_Emoji}|\p{RGI_Emoji}\u200D|\n\p{RGI_Emoji})+$/v, callback);
 }
 
 export function ApplyHeadingMarkdown(text, callback) {
