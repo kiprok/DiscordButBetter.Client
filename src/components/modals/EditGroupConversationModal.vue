@@ -6,6 +6,8 @@ import FriendListItemButton from '@/components/FriendListItemButton.vue';
 import DefaultListAnimation from '@/components/animations/DefaultListAnimation.vue';
 import { useModalStore } from '@/stores/modalStore.js';
 import { useServerStore } from '@/stores/server.js';
+import { GetProfilePictureUrl, UploadFileToS3 } from '@/composables/utility.js';
+import RoundedImage from '@/components/RoundedImage.vue';
 
 const userStore = useUserStore();
 const serverStore = useServerStore();
@@ -19,6 +21,11 @@ const friendsAddedToConversation = ref([]);
 const currentParticipants = ref([]);
 const participantsToRemove = ref([]);
 const participantsToAdd = ref([]);
+
+const currentConversationPicture = ref();
+const newConversationPicture = ref();
+
+const uploadedImage = ref();
 
 const _isLoading = ref(false);
 
@@ -38,11 +45,15 @@ watch(
       newConversationName.value = conversation.conversationName;
       currentParticipants.value = participants;
       friendsAddedToConversation.value = participants;
+      currentConversationPicture.value = conversation.conversationPicture;
       participantsToAdd.value = [];
       participantsToRemove.value = [];
       addingFriends.value = false;
     } else {
       searchQuery.value = '';
+      uploadedImage.value = null;
+      currentConversationPicture.value = '';
+      newConversationPicture.value = '';
       newConversationName.value = '';
       currentParticipants.value = [];
       friendsAddedToConversation.value = [];
@@ -96,11 +107,64 @@ async function SaveChanges() {
   if (participantsToRemove.value.length > 0) {
     request.participantsToRemove = participantsToRemove.value;
   }
+  if (uploadedImage.value) {
+    await UploadConversationPicture();
+    request.conversationPicture = newConversationPicture.value;
+  }
   const response = await serverStore.UpdateConversationAsync(conversation.conversationId, request);
   if (response) {
     modalStore.CloseModal(modalName);
   }
   _isLoading.value = false;
+}
+
+async function UploadConversationPicture() {
+  const filePicker = document.getElementById('convo-picture-settings-picker');
+  const file = filePicker.files[0];
+  console.log('File:', file);
+  const fileName = file.name;
+  const fileType = file.type;
+  const fileSize = file.size;
+
+  if (fileType.includes('image') === false) {
+    console.log('File is not an image');
+    return;
+  }
+
+  const response = await serverStore.UploadAvatarAsync(fileName, fileType, fileSize);
+  if (response) {
+    const presignedUrl = response.uploadUrl;
+    const newFileName = response.newFileName;
+    console.log('Upload URL:', presignedUrl);
+    console.log('reponse:', response);
+
+    const responseUpload = await UploadFileToS3(file, presignedUrl);
+
+    console.log('Upload response:', responseUpload);
+    if (responseUpload.ok) {
+      newConversationPicture.value = newFileName;
+      console.log('Uploaded profile picture');
+    }
+  }
+}
+
+async function OnPictureChange(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.includes('image')) {
+    console.log('File is not an image');
+    return;
+  }
+
+  console.log(file);
+
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => {
+    uploadedImage.value = reader.result;
+    console.log(uploadedImage.value);
+  };
 }
 </script>
 
@@ -112,7 +176,7 @@ async function SaveChanges() {
         class="w-screen h-dvh bg-black/70 flex items-center justify-center overflow-hidden"
         @click="modalStore.CloseModal(modalName)">
         <div
-          class="center relative text-white bg-gray-600 flex flex-col rounded-lg px-4 py-8 w-[40rem] min-h-0 min-w-0
+          class="center relative text-white bg-gray-600 flex flex-col rounded-lg px-4 py-4 w-[40rem] min-h-0 min-w-0
             h-[34rem] max-h-full md:mx-4"
           @click.stop>
           <button
@@ -120,18 +184,55 @@ async function SaveChanges() {
             class="absolute top-0 right-2 hover:text-gray-500">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
-          <label for="conversationNameBox" class="">Name for conversation:</label>
-          <input
-            type="text"
-            ref="conversationNameBox"
-            id="conversationNameBox"
-            placeholder="Conversation Name"
-            v-model="newConversationName"
-            :disabled="
-              modalStore.GetModalArguments(modalName).conversation.ownerId !==
-              serverStore.user.userId
-            "
-            class="border-2 disabled:opacity-40 bg-gray-500 border-gray-700 mb-4 flex-none" />
+          <div class="flex min-w-0 w-full items-center content-center gap-2">
+            <label
+              for="convo-picture-settings-picker"
+              class="relative text-lg font-bold overflow-hidden size-14 flex-none rounded-full hover:cursor-pointer
+                group/pfp">
+              <rounded-image
+                :src="
+                  uploadedImage ? uploadedImage : GetProfilePictureUrl(currentConversationPicture)
+                "
+                alt="convoPicture"
+                class="size-full flex-none" />
+
+              <span
+                v-if="
+                  modalStore.GetModalArguments(modalName).conversation.ownerId ===
+                  serverStore.user.userId
+                "
+                class="absolute inset-0 bg-black/50 items-center justify-center hidden group-hover/pfp:flex">
+                <i class="fa-solid fa-camera text-white text-2xl"></i>
+              </span>
+            </label>
+            <input
+              type="file"
+              name="pfp"
+              id="convo-picture-settings-picker"
+              :disabled="
+                modalStore.GetModalArguments(modalName).conversation.ownerId !==
+                serverStore.user.userId
+              "
+              accept="image/*"
+              @change="OnPictureChange"
+              hidden="hidden" />
+
+            <div class="flex flex-col min-w-0 grow">
+              <label for="conversationNameBox" class="">Name for conversation:</label>
+              <input
+                type="text"
+                ref="conversationNameBox"
+                id="conversationNameBox"
+                placeholder="Conversation Name"
+                v-model="newConversationName"
+                :disabled="
+                  modalStore.GetModalArguments(modalName).conversation.ownerId !==
+                  serverStore.user.userId
+                "
+                class="border-2 disabled:opacity-40 bg-gray-500 border-gray-700 mb-4 grow min-w-0" />
+            </div>
+          </div>
+
           <label for="inputBox" class="">Search for friend to add:</label>
           <div class="flex items-center min-w-0 gap-2">
             <button
@@ -217,7 +318,8 @@ async function SaveChanges() {
                 (newConversationName ===
                   modalStore.GetModalArguments(modalName).conversation.conversationName &&
                   participantsToAdd.length === 0 &&
-                  participantsToRemove.length === 0) ||
+                  participantsToRemove.length === 0 &&
+                  !uploadedImage) ||
                 _isLoading
               ">
               Save

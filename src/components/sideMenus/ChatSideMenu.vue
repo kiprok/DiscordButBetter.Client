@@ -15,6 +15,7 @@ import { useServerStore } from '@/stores/server.js';
 import SkellyLoading from '@/components/Skeletons/SkellyLoading.vue';
 import { FormatLastMessageTimeShort, GetProfilePictureUrl } from '../../composables/utility.js';
 import { useCurrentTimeStore } from '@/stores/currentTime.js';
+import RoundedImage from '@/components/RoundedImage.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -100,10 +101,10 @@ async function CloseConversation(conversationId) {
                 }
               ">
               <div class="flex items-center min-w-0" v-if="convo.conversationType === 1">
-                <img
+                <rounded-image
                   :src="GetProfilePictureUrl(convo.conversationPicture)"
                   alt="pfp"
-                  class="size-10 flex-none rounded-full" />
+                  class="size-10 flex-none" />
                 <span class="truncate text-sm font-bold ml-2 min-w-0">
                   {{ convo.conversationName }}
                 </span>

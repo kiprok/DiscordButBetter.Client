@@ -65,7 +65,7 @@ async function CreateConversation() {
         class="w-screen h-dvh bg-black/70 flex items-center justify-center overflow-hidden"
         @click="modalStore.CloseModal(modalName)">
         <div
-          class="center relative text-white bg-gray-600 flex flex-col rounded-lg px-4 py-8 w-[40rem] min-h-0 min-w-0
+          class="center relative text-white bg-gray-600 flex flex-col rounded-lg px-4 py-4 w-[40rem] min-h-0 min-w-0
             h-[34rem] max-h-full md:mx-4"
           @click.stop>
           <button

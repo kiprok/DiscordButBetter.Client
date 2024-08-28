@@ -13,6 +13,7 @@ import { useServerStore } from '@/stores/server.js';
 import UserItemFullDetail from '@/components/user/UserItemFullDetail.vue';
 import { GetProfilePictureUrl } from '@/composables/utility.js';
 import { useModalStore } from '@/stores/modalStore.js';
+import RoundedImage from '@/components/RoundedImage.vue';
 
 const MessageList = defineAsyncComponent(() => import('@/components/MessageList.vue'));
 const ChatInfoMenu = defineAsyncComponent(() => import('@/components/sideMenus/ChatInfoMenu.vue'));
@@ -80,15 +81,15 @@ function SendChatMessage() {}
         <i class="fa-solid fa-chevron-left"></i>
       </label>
       <div
-        class="flex min-w-0 gap-2 items-center text-white"
+        class="flex min-w-0 gap-2 items-center group-[.sidebar-checked]:hidden lg:!flex text-white"
         v-if="conversationStore.GetConversationById(route.params.id)?.conversationType === 1">
-        <img
-          class="size-10 rounded-full"
+        <rounded-image
           :src="
             GetProfilePictureUrl(
               conversationStore.GetConversationById(route.params.id)?.conversationPicture,
             )
           "
+          class="size-10"
           alt="chat image" />
         <h1 class="text-2xl font-bold truncate min-w-0 group-[.sidebar-checked]:hidden lg:!block">
           {{ conversationStore.GetConversationById(route.params.id)?.conversationName }}

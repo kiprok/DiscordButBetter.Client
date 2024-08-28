@@ -17,6 +17,7 @@ import {
   GetProfilePictureUrl,
 } from '@/composables/utility.js';
 import { useCurrentTimeStore } from '@/stores/currentTime.js';
+import RoundedImage from '@/components/RoundedImage.vue';
 
 const emits = defineEmits(['scroll-reply', 'OnMountChange']);
 const props = defineProps(['message', 'allowedFunctions', 'previousAlsoOwner', 'tag']);
@@ -70,10 +71,11 @@ function OpenContextMenu() {
     :class="{ 'mt-2': !previousAlsoOwner }">
     <div class="pl-6 h-5 flex flex-row items-end truncate overflow-hidden w-full" v-if="reply">
       <div class="flex-none h-3 w-8 rounded-tl border border-b-0 border-r-0 border-black"></div>
-      <img
+      <rounded-image
         :src="GetProfilePictureUrl(userStore.GetUserById(reply.senderId)?.profilePicture)"
         alt="profile picture"
-        class="mr-1 size-4 flex-none rounded-full" />
+        class="mr-1 size-4 flex-none" />
+
       <div
         class="flex items-center content-center grow min-w-0 hover:cursor-pointer hover:text-white hover:underline"
         @click="$emit('scroll-reply', reply.messageId)">
@@ -87,11 +89,10 @@ function OpenContextMenu() {
     </div>
     <div class="relative flex flex-row justify-between">
       <div class="ml-1 mr-2 mt-0 w-10 flex-none">
-        <img
+        <rounded-image
           :src="GetProfilePictureUrl(userStore.GetUserById(props.message.senderId).profilePicture)"
           alt="profile picture"
-          class="size-full h-10 rounded-full hover:cursor-pointer"
-          v-if="!previousAlsoOwner"
+          class="size-10 hover:cursor-pointer"
           @click="
             modalStore.OpenModal('userProfile', {
               user: userStore.GetUserById(props.message.senderId),

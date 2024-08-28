@@ -1,5 +1,6 @@
 <script setup>
 import { GetProfilePictureUrl } from '@/composables/utility.js';
+import RoundedImage from '@/components/RoundedImage.vue';
 
 const props = defineProps(['user']);
 </script>
@@ -7,10 +8,10 @@ const props = defineProps(['user']);
 <template>
   <div>
     <div class="relative size-full">
-      <img
+      <rounded-image
         :src="GetProfilePictureUrl(user?.profilePicture)"
         :alt="user?.username"
-        class="rounded-full size-full" />
+        class="size-full" />
       <div v-if="user?.status === 0" class="bg-gray-600 notification-dot" />
       <div v-if="user?.status === 1" class="bg-green-600 notification-dot" />
       <div v-if="user?.status === 2" class="bg-yellow-500 notification-dot">

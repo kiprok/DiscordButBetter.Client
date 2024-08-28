@@ -3,6 +3,7 @@ import { useUserStore } from '@/stores/user.js';
 import { useServerStore } from '@/stores/server.js';
 import { ref } from 'vue';
 import { GetProfilePictureUrl, UploadFileToS3 } from '@/composables/utility.js';
+import RoundedImage from '@/components/RoundedImage.vue';
 
 const userStore = useUserStore();
 const serverStore = useServerStore();
@@ -96,7 +97,7 @@ async function OnPfpChange(event) {
       <label
         for="pfp-settings-picker"
         class="relative text-lg font-bold overflow-hidden w-20 h-20 rounded-full hover:cursor-pointer group/pfp">
-        <img
+        <rounded-image
           :src="uploadedImage ? uploadedImage : GetProfilePictureUrl(profilePicture)"
           alt="Profile Picture"
           class="size-full flex-none" />
