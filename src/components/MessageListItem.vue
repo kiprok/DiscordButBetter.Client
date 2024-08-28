@@ -93,6 +93,7 @@ function OpenContextMenu() {
           :src="GetProfilePictureUrl(userStore.GetUserById(props.message.senderId).profilePicture)"
           alt="profile picture"
           class="size-10 hover:cursor-pointer"
+          v-if="!previousAlsoOwner"
           @click="
             modalStore.OpenModal('userProfile', {
               user: userStore.GetUserById(props.message.senderId),
