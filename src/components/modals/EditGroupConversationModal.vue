@@ -127,7 +127,11 @@ async function SaveChanges() {
             id="conversationNameBox"
             placeholder="Conversation Name"
             v-model="newConversationName"
-            class="border-2 bg-gray-500 border-gray-700 mb-4 flex-none" />
+            :disabled="
+              modalStore.GetModalArguments(modalName).conversation.ownerId !==
+              serverStore.user.userId
+            "
+            class="border-2 disabled:opacity-40 bg-gray-500 border-gray-700 mb-4 flex-none" />
           <label for="inputBox" class="">Search for friend to add:</label>
           <div class="flex items-center min-w-0 gap-2">
             <button
@@ -187,7 +191,14 @@ async function SaveChanges() {
                       <i class="fa-solid fa-plus" />
                     </friend-list-item-button>
                   </div>
-                  <div v-else class="ml-auto text-black">
+                  <div
+                    v-else-if="
+                      !currentParticipants.find((newFriendId) => newFriendId === user.userId) ||
+                      (currentParticipants.find((newFriendId) => newFriendId === user.userId) &&
+                        modalStore.GetModalArguments(modalName).conversation.ownerId ===
+                          serverStore.user.userId)
+                    "
+                    class="ml-auto text-black">
                     <friend-list-item-button
                       class="hover:text-red-700"
                       @click="RemoveFriendFromConversation(user.userId)">

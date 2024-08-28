@@ -94,10 +94,6 @@ function SendChatMessage() {}
           {{ conversationStore.GetConversationById(route.params.id)?.conversationName }}
         </h1>
         <span
-          v-if="
-            conversationStore.GetConversationById(route.params.id)?.ownerId ===
-            serverStore.user.userId
-          "
           class="rounded-lg bg-white/20 p-1 flex-none hover:bg-white/40 select-none cursor-pointer"
           @click="
             () => {
