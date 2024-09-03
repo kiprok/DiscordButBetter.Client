@@ -12,6 +12,8 @@
     "@microsoft/signalr": "^8.0.0",
     "@microsoft/signalr-protocol-msgpack": "^8.0.0",
     "@vitejs/plugin-basic-ssl": "^1.1.0",
+    "@volar/language-server": "2.4.0-alpha.18",
+    "@vue/language-server": "2.0.28",
     "highlight.js": "^11.9.0",
     "pinia": "^2.1.7",
     "vue": "^3.4.27",
