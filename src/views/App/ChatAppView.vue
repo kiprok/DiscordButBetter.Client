@@ -116,6 +116,12 @@ async function LoadUserData() {
     conversationStore.AddVisibleConversation(convo);
   }
 
+  const currentStatus = userStore.GetUserById(serverStore.user.userId).status;
+
+  if (currentStatus === 0) {
+    await serverStore.UpdateUserAsync({ status: 1 });
+  }
+
   serverStore.IsFullyLoaded = true;
   _isLoading.value = false;
 }
