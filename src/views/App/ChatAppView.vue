@@ -104,8 +104,7 @@ async function LoadUserData() {
   for (const convo of conversations) {
     conversationStore.AddConversation(convo);
     for (const participantId of convo.participants) {
-      var user = await serverStore.GetUserByIdAsync(participantId);
-      userStore.users[participantId] = user;
+      userStore.users[participantId] = await serverStore.GetUserByIdAsync(participantId);
     }
   }
   const visibleConversations = await serverStore.GetVisibleConversationsAsync();
