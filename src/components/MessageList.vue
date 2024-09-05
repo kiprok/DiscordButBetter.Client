@@ -119,7 +119,6 @@ async function LoadOlderMessages(startPointId) {
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
 
-  //TODO FIX ISSUE THAT CAUSES JUMPS WHEN LOADING OLDER MESSAGES
   // if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
   //   waitingMessagesAbove.push(
   //     ...conversationStore.RemoveNewerMessages(
@@ -127,8 +126,8 @@ async function LoadOlderMessages(startPointId) {
   //       conversationStore.GetVisibleMessages(props.conversation.conversationId).length - 80,
   //     ),
   //   );
-  //  props.conversation.viewingOlderMessages = true;
-  //}
+  //   props.conversation.viewingOlderMessages = true;
+  // }
 }
 
 async function LoadNewerMessages(startPointId) {
@@ -154,7 +153,6 @@ async function LoadNewerMessages(startPointId) {
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
 
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
-  //TODO FIX ISSUE THAT CAUSES JUMPS WHEN LOADING NEW MESSAGES
   // if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
   //   waitingMessagesBelow.push(
   //     ...conversationStore.RemoveOlderMessages(
@@ -190,27 +188,10 @@ function OnMessageMountChange(message, eventType) {
 
   if (IsLoadingCompleted(waitingMessagesAbove, message)) {
     HandleNewAboveMessages();
-    if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
-      waitingMessagesAbove.push(
-        ...conversationStore.RemoveNewerMessages(
-          props.conversation.conversationId,
-          conversationStore.GetVisibleMessages(props.conversation.conversationId).length - 80,
-        ),
-      );
-      props.conversation.viewingOlderMessages = true;
-    }
     props.conversation.isLoadingMessages = false;
     return;
   } else if (IsLoadingCompleted(waitingMessagesBelow, message)) {
     HandleNewBelowMessages();
-    if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
-      waitingMessagesAbove.push(
-        ...conversationStore.RemoveOlderMessages(
-          props.conversation.conversationId,
-          conversationStore.GetVisibleMessages(props.conversation.conversationId).length - 80,
-        ),
-      );
-    }
     props.conversation.isLoadingMessages = false;
     return;
   } else if (IsLoadingCompleted(waitingMessagesJump.messages, message)) {
