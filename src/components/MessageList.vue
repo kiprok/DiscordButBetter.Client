@@ -24,6 +24,7 @@ const messageListContainer = ref();
 const messageListDom = ref();
 
 const oldScrollHeight = ref(0);
+const oldOffsetHeight = ref(0);
 
 const chatIsLoading = ref(true);
 const waitingMessagesAbove = reactive([]);
@@ -118,6 +119,7 @@ async function LoadOlderMessages(startPointId) {
 
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
+  oldOffsetHeight.value = messageListDom.value?.offsetHeight ?? 0;
 
   //TODO FIX ISSUE THAT CAUSES JUMPS WHEN LOADING OLDER MESSAGES
   // if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
@@ -154,6 +156,8 @@ async function LoadNewerMessages(startPointId) {
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
 
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
+  oldOffsetHeight.value = messageListDom.value?.offsetHeight ?? 0;
+
   //TODO FIX ISSUE THAT CAUSES JUMPS WHEN LOADING NEW MESSAGES
   // if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
   //   waitingMessagesBelow.push(
@@ -190,28 +194,33 @@ function OnMessageMountChange(message, eventType) {
 
   if (IsLoadingCompleted(waitingMessagesAbove, message)) {
     HandleNewAboveMessages();
-    if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
+    props.conversation.isLoadingMessages = false;
+
+    if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length > 80) {
+      console.log('removing below messages');
       waitingMessagesAbove.push(
         ...conversationStore.RemoveNewerMessages(
           props.conversation.conversationId,
           conversationStore.GetVisibleMessages(props.conversation.conversationId).length - 80,
         ),
       );
+      props.conversation.isLoadingMessages = true;
       props.conversation.viewingOlderMessages = true;
     }
-    props.conversation.isLoadingMessages = false;
     return;
   } else if (IsLoadingCompleted(waitingMessagesBelow, message)) {
     HandleNewBelowMessages();
-    if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
+    props.conversation.isLoadingMessages = false;
+    if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length > 80) {
+      console.log('removing above messages');
       waitingMessagesAbove.push(
         ...conversationStore.RemoveOlderMessages(
           props.conversation.conversationId,
           conversationStore.GetVisibleMessages(props.conversation.conversationId).length - 80,
         ),
       );
+      props.conversation.isLoadingMessages = true;
     }
-    props.conversation.isLoadingMessages = false;
     return;
   } else if (IsLoadingCompleted(waitingMessagesJump.messages, message)) {
     HandleNewJumpMessages();
@@ -233,8 +242,25 @@ function OnMessageMountChange(message, eventType) {
 function HandleNewAboveMessages() {
   if (!chatIsLoading.value) {
     let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
-    console.log('above dif', dif);
-    console.log('scroll top above', messageListContainer.value.scrollTop);
+    let dif2 = oldOffsetHeight.value - messageListDom.value.offsetHeight;
+    console.log('scroll Height', messageListContainer.value.scrollHeight);
+    console.log('offset Height', messageListContainer.value.offsetHeight);
+    console.log(
+      'calculation',
+      -(messageListContainer.value.scrollHeight - messageListContainer.value.offsetHeight) + 5,
+    );
+    console.log('scrolltop', messageListContainer.value.scrollTop);
+    messageListContainer.value.scrollTop = Math.min(-5, messageListContainer.value.scrollTop);
+    console.log('scrolltop 2', messageListContainer.value.scrollTop);
+
+    messageListContainer.value.scrollTop = Math.max(
+      -(messageListContainer.value.scrollHeight - messageListContainer.value.offsetHeight) + 5,
+      messageListContainer.value.scrollTop,
+    );
+    console.log('scrolltop 3', messageListContainer.value.scrollTop);
+
+    console.log('-----------------------------------------');
+
     return;
   }
 
@@ -245,14 +271,29 @@ function HandleNewAboveMessages() {
 function HandleNewBelowMessages() {
   if (!messageListContainer.value) return;
   let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
+  let dif2 = oldOffsetHeight.value - messageListDom.value.offsetHeight;
+
   if (!chatIsLoading.value) {
-    console.log('below dif', dif);
+    console.log('dif', dif);
+    console.log('dif2', dif2);
+    console.log('scroll Height', messageListContainer.value.scrollHeight);
+    console.log('offset Height', messageListContainer.value.offsetHeight);
+    console.log(
+      'calculation',
+      -(messageListContainer.value.scrollHeight - messageListContainer.value.offsetHeight) + 5,
+    );
+    console.log('scrolltop', messageListContainer.value.scrollTop);
+
     messageListContainer.value.scrollTop += dif;
+    console.log('scrolltop 2', messageListContainer.value.scrollTop);
+
     messageListContainer.value.scrollTop = Math.min(-5, messageListContainer.value.scrollTop);
     messageListContainer.value.scrollTop = Math.max(
       -(messageListContainer.value.scrollHeight - messageListContainer.value.offsetHeight) + 5,
       messageListContainer.value.scrollTop,
     );
+    console.log('scrolltop 3', messageListContainer.value.scrollTop);
+    console.log('-----------------------------------------');
   } else {
     ScrollToSavedLocation();
     chatIsLoading.value = false;
