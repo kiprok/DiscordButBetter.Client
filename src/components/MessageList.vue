@@ -25,6 +25,7 @@ const messageListDom = ref();
 
 const oldScrollHeight = ref(0);
 const oldOffsetHeight = ref(0);
+const oldScrollPosition = ref(0);
 
 const chatIsLoading = ref(true);
 const waitingMessagesAbove = reactive([]);
@@ -120,6 +121,8 @@ async function LoadOlderMessages(startPointId) {
   conversationStore.AddMessages(props.conversation.conversationId, newMessages);
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
   oldOffsetHeight.value = messageListDom.value?.offsetHeight ?? 0;
+  oldScrollPosition.value =
+    messageListContainer.value.scrollHeight + messageListContainer.value.scrollTop;
 
   //TODO FIX ISSUE THAT CAUSES JUMPS WHEN LOADING OLDER MESSAGES
   // if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
@@ -157,6 +160,8 @@ async function LoadNewerMessages(startPointId) {
 
   oldScrollHeight.value = messageListContainer.value?.scrollHeight ?? 0;
   oldOffsetHeight.value = messageListDom.value?.offsetHeight ?? 0;
+  oldScrollPosition.value =
+    messageListContainer.value.scrollHeight + messageListContainer.value.scrollTop;
 
   //TODO FIX ISSUE THAT CAUSES JUMPS WHEN LOADING NEW MESSAGES
   // if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length >= 80) {
@@ -241,7 +246,7 @@ function OnMessageMountChange(message, eventType) {
 
 function HandleNewAboveMessages() {
   if (!chatIsLoading.value) {
-    let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
+    /*let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
     let dif2 = oldOffsetHeight.value - messageListDom.value.offsetHeight;
     console.log('scroll Height', messageListContainer.value.scrollHeight);
     console.log('offset Height', messageListContainer.value.offsetHeight);
@@ -260,7 +265,7 @@ function HandleNewAboveMessages() {
     console.log('scrolltop 3', messageListContainer.value.scrollTop);
 
     console.log('-----------------------------------------');
-
+*/
     return;
   }
 
@@ -283,15 +288,20 @@ function HandleNewBelowMessages() {
       -(messageListContainer.value.scrollHeight - messageListContainer.value.offsetHeight) + 5,
     );
     console.log('scrolltop', messageListContainer.value.scrollTop);
+    console.log('oldscrollposition', oldScrollPosition.value);
 
-    messageListContainer.value.scrollTop += dif;
+    messageListContainer.value.scrollTop = -(
+      messageListContainer.value.scrollHeight - oldScrollPosition.value
+    );
+
+    /*messageListContainer.value.scrollTop += dif;
     console.log('scrolltop 2', messageListContainer.value.scrollTop);
 
     messageListContainer.value.scrollTop = Math.min(-5, messageListContainer.value.scrollTop);
     messageListContainer.value.scrollTop = Math.max(
       -(messageListContainer.value.scrollHeight - messageListContainer.value.offsetHeight) + 5,
       messageListContainer.value.scrollTop,
-    );
+    );*/
     console.log('scrolltop 3', messageListContainer.value.scrollTop);
     console.log('-----------------------------------------');
   } else {
