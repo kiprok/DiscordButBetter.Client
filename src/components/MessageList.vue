@@ -1,6 +1,15 @@
 <script setup>
 import { useUserStore } from '@/stores/user.js';
-import { computed, defineAsyncComponent, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import {
+  computed,
+  defineAsyncComponent,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  watch,
+} from 'vue';
 import { useRoute } from 'vue-router';
 import { useConversationStore } from '@/stores/conversation.js';
 import { useSendingMessageStore } from '@/stores/sendingMessage.js';
@@ -211,6 +220,20 @@ function OnMessageMountChange(message, eventType) {
       );
       props.conversation.isLoadingMessages = true;
       props.conversation.viewingOlderMessages = true;
+      console.log('scrollheight before tick', messageListContainer.value.scrollHeight);
+      console.log('children counts before tick', messageListDom.value.childElementCount);
+      console.log(
+        'message list count before tick',
+        conversationStore.GetVisibleMessages(props.conversation.conversationId).length,
+      );
+      nextTick(() => {
+        console.log('children counts after tick', messageListDom.value.childElementCount);
+        console.log('scrollheight next tick', messageListContainer.value.scrollHeight);
+        console.log(
+          'message list count after tick',
+          conversationStore.GetVisibleMessages(props.conversation.conversationId).length,
+        );
+      });
     }
     return;
   } else if (IsLoadingCompleted(waitingMessagesBelow, message)) {
@@ -245,66 +268,38 @@ function OnMessageMountChange(message, eventType) {
 }
 
 function HandleNewAboveMessages() {
+  if (!messageListContainer.value) return;
   if (!chatIsLoading.value) {
-    /*let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
-    let dif2 = oldOffsetHeight.value - messageListDom.value.offsetHeight;
-    console.log('scroll Height', messageListContainer.value.scrollHeight);
-    console.log('offset Height', messageListContainer.value.offsetHeight);
-    console.log(
-      'calculation',
-      -(messageListContainer.value.scrollHeight - messageListContainer.value.offsetHeight) + 5,
+    console.log('scrollheight when above', messageListContainer.value.scrollHeight);
+    /*console.log('scrolltop', messageListContainer.value.scrollTop);
+    console.log('oldscrollposition', oldScrollPosition.value);
+    console.log('scrollheight', messageListContainer.value.scrollHeight);
+    messageListContainer.value.scrollTop = -(
+      messageListContainer.value.scrollHeight - oldScrollPosition.value
     );
-    console.log('scrolltop', messageListContainer.value.scrollTop);
-    messageListContainer.value.scrollTop = Math.min(-5, messageListContainer.value.scrollTop);
     console.log('scrolltop 2', messageListContainer.value.scrollTop);
-
-    messageListContainer.value.scrollTop = Math.max(
-      -(messageListContainer.value.scrollHeight - messageListContainer.value.offsetHeight) + 5,
-      messageListContainer.value.scrollTop,
-    );
-    console.log('scrolltop 3', messageListContainer.value.scrollTop);
-
-    console.log('-----------------------------------------');
-*/
+    console.log('---------------------------------------------');*/
     return;
   }
-
+  console.log('test4');
   ScrollToSavedLocation();
   chatIsLoading.value = false;
 }
 
 function HandleNewBelowMessages() {
   if (!messageListContainer.value) return;
-  let dif = oldScrollHeight.value - messageListContainer.value.scrollHeight;
-  let dif2 = oldOffsetHeight.value - messageListDom.value.offsetHeight;
-
   if (!chatIsLoading.value) {
-    console.log('dif', dif);
-    console.log('dif2', dif2);
-    console.log('scroll Height', messageListContainer.value.scrollHeight);
-    console.log('offset Height', messageListContainer.value.offsetHeight);
-    console.log(
-      'calculation',
-      -(messageListContainer.value.scrollHeight - messageListContainer.value.offsetHeight) + 5,
-    );
     console.log('scrolltop', messageListContainer.value.scrollTop);
     console.log('oldscrollposition', oldScrollPosition.value);
+    console.log('scrollheight', messageListContainer.value.scrollHeight);
 
     messageListContainer.value.scrollTop = -(
       messageListContainer.value.scrollHeight - oldScrollPosition.value
     );
-
-    /*messageListContainer.value.scrollTop += dif;
     console.log('scrolltop 2', messageListContainer.value.scrollTop);
-
-    messageListContainer.value.scrollTop = Math.min(-5, messageListContainer.value.scrollTop);
-    messageListContainer.value.scrollTop = Math.max(
-      -(messageListContainer.value.scrollHeight - messageListContainer.value.offsetHeight) + 5,
-      messageListContainer.value.scrollTop,
-    );*/
-    console.log('scrolltop 3', messageListContainer.value.scrollTop);
-    console.log('-----------------------------------------');
+    console.log('---------------------------------------------');
   } else {
+    console.log('test5');
     ScrollToSavedLocation();
     chatIsLoading.value = false;
   }
