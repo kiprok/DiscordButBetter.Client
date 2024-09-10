@@ -352,41 +352,39 @@ function previousAlsoOwner(message, index) {
         class="p-4"
         id="message-list"
         ref="messageListDom">
-        <transition-group name="message-list">
-          <li
-            v-for="(message, index) in conversationStore.GetVisibleMessages(
-              props.conversation.conversationId,
-            )"
-            :key="message.messageId">
-            <div
-              v-if="
-                !IsSameDay(
-                  conversationStore.GetVisibleMessages(props.conversation.conversationId)[
-                    index - 1
-                  ],
-                  message,
-                )
-              "
-              class="flex justify-center items-center text-gray-500 border-b border-gray-500">
-              {{ new Date(message.sentAt).toLocaleDateString() }}
-            </div>
-            <message-list-item
-              class="hover:bg-gray-400"
-              tag="div"
-              :data-msg-id="message.messageId"
-              :data-msg-list-index="index"
-              :data-msg-sender-id="message.senderId"
-              :message="message"
-              @scroll-reply="ScrollToMessage"
-              @on-mount-change="OnMessageMountChange"
-              :previous-also-owner="previousAlsoOwner(message, index)"
-              :allowedFunctions="{
-                allowReply: true,
-                allowEdit: true,
-                allowDelete: true,
-              }" />
-          </li>
-        </transition-group>
+        <!--        <transition-group name="message-list">-->
+        <li
+          v-for="(message, index) in conversationStore.GetVisibleMessages(
+            props.conversation.conversationId,
+          )"
+          :key="message.messageId">
+          <div
+            v-if="
+              !IsSameDay(
+                conversationStore.GetVisibleMessages(props.conversation.conversationId)[index - 1],
+                message,
+              )
+            "
+            class="flex justify-center items-center text-gray-500 border-b border-gray-500">
+            {{ new Date(message.sentAt).toLocaleDateString() }}
+          </div>
+          <message-list-item
+            class="hover:bg-gray-400"
+            tag="div"
+            :data-msg-id="message.messageId"
+            :data-msg-list-index="index"
+            :data-msg-sender-id="message.senderId"
+            :message="message"
+            @scroll-reply="ScrollToMessage"
+            @on-mount-change="OnMessageMountChange"
+            :previous-also-owner="previousAlsoOwner(message, index)"
+            :allowedFunctions="{
+              allowReply: true,
+              allowEdit: true,
+              allowDelete: true,
+            }" />
+        </li>
+        <!--        </transition-group>-->
       </ul>
       <skelly-loading v-else class="size-full text-[8rem]" />
     </div>
