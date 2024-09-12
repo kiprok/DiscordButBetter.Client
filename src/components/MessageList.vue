@@ -210,7 +210,7 @@ function OnMessageMountChange(message, eventType) {
     HandleNewAboveMessages();
     props.conversation.isLoadingMessages = false;
 
-    if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length > 80) {
+    /*if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length > 80) {
       console.log('removing below messages');
       waitingMessagesAbove.push(
         ...conversationStore.RemoveNewerMessages(
@@ -220,26 +220,12 @@ function OnMessageMountChange(message, eventType) {
       );
       props.conversation.isLoadingMessages = true;
       props.conversation.viewingOlderMessages = true;
-      console.log('scrollheight before tick', messageListContainer.value.scrollHeight);
-      console.log('children counts before tick', messageListDom.value.childElementCount);
-      console.log(
-        'message list count before tick',
-        conversationStore.GetVisibleMessages(props.conversation.conversationId).length,
-      );
-      nextTick(() => {
-        console.log('children counts after tick', messageListDom.value.childElementCount);
-        console.log('scrollheight next tick', messageListContainer.value.scrollHeight);
-        console.log(
-          'message list count after tick',
-          conversationStore.GetVisibleMessages(props.conversation.conversationId).length,
-        );
-      });
-    }
+    }*/
     return;
   } else if (IsLoadingCompleted(waitingMessagesBelow, message)) {
     HandleNewBelowMessages();
     props.conversation.isLoadingMessages = false;
-    if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length > 80) {
+    /*if (conversationStore.GetVisibleMessages(props.conversation.conversationId).length > 80) {
       console.log('removing above messages');
       waitingMessagesAbove.push(
         ...conversationStore.RemoveOlderMessages(
@@ -248,7 +234,7 @@ function OnMessageMountChange(message, eventType) {
         ),
       );
       props.conversation.isLoadingMessages = true;
-    }
+    }*/
     return;
   } else if (IsLoadingCompleted(waitingMessagesJump.messages, message)) {
     HandleNewJumpMessages();
