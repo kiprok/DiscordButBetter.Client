@@ -156,7 +156,7 @@ export const useServerStore = defineStore('server', () => {
   }
 
   async function AcceptFriendRequestAsync(requestId, userId) {
-    const response = await fetch(`/api/users/friends/requests`, {
+    const response = await fetch(`/api/users/friends/requests/accept`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -172,7 +172,7 @@ export const useServerStore = defineStore('server', () => {
   }
 
   async function DeclineFriendRequestAsync(requestId, userId) {
-    const response = await fetch(`/api/users/friends/requests`, {
+    const response = await fetch(`/api/users/friends/requests/decline`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -188,7 +188,7 @@ export const useServerStore = defineStore('server', () => {
   }
 
   async function SendFriendRequestAsync(userId) {
-    const response = await fetch(`/api/users/friends/requests`, {
+    const response = await fetch(`/api/users/friends/requests/send`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -203,7 +203,7 @@ export const useServerStore = defineStore('server', () => {
   }
 
   async function CancelFriendRequestAsync(requestId, userId) {
-    const response = await fetch(`/api/users/friends/requests`, {
+    const response = await fetch(`/api/users/friends/requests/cancel`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
